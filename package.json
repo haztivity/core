@@ -14,6 +14,7 @@
   "license": "ISC",
   "homepage": "",
   "devDependencies": {
+    "@types/core-js": "^0.9.35",
     "autoprefixer": "^6.5.1",
     "body-parser": "^1.15.2",
     "commander": "^2.9.0",
@@ -46,8 +47,19 @@
     "typescript": "^2.1.1"
   },
   "jspm": {
+    "dependencies": {
+      "bottlejs": "npm:bottlejs@^1.5.0",
+      "core-js": "npm:core-js@^2.4.1",
+      "es6-shim": "npm:es6-shim@^0.35.2",
+      "jquery": "npm:jquery@^3.1.1",
+      "json": "github:systemjs/plugin-json@^0.2.3",
+      "loglevel": "npm:loglevel@^1.4.1"
+    },
     "devDependencies": {
       "typescript": "npm:typescript@^2.0.7"
     }
+  },
+  "dependencies": {
+    "@types/loglevel": "^1.4.29"
   }
 }
