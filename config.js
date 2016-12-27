@@ -9,7 +9,6 @@ System.config({
 
   map: {
     "bottlejs": "npm:bottlejs@1.5.0",
-    "core-js": "npm:core-js@2.4.1",
     "es6-shim": "npm:es6-shim@0.35.2",
     "jquery": "npm:jquery@3.1.1",
     "json": "github:systemjs/plugin-json@0.2.3",
@@ -160,12 +159,6 @@ System.config({
       "string_decoder": "github:jspm/nodelibs-string_decoder@0.1.0"
     },
     "npm:constants-browserify@0.0.1": {
-      "systemjs-json": "github:systemjs/plugin-json@0.1.2"
-    },
-    "npm:core-js@2.4.1": {
-      "fs": "github:jspm/nodelibs-fs@0.1.2",
-      "path": "github:jspm/nodelibs-path@0.1.0",
-      "process": "github:jspm/nodelibs-process@0.1.2",
       "systemjs-json": "github:systemjs/plugin-json@0.1.2"
     },
     "npm:core-util-is@1.0.2": {

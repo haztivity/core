@@ -1,5 +1,5 @@
 import {Bottle} from "bottlejs";
-import Bottle = require("../jspm_packages/npm/bottlejs@1.5.0/dist/bottle");
+import Bottle = require("../../jspm_packages/npm/bottlejs@1.5.0/dist/bottle");
 import $ from "jquery";
 export interface IServiceConfig{
     dependencies?:String[];
@@ -68,7 +68,7 @@ class InjectorClass{
      */
     public service(name:string,service:any,config:IServiceConfig){
         if(this._check(name)){
-            let dependencies = service.$inject;
+            let dependencies = service.$inject || [];
             service.$inject = $.unique($.extend(dependencies,config.dependencies || []));
             this.bottle.factory(name,this._factory.bind({
                 name:name,
@@ -133,14 +133,15 @@ class InjectorClass{
      * })
      */
     protected _factory(container){
-        let service = this.service,
+        let service = <any>this.service,
             dependencies = service.$inject,
-            dependenciesInstances = [];
+            dependenciesInstances = [],
+            that =<any>this;
         if(dependencies){
             for(let dependencie of dependencies){
                 let dep = container[dependencie];
                 if(dep == undefined){
-                    throw `Injector: could not inject ${dependencie} to ${this.name}`;
+                    throw `Injector: could not inject ${dependencie} to ${that.name}`;
                 }else {
                     dependenciesInstances.push(dep);
                 }
@@ -154,20 +155,7 @@ class InjectorClass{
 let bottle = new Bottle();
 export const Injector = new InjectorClass(bottle);
 bottle.factory("Injector",(container)=>{
-    return Injector;
+    return {
+        get:Injector.get.bind(Injector)
+    };
 });
-
-
-//Decorator
-export interface IInjectableParams extends IServiceConfig{}
-/**
- * @description Decorator to make a element injectable by the injector
- * @param params
- * @returns {(target:any)=>undefined}
- * @function
- */
-export function Injectable(params:IInjectableParams){
-    return (target)=>{
-        Injector.service(target.name,target,params);
-    }
-}

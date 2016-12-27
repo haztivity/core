@@ -1,18 +1,12 @@
-import * as core from 'core-js/shim';
-core;
-import {Injector} from "./Injector";
-import * as defaultConfig from "./haztivity.config.json!json";
-import $ from "jquery";
+/**
+ * @license
+ * Copyright Davinchi. All Rights Reserved.
+ */
 
-let resultConfig;
-//merge default config with provided config
-if(typeof config != "undefined"){
-    resultConfig = $.extend(true,defaultConfig,config);
-}else{
-    resultConfig = defaultConfig;
-}
-//Register config to be injectable
-Injector.constant("config",resultConfig);
-//Export core
-export * from "./Injector";
-export * from "./utils/Logger";
+/**
+ * @module
+ * @description
+ * Punto de entrada a los APIs públicos e inicialización del core
+ */
+export * from "./di";
+export * from "./utils";
