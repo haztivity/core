@@ -8,9 +8,10 @@
  * @description
  * Punto de entrada a los APIs públicos e inicialización del core
  */
+export * from "./di";
 import * as $DI from "./jqueryDI";
 $DI;
 export * from "./base";
 export * from "./sco";
-export * from "./di";
 export * from "./utils";
+export * from "./page";

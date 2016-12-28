@@ -6,7 +6,7 @@ import {IScoOptions,Sco} from "./Sco";
 import {Injector} from "../di";
 let sco;
 export class ScoFactory{
-    public static createSco(options:IScoOptions){
+    public static instance(options:IScoOptions){
         debugger;
         if(!sco){
             sco = Sco.instance();

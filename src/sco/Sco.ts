@@ -26,14 +26,11 @@ export class Sco extends BaseHaztivity{
     protected Injector:InjectorClass;
     protected Navigator;
     protected ComponentManager;
-    protected eventHandler:EventEmitter2;
+    protected eventEmitter:EventEmitter2;
     protected EventEmitterFactory:EventEmitterFactory;
     protected options: IScoOptions;
-    constructor(...dependencies){
-        super(...dependencies);
-    }
     protected _init(){
-        this.eventHandler=this.EventEmitterFactory.create();
+        this.eventEmitter=this.EventEmitterFactory.instance();
     }
     protected _config(options){
         this.options = options;

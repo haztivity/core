@@ -1,13 +1,16 @@
 import Bottle from "bottlejs";
 import * as Bottle from "../../jspm_packages/npm/bottlejs@1.5.0/dist/bottle";
 import $ from "jquery";
+import {BaseHaztivity} from "../base/BaseHaztivity";
+import Bottle = require("../../jspm_packages/npm/bottlejs@1.5.0/dist/bottle");
 export interface IServiceConfig{
     dependencies?:String[];
 }
 export class InjectorError extends Error{
     public static readonly TYPES = {
         NOT_REGISTERED:0,
-        ALREADY_REGISTERED:1
+        ALREADY_REGISTERED:1,
+        NAME_REQUIRED:2
     };
 
     /**
@@ -42,20 +45,34 @@ export class InjectorError extends Error{
             case InjectorError.TYPES.ALREADY_REGISTERED:
                 result=`${this.dependencie} is already registered`;
                 break;
+            case InjectorEro.TYPES.NAME_REQUIRED:
+                result = "The parameter 'name' is required";
+                break;
         }
+        result+=`[Error] Injector - ${result}`;
         return result;
     }
 }
-export class InjectorClass{
+export class Injector{
+    public static injector:Injector;
+    public static getInstance(){
+        if(!Injector.injector) {
+            let bottle = new Bottle();
+            Injector.injector = new Injector($, bottle);
+            bottle.factory("Injector", (container) => {
+                return new InjectorService(Injector.injector);
+            });
+        }
+        return Injector.injector;
+    }
     /**
      * @constructor
      * @description Injector de dependencias
-     * @param {JQuery}  $
-     * @param {Bottle}  bottle       Instancia de bottlejs a utilizar como contenedor
      * @requires Bottle
      * @see https://github.com/young-steveo/bottlejs
      */
-    constructor(protected $,protected bottle:Bottle){
+    protected constructor(protected $:JQueryStatic,protected bottle:Bottle){
+
     }
 
     /**
@@ -111,10 +128,14 @@ export class InjectorClass{
      * @protected
      */
     protected _check(name){
-        if(this.bottle.list().indexOf(name) === -1){
-            return true;
+        if(name) {
+            if (this.bottle.list().indexOf(name) === -1) {
+                return true;
+            } else {
+                throw new InjectorError(InjectorError.TYPES.ALREADY_REGISTERED, name);
+            }
         }else{
-            throw new InjectorError(InjectorError.TYPES.ALREADY_REGISTERED,name);
+            throw new InjectorError(InjectorError.TYPES.NAME_REQUIRED);
         }
     }
 
@@ -197,7 +218,7 @@ export class InjectorClass{
         if(this._check(name)){
             this.bottle.instanceFactory(name,(container)=>{
                 this._registerDependencies(service,config.dependencies);
-                factory.call(null,container);
+                return factory.call(null,container);
             });
         }
     }
@@ -241,6 +262,7 @@ export class InjectorClass{
             dependenciesInstances = that.injector.getFor(service);
         return new service(...dependenciesInstances);
     }
+
 }
 export class InjectorService{
     /**
@@ -255,9 +277,3 @@ export class InjectorService{
 
     }
 }
-//Create instance and register injector
-let bottle = new Bottle();
-export const Injector = new InjectorClass($,bottle);
-bottle.factory("Injector",(container)=>{
-    return new InjectorService(Injector);
-});

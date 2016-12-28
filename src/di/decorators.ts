@@ -1,9 +1,16 @@
 import {Injector,IServiceConfig} from "./Injector";
 //Decorator
-export interface IInjectableParams extends IServiceConfig{}
+export interface IInjectableParams extends IServiceConfig{
+    instantiable?:boolean;
+}
 export interface IInjectParams extends IServiceConfig{}
+const injectorInstance = Injector.getInstance();
 function injectableDecoratorFun(target){
-    Injector.service(this.name,target,this);
+    if(this.instantiable){
+        injectorInstance.instanceFactory(this.name,target,construct.bind({injectorInstance:injectorInstance,target:target,params:this}),this);
+    }else {
+        injectorInstance.service(this.name, target, this);
+    }
 }
 /**
  * @description Decora una clase para hacerla inyectable a través del Injector
@@ -16,15 +23,15 @@ export function Injectable(params:IInjectableParams){
 }
 function construct(...args){
     if(typeof this.params.factory === "function"){
-        return this.params.factory.call(null,args,this.Injector.getFor(this.target));
+        return this.params.factory.call(null,args,this.injectorInstance.getFor(this.target));
     }else {
-        return new this.target(...this.Injector.getFor(this.target));
+        return new this.target(...this.injectorInstance.getFor(this.target));
     }
 }
 function injectDecoratorFun(target){
-    Injector._registerDependencies(target,this.dependencies);
+    injectorInstance._registerDependencies(target,this.dependencies);
     target.instance=construct.bind({
-        Injector:Injector,
+        injectorInstance:injectorInstance,
         target:target,
         params:this
     });

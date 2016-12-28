@@ -14,7 +14,5 @@ log.methodFactory = function (methodName, logLevel, loggerName) {
 };
 log.setLevel(log.getLevel()); // Be sure to call setLevel method in order to apply plugin
 //Register in injector
-Injector.factory("Logger",(container)=>{
-    return log;
-});
+Injector.getInstance().constant("Logger",log);
 export {log as Logger};

@@ -4,4 +4,4 @@
  */
 import $ from "jquery";
 import {Injector} from "./di";
-Injector.constant("$",$);
+Injector.getInstance().constant("$",$);

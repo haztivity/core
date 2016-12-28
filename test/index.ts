@@ -1,4 +1,4 @@
-import {ScoFactory} from "../src/core";
-let result = ScoFactory.createSco({
-    test:1
+import {PageFactory} from "../src/core";
+let page = PageFactory.createPage({
+    name:"Test"
 });
