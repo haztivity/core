@@ -12,6 +12,10 @@ export interface IScoOptions{
     dependencies:[
         "EventEmitterFactory"
     ]
+    //factory:(args,dependencies)=>{
+    //    //args[0] == options
+    //    return new Sco(args[0],...dependencies);
+    //}
 })
 export class Sco extends BaseHaztivity{
     public static EVENTS = {
@@ -28,14 +32,13 @@ export class Sco extends BaseHaztivity{
     constructor(...dependencies){
         super(...dependencies);
     }
-    protected setOptions(options){
-        this.options = options;
-    }
-    protected init(){
+    protected _init(){
         this.eventHandler=this.EventEmitterFactory.create();
     }
+    protected _config(options){
+        this.options = options;
+    }
     public run(){
-
     }
     public on(){
 

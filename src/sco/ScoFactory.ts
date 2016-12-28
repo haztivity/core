@@ -10,8 +10,8 @@ export class ScoFactory{
         debugger;
         if(!sco){
             sco = Sco.instance();
-            sco.setOptions(options);
-            sco.init();
+            sco._config(options);
+            sco._init();
         }
         return sco;
     }

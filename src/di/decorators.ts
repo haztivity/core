@@ -14,14 +14,19 @@ function injectableDecoratorFun(target){
 export function Injectable(params:IInjectableParams){
     return injectableDecoratorFun.bind(params);
 }
-function construct(){
-    return new this.target(...this.Injector.getFor(this.target));
+function construct(...args){
+    if(typeof this.params.factory === "function"){
+        return this.params.factory.call(null,args,this.Injector.getFor(this.target));
+    }else {
+        return new this.target(...this.Injector.getFor(this.target));
+    }
 }
 function injectDecoratorFun(target){
     Injector._registerDependencies(target,this.dependencies);
     target.instance=construct.bind({
         Injector:Injector,
-        target:target
+        target:target,
+        params:this
     });
 }
 /**
