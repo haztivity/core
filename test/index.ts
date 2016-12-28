@@ -1,12 +1,4 @@
-import {Injector,Injectable,IInjectableParams} from "../src/core";
-@Injectable(<IInjectableParams>{
-    dependencies:[
-        "Logger"
-    ]
-})
-class Test{
-    constructor(dependencies){
-        debugger;
-    }
-}
-Injector.get("Test");
+import {ScoFactory} from "../src/core";
+let result = ScoFactory.createSco({
+    test:1
+});

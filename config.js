@@ -10,6 +10,7 @@ System.config({
   map: {
     "bottlejs": "npm:bottlejs@1.5.0",
     "es6-shim": "npm:es6-shim@0.35.2",
+    "eventemitter2": "npm:eventemitter2@2.2.1",
     "jquery": "npm:jquery@3.1.1",
     "json": "github:systemjs/plugin-json@0.2.3",
     "loglevel": "npm:loglevel@1.4.1",

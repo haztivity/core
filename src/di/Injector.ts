@@ -1,10 +1,10 @@
-import {Bottle} from "bottlejs";
-import Bottle = require("../../jspm_packages/npm/bottlejs@1.5.0/dist/bottle");
+import Bottle from "bottlejs";
+import * as Bottle from "../../jspm_packages/npm/bottlejs@1.5.0/dist/bottle";
 import $ from "jquery";
 export interface IServiceConfig{
     dependencies?:String[];
 }
-class InjectorClass{
+export class InjectorClass{
     /**
      * @constructor
      * @description Injector de dependencias
@@ -12,18 +12,45 @@ class InjectorClass{
      * @requires Bottle
      * @see https://github.com/young-steveo/bottlejs
      */
-    constructor(protected bottle:Bottle){
+    constructor(protected $,protected bottle:Bottle){
     }
 
+    /**
+     * @description Resuelve y devuelve todas las dependencias para
+     * @param target
+     * @returns {Array}
+     */
+    public getFor(target:any):any{
+        let result = null;
+        if(target && target.$inject){
+            result = this.get(target.$inject);
+        }
+        return result;
+    }
     /**
      * @description Obtiene un elemento del injector
      * @param {String}      name        Nombre de la dependencia a inyectar
      * @returns {any}
      */
-    public get(name:string):any{
-        return this.bottle.container[name];
-    }
+    public get(name:string|string[]):any{
+        if(Array.isArray(name)){
+            let result = [];
+            for(let dep of name){
+                result.push(this._get(dep));
+            }
+            return result;
+        }else{
+            return this._get(<string>name);
+        }
 
+    }
+    protected _get(name:string){
+        let dep = this.bottle.container[name];
+        if(dep == undefined){
+            throw `Injector: could not inject ${name} because is not registered`;
+        }
+        return dep;
+    }
     /**
      * @description Comprueba si una dependencia ya ha sido registrada
      * @param {String}      name       dependencia a comprobar
@@ -69,7 +96,7 @@ class InjectorClass{
     public service(name:string,service:any,config:IServiceConfig){
         if(this._check(name)){
             let dependencies = service.$inject || [];
-            service.$inject = $.unique($.extend(dependencies,config.dependencies || []));
+            service.$inject = this.$.unique(this.$.extend(dependencies,config.dependencies || []));
             this.bottle.factory(name,this._factory.bind({
                 name:name,
                 service:service,
@@ -98,7 +125,11 @@ class InjectorClass{
             this.bottle.factory(name,factory);
         }
     }
-
+    public instanceFactory(name:string,factory:Function){
+        if(this._check(name)){
+            this.bottle.instanceFactory(name,factory);
+        }
+    }
     /**
      * @description Registra una constante inyectable
      * @param {String}      name    Nombre de la constante
@@ -147,15 +178,25 @@ class InjectorClass{
                 }
             }
         }
-        return new service(dependenciesInstances);
+        return new service(...dependenciesInstances);
     }
 }
+export class InjectorService{
+    /**
+     * @constructor
+     * @description Servicio a inyectar por DI que expone las funciones públicas que se pueden utilizar en tiempo de ejecución
+     * @param {InjectorClass}   injector       Inyector a utilizar
+     */
+    constructor(injector){
+        this.get = Injector.get.bind(injector);
+    }
+    public get(name:string|string[]){
 
+    }
+}
 //Create instance and register injector
 let bottle = new Bottle();
-export const Injector = new InjectorClass(bottle);
+export const Injector = new InjectorClass($,bottle);
 bottle.factory("Injector",(container)=>{
-    return {
-        get:Injector.get.bind(Injector)
-    };
+    return new InjectorService(Injector);
 });
