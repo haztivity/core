@@ -4,10 +4,53 @@ import $ from "jquery";
 export interface IServiceConfig{
     dependencies?:String[];
 }
+export class InjectorError extends Error{
+    public static readonly TYPES = {
+        NOT_REGISTERED:0,
+        ALREADY_REGISTERED:1
+    };
+
+    /**
+     * @constructor
+     * @description Clase error de Injector
+     * @extends Error
+     * @param {number}          code            Código de error. Se ha de corresponder con alguno de los indicados en TYPES
+     * @param {string}          dependencie     Nombre de la dependencia que lanza la excepción
+     * @param {string}          [target]        Clase a la cual inyectar la dependencia
+     */
+    constructor(protected code:number,protected dependencie,protected target?){
+        super();
+        this.message = this._resolveMessage();
+    }
+
+    /**
+     * @description Genera el mensaje en base al código
+     * @param code
+     * @returns {string}
+     * @private
+     */
+    protected _resolveMessage(){
+        let result = "";
+        switch(this.code){
+            case InjectorError.TYPES.NOT_REGISTERED:
+                if(this.target){
+                    result=`could not inject ${this.dependencie} into ${this.target} because is not registered`;
+                }else {
+                    result = `${this.dependencie} is not registered in the Injector.`
+                }
+                break;
+            case InjectorError.TYPES.ALREADY_REGISTERED:
+                result=`${this.dependencie} is already registered`;
+                break;
+        }
+        return result;
+    }
+}
 export class InjectorClass{
     /**
      * @constructor
      * @description Injector de dependencias
+     * @param {JQuery}  $
      * @param {Bottle}  bottle       Instancia de bottlejs a utilizar como contenedor
      * @requires Bottle
      * @see https://github.com/young-steveo/bottlejs
@@ -23,31 +66,41 @@ export class InjectorClass{
     public getFor(target:any):any{
         let result = null;
         if(target && target.prototype.$inject){
-            result = this.get(target.prototype.$inject);
+            let dependencies = target.prototype.$inject;
+            result = [];
+            for(let dependencie of dependencies){
+                let depInstance = this.get(dependencie,false);
+                if(depInstance != undefined){
+                    result.push(depInstance);
+                }else{
+                    throw new InjectorError(InjectorError.TYPES.NOT_REGISTERED,dependencie,target.name);
+                }
+            }
         }
         return result;
     }
     /**
      * @description Obtiene un elemento del injector
-     * @param {String}      name        Nombre de la dependencia a inyectar
+     * @param {String}      name            Nombre de la dependencia a inyectar
+     * @param {boolean}     [throwError]    Indica si lanzar excepción en caso de no encontrar la dependencia
      * @returns {any}
      */
-    public get(name:string|string[]):any{
+    public get(name:string|string[],throwError=true):any{
         if(Array.isArray(name)){
             let result = [];
             for(let dep of name){
-                result.push(this._get(dep));
+                result.push(this._get(dep,throwError));
             }
             return result;
         }else{
-            return this._get(<string>name);
+            return this._get(<string>name,throwError);
         }
 
     }
-    protected _get(name:string){
+    protected _get(name:string,throwError=true){
         let dep = this.bottle.container[name];
-        if(dep == undefined){
-            throw `Injector: could not inject ${name} because is not registered`;
+        if(dep == undefined && throwError !== false){
+            throw new InjectorError(InjectorError.TYPES.NOT_REGISTERED,name);
         }
         return dep;
     }
@@ -61,7 +114,7 @@ export class InjectorClass{
         if(this.bottle.list().indexOf(name) === -1){
             return true;
         }else{
-            throw ``;
+            throw new InjectorError(InjectorError.TYPES.ALREADY_REGISTERED,name);
         }
     }
 
@@ -99,7 +152,8 @@ export class InjectorClass{
             this.bottle.factory(name,this._factory.bind({
                 name:name,
                 service:service,
-                config:config
+                config:config,
+                injector:this
             }));
         }
     }
@@ -181,20 +235,10 @@ export class InjectorClass{
      * })
      */
     protected _factory(container){
-        let service = <any>this.service,
-            dependencies = service.prototype.$inject,
-            dependenciesInstances = [],
-            that =<any>this;
-        if(dependencies){
-            for(let dependencie of dependencies){
-                let dep = container[dependencie];
-                if(dep == undefined){
-                    throw `Injector: could not inject ${dependencie} to ${that.name}`;
-                }else {
-                    dependenciesInstances.push(dep);
-                }
-            }
-        }
+        let that = <any>this;
+        debugger;
+        let service = that.service,
+            dependenciesInstances = that.injector.getFor(service);
         return new service(...dependenciesInstances);
     }
 }
