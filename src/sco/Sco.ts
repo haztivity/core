@@ -2,19 +2,18 @@
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-import {Injector,Injectable,InjectorClass} from "../di";
+import {BaseHaztivity} from "../base";
+import {Injector,Inject,InjectorClass} from "../di";
 import {EventEmitterFactory,IEventEmitterFactoryCreate} from "../utils"
 export interface IScoOptions{
 
 }
-EventEmitterFactory;
-@Injectable({
+@Inject({
     dependencies:[
-        "Injector",
         "EventEmitterFactory"
     ]
 })
-export class Sco {
+export class Sco extends BaseHaztivity{
     public static EVENTS = {
         "navigator:lastPage":"",
         "sco:end":"sco:end"
@@ -23,17 +22,17 @@ export class Sco {
     protected Injector:InjectorClass;
     protected Navigator;
     protected ComponentManager;
-    protected eventHandler;
+    protected eventHandler:EventEmitter2;
     protected EventEmitterFactory:EventEmitterFactory;
     protected options: IScoOptions;
     constructor(...dependencies){
-        debugger;
+        super(...dependencies);
     }
     protected setOptions(options){
         this.options = options;
     }
     protected init(){
-
+        this.eventHandler=this.EventEmitterFactory.create();
     }
     public run(){
 

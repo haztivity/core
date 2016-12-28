@@ -10,6 +10,7 @@
  */
 import * as $DI from "./jqueryDI";
 $DI;
+export * from "./base";
 export * from "./sco";
 export * from "./di";
 export * from "./utils";

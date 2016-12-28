@@ -22,8 +22,8 @@ export class InjectorClass{
      */
     public getFor(target:any):any{
         let result = null;
-        if(target && target.$inject){
-            result = this.get(target.$inject);
+        if(target && target.prototype.$inject){
+            result = this.get(target.prototype.$inject);
         }
         return result;
     }
@@ -95,8 +95,7 @@ export class InjectorClass{
      */
     public service(name:string,service:any,config:IServiceConfig){
         if(this._check(name)){
-            let dependencies = service.$inject || [];
-            service.$inject = this.$.unique(this.$.extend(dependencies,config.dependencies || []));
+            this._registerDependencies(service,config.dependencies);
             this.bottle.factory(name,this._factory.bind({
                 name:name,
                 service:service,
@@ -105,6 +104,18 @@ export class InjectorClass{
         }
     }
 
+    /**
+     * @description Registra las depedencias en una clase
+     * @param service
+     * @param dependencies
+     * @returns {boolean}
+     * @private
+     */
+    protected _registerDependencies(service,dependencies){
+        let currentDependencies = service.prototype.$inject || [];
+        service.prototype.$inject = this.$.unique(this.$.extend(currentDependencies, dependencies || []));
+        return true;
+    }
     /**
      * @description Registra un servicio indicando cómo instanciarla
      * @param {String}              name        Nombre del servicio
@@ -120,14 +131,20 @@ export class InjectorClass{
      *      return new Test(someDependencie);
      * });
      */
-    public factory(name:string,factory:Function){
+    public factory(name:string,service,factory:Function,config){
         if(this._check(name)){
-            this.bottle.factory(name,factory);
+            this.bottle.factory(name,(container)=>{
+                this._registerDependencies(service,config.dependencies);
+                factory.call(null,container);
+            });
         }
     }
-    public instanceFactory(name:string,factory:Function){
+    public instanceFactory(name:string,service,factory:Function,config){
         if(this._check(name)){
-            this.bottle.instanceFactory(name,factory);
+            this.bottle.instanceFactory(name,(container)=>{
+                this._registerDependencies(service,config.dependencies);
+                factory.call(null,container);
+            });
         }
     }
     /**
@@ -165,7 +182,7 @@ export class InjectorClass{
      */
     protected _factory(container){
         let service = <any>this.service,
-            dependencies = service.$inject,
+            dependencies = service.prototype.$inject,
             dependenciesInstances = [],
             that =<any>this;
         if(dependencies){
