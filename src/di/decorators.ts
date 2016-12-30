@@ -1,47 +1,44 @@
-import {Injector,IServiceConfig} from "./Injector";
-//Decorator
-export interface IInjectableParams extends IServiceConfig{
-    instantiable?:boolean;
-}
-export interface IInjectParams extends IServiceConfig{}
+/**
+ * @license
+ * Copyright Davinchi. All Rights Reserved.
+ */
+import {Injector} from "./Injector";
 const injectorInstance = Injector.getInstance();
-function injectableDecoratorFun(target){
-    if(this.instantiable){
-        injectorInstance.instanceFactory(this.name,target,construct.bind({injectorInstance:injectorInstance,target:target,params:this}),this);
-    }else {
-        injectorInstance.service(this.name, target, this);
+interface IBaseParams {
+    name: string;
+    dependencies: string[];
+    factory?: Function;
+}
+export interface ICoreParams extends IBaseParams{
+    public:boolean;
+}
+export interface IModuleParams extends IBaseParams{}
+export interface IServiceParams extends IBaseParams{}
+export interface IServiceInstanceParams {
+    name:string;
+    instance:any;
+}
+export function Core (params:ICoreParams){
+    return (target)=> {
+        if (params.public) {
+            injectorInstance.registerCorePublic(params.name, target,params.dependencies,params.factory);
+        } else {
+            injectorInstance.registerCore(params.name, target,params.dependencies,params.factory);
+        }
     }
 }
-/**
- * @description Decora una clase para hacerla inyectable a través del Injector
- * @param params
- * @returns {(target:any)=>undefined}
- * @function
- */
-export function Injectable(params:IInjectableParams){
-    return injectableDecoratorFun.bind(params);
-}
-function construct(...args){
-    if(typeof this.params.factory === "function"){
-        return this.params.factory.call(null,args,this.injectorInstance.getFor(this.target));
-    }else {
-        return new this.target(...this.injectorInstance.getFor(this.target));
+export function Module(params:IModuleParams){
+    return (target) =>{
+        injectorInstance.registerModule(params.name,target,params.dependencies,params.factory);
     }
 }
-function injectDecoratorFun(target){
-    injectorInstance._registerDependencies(target,this.dependencies);
-    target.instance=construct.bind({
-        injectorInstance:injectorInstance,
-        target:target,
-        params:this
-    });
+export function Service(params:IServiceParams){
+    return (target)=>{
+        injectorInstance.registerService(params.name,target,params.dependencies,params.factory);
+    }
 }
-/**
- * @description Registra las dependencias en una clase e implementa la función "instance" para instanciarla sin habilitar su uso a través de Injector
- * @param params
- * @returns {any}
- * @constructor
- */
-export function Inject(params:IInjectParams){
-    return injectDecoratorFun.bind(params);
+export function ServiceInstance(params:IServiceInstanceParams){
+    return (target) =>{
+        injectorInstance.registerServiceInstance(params.name,params.instance);
+    }
 }

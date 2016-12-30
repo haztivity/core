@@ -1,5 +1,4 @@
 import * as loglevel from "loglevel";
-import {Injector} from "../di";
 declare let loglevel:any;
 //Create log
 let log = loglevel.getLogger("haztivity-core");
@@ -14,5 +13,4 @@ log.methodFactory = function (methodName, logLevel, loggerName) {
 };
 log.setLevel(log.getLevel()); // Be sure to call setLevel method in order to apply plugin
 //Register in injector
-Injector.getInstance().constant("Logger",log);
 export {log as Logger};

@@ -1,279 +1,297 @@
-import Bottle from "bottlejs";
-import * as Bottle from "../../jspm_packages/npm/bottlejs@1.5.0/dist/bottle";
-import $ from "jquery";
-import {BaseHaztivity} from "../base/BaseHaztivity";
-import Bottle = require("../../jspm_packages/npm/bottlejs@1.5.0/dist/bottle");
-export interface IServiceConfig{
-    dependencies?:String[];
+/**
+ * @license
+ * Copyright Davinchi. All Rights Reserved.
+ */
+import {Bottle} from "bottlejs";
+import {DependencyHasItsOwnAsDependency,DependencyAlreadyRegistered,DependencyNotRegisteredError,DependencyOptionRequired} from "./Errors";
+import * as IBottle from "../../jspm_packages/npm/bottlejs@1.5.0/dist/bottle";
+export const TYPES = {
+    core:"Core",
+    page:"Page",
+    service:"Service",
+    resource:"Resourece",
+    component:"Component"
+};
+export interface IInjector{
+    exists(name:string):boolean;
+    existsIn(name:string,containerName:string):boolean;
+    get(name:string):any;
+    getOf(name:string,containerName:string):any;
 }
-export class InjectorError extends Error{
-    public static readonly TYPES = {
-        NOT_REGISTERED:0,
-        ALREADY_REGISTERED:1,
-        NAME_REQUIRED:2
-    };
-
+export interface IInjectorType{
+    name:string;
+    allowAccess:boolean|String[];
+}
+export const TYPES ={
+    CorePublic:{
+        name:"CorePublic",
+        allowAccess:true
+    },
+    Core:{
+        name:"Core",
+        allowAccess:true
+    },
+    Module:{
+        name:"Module",
+        allowAccess:[
+            "Core",
+            "CorePublic",
+            "Service",
+            "Page"
+        ]
+    },
+    Service:{
+        name:"Service",
+        allowAccess:[
+            "CorePublic",
+            "Module"
+        ]
+    },
+    Sco:{
+        name:"Sco",
+        allowAccess:[
+            "CorePublic",
+            "Service"
+        ]
+    },
+    Resource:{
+        name:"Resource",
+        allowAccess:[
+            "Service"
+        ]
+    },
+    Component:{
+        name:"Component",
+        allowAccess:[
+            "Service"
+        ]
+    },
+    Page:{
+        name:"Page",
+        allowAccess:[
+            "Service"
+        ]
+    }
+};
+/**
+ * Inyector de dependencias. Api para la manipulación de contenedores y dependencias
+ * @class
+ */
+export class Injector implements IInjector{
+    protected static _instance:Injector;
     /**
-     * @constructor
-     * @description Clase error de Injector
-     * @extends Error
-     * @param {number}          code            Código de error. Se ha de corresponder con alguno de los indicados en TYPES
-     * @param {string}          dependencie     Nombre de la dependencia que lanza la excepción
-     * @param {string}          [target]        Clase a la cual inyectar la dependencia
+     * Contenedor principal
+     * @member {InjectorContainer} _root
+     * @protected
      */
-    constructor(protected code:number,protected dependencie,protected target?){
-        super();
-        this.message = this._resolveMessage();
+    protected _root:IBottle;
+    /**
+     * Instancia el Inyector. Por defecto se genera un contenedor root
+     * @constructor
+     */
+    protected constructor(){
+        this._root = new Bottle();
     }
 
+
     /**
-     * @description Genera el mensaje en base al código
-     * @param code
-     * @returns {string}
-     * @private
+     * @description Comprueba si una clase se ha registrado en el contenedor root. Equivale a injector.getContainer("root").exists("Dependencia");
+     * @param {String}  name    Nombre registrado de la clase a comprobar
+     * @returns {boolean}
      */
-    protected _resolveMessage(){
-        let result = "";
-        switch(this.code){
-            case InjectorError.TYPES.NOT_REGISTERED:
-                if(this.target){
-                    result=`could not inject ${this.dependencie} into ${this.target} because is not registered`;
-                }else {
-                    result = `${this.dependencie} is not registered in the Injector.`
-                }
-                break;
-            case InjectorError.TYPES.ALREADY_REGISTERED:
-                result=`${this.dependencie} is already registered`;
-                break;
-            case InjectorEro.TYPES.NAME_REQUIRED:
-                result = "The parameter 'name' is required";
-                break;
+    public exists(name: string): boolean {
+        return this._exists(name,this._root.container);
+    }
+    protected _exists(name:string,container:IBottle.IContainer){
+        return container.$list().indexOf(name) !== -1;
+    }
+    /**
+     * @description Comprueba si una clase se ha registrado en un contenedor en concreto. Equivale a injector.getContainer("contenedor").exists("Dependencia");
+     * Si el contenedor no existe se resuelve como falso
+     * @param {String}  name            Nombre registrado de la clase a comprobar
+     * @param {String}  containerName   Nombre del contenedor en el cual comprobar
+     * @returns {boolean}
+     */
+    public existsIn(name: string, containerName: string): boolean {
+        let exists = false;
+        if(this.exists(containerName)){
+            let container = this._root[containerName];
+            exists = this._exists(name,container);
         }
-        result+=`[Error] Injector - ${result}`;
+        return exists;
+    }
+    /**
+     * @description Obtiene una clase mediante el nombre registrado del contenedor root. Equivale a injector.getContainer("root").get("Dependencia");
+     * @param {String}  name    Nombre registrado de la clase a obtener
+     */
+    public get(name: string): any {
+        return this._root.container[name];
+    }
+    /**
+     * @description Obtiene una clase mediante el nombre registrado para un contenedor en concreto. Equivale a injector.getContainer("contenedor").get("Dependencia");
+     * Si el contenedor no existe se resuelve como null
+     * @param {String}  name            Nombre registrado de la clase a obtener
+     * @param {String}  containerName   Nombre del contenedor del cual obtener la clase
+     */
+    public getOf(name: string, containerName: string): any {
+        let result;
+        if(this.existsIn(name,containerName)){
+            result = this._root.container[containerName][name];
+        }
         return result;
     }
-}
-export class Injector{
-    public static injector:Injector;
-    public static getInstance(){
-        if(!Injector.injector) {
-            let bottle = new Bottle();
-            Injector.injector = new Injector($, bottle);
-            bottle.factory("Injector", (container) => {
-                return new InjectorService(Injector.injector);
-            });
-        }
-        return Injector.injector;
-    }
-    /**
-     * @constructor
-     * @description Injector de dependencias
-     * @requires Bottle
-     * @see https://github.com/young-steveo/bottlejs
-     */
-    protected constructor(protected $:JQueryStatic,protected bottle:Bottle){
-
+    protected _setType(target,type){
+        Object.defineProperty(target,"haztivityType",{
+            configurable:false,
+            writable:false,
+            value:type
+        });
     }
 
     /**
-     * @description Resuelve y devuelve todas las dependencias para
-     * @param target
+     * Obtiene un conjunto de dependencias para un tipo concreto validando el acceso
+     * @param {IInjectorType}           type            Tipo que solicita las dependencias
+     * @param {String[]}                dependencies    Conjunto de nombres de dependencias a obtener
      * @returns {Array}
+     * @protected
      */
-    public getFor(target:any):any{
-        let result = null;
-        if(target && target.prototype.$inject){
-            let dependencies = target.prototype.$inject;
-            result = [];
-            for(let dependencie of dependencies){
-                let depInstance = this.get(dependencie,false);
-                if(depInstance != undefined){
-                    result.push(depInstance);
-                }else{
-                    throw new InjectorError(InjectorError.TYPES.NOT_REGISTERED,dependencie,target.name);
+    protected _getFor(type:IInjectorType,dependencies){
+        let resolvedDependencies = [];
+        for (let dependencieName of dependencies) {
+            let dependency = this.get(dependencieName);
+            resolvedDependencies.push(dependency);
+        }
+        //todo Validate access
+        return resolvedDependencies;
+    }
+
+    /**
+     * Registra un servicio
+     * @param {IInjectorType}   type            Tipo de elemento de haztivity
+     * @param {String}          name            Nombre del servicio. Debe ser único
+     * @param {*}               service         Clase a registrar
+     * @param {String[]}        dependencies    Conjunto de nombre de dependencias a inyectar. Las dependencias que puede inyectar están restringidas por el tipo de elemento registrado
+     * @param {Function}        [factory]       Función para la instanciación de la clase. Debe devolver un objeto
+     * @example
+     * class MyService{
+     *
+     * }
+     * let myServiceDependencies = [
+     *      "SomeDependency"
+     * ]
+     * injector.registerService("MyService",MyService,myServiceDependencies,(service,dependencies,resolvedDependencies)=>{
+     *      let instance = new service(...resolvedDependencies);
+     *      instance.doSomething();
+     *      return instance;
+     * })
+     * @protected
+     */
+    protected _registerService(type:IInjectorType,name:string,service,dependencies,factory?:Function){
+        if(!!name) {
+            if (!this.exists(name)) {
+                if (dependencies.indexOf(name) === -1) {
+                    let that = this;
+                    this._root.provider(name,function() {
+                        //store type in the factory and in the constructor to manage permisions
+                        that._setType(this, type.name);
+                        that._setType(service.constructor, type.name);
+                        //create getter, the getter provides the instance
+                        this.$get = (container) => {
+                            let resolvedDependencies = that._getFor(type, dependencies);
+                            //if a custom factory function is provided
+                            if (typeof factory === "function") {
+                                return factory.call(service, dependencies, resolvedDependencies);
+                            } else {
+                                return new service(...resolvedDependencies);
+                            }
+                        }
+                    })
+                } else {
+                    throw new DependencyHasItsOwnAsDependency(name);
                 }
-            }
-        }
-        return result;
-    }
-    /**
-     * @description Obtiene un elemento del injector
-     * @param {String}      name            Nombre de la dependencia a inyectar
-     * @param {boolean}     [throwError]    Indica si lanzar excepción en caso de no encontrar la dependencia
-     * @returns {any}
-     */
-    public get(name:string|string[],throwError=true):any{
-        if(Array.isArray(name)){
-            let result = [];
-            for(let dep of name){
-                result.push(this._get(dep,throwError));
-            }
-            return result;
-        }else{
-            return this._get(<string>name,throwError);
-        }
-
-    }
-    protected _get(name:string,throwError=true){
-        let dep = this.bottle.container[name];
-        if(dep == undefined && throwError !== false){
-            throw new InjectorError(InjectorError.TYPES.NOT_REGISTERED,name);
-        }
-        return dep;
-    }
-    /**
-     * @description Comprueba si una dependencia ya ha sido registrada
-     * @param {String}      name       dependencia a comprobar
-     * @returns {boolean}
-     * @protected
-     */
-    protected _check(name){
-        if(name) {
-            if (this.bottle.list().indexOf(name) === -1) {
-                return true;
             } else {
-                throw new InjectorError(InjectorError.TYPES.ALREADY_REGISTERED, name);
+                throw new DependencyAlreadyRegistered(name);
             }
         }else{
-            throw new InjectorError(InjectorError.TYPES.NAME_REQUIRED);
+            throw new DependencyOptionRequired("name");
         }
     }
 
     /**
-     * @description Registra un servicio
-     * Hace uso de _factory para la resolución de dependencias.
-     * Se puede utilizar el decorador Injectable
-     * @param {String}          name            Nombre del servicio
-     * @param {Function}        service         Servicio a registrar
-     * @param {IServiceConfig}  [config]        Configuración del registro
-     * @see _factory
-     * @see IServiceConfig
-     * @example
-     * class Test{
-     *      constructor(dependencies){
-     *
-     *      }
-     * }
-     * Injector.service("Test",Test,{
-     *      dependencies:["someDependencie"]
-     * });
-     * @example
-     * @Injectable({
-     *      dependencies:["someDependencie"]
-     * })
-     * class Test{
-     *      constructor(dependencies){
-     *
-     *      }
-     * }
+     * Registra un servicio de tipo Service de haztivity
+     * @see _registerService
+     * @see TYPES
      */
-    public service(name:string,service:any,config:IServiceConfig){
-        if(this._check(name)){
-            this._registerDependencies(service,config.dependencies);
-            this.bottle.factory(name,this._factory.bind({
-                name:name,
-                service:service,
-                config:config,
-                injector:this
-            }));
+    public registerService(name:string,service,dependencies,factory?:Function){
+        this._registerService(TYPES.Service,name,service,dependencies,factory);
+    }
+    /**
+     * Registra un servicio de tipo Core de haztivity
+     * @see _registerService
+     * @see TYPES
+     */
+    public registerCore(name:string,service,dependencies,factory?:Function){
+        this._registerService(TYPES.Core,name,service,dependencies,factory);
+    }
+    /**
+     * Registra un servicio de tipo Sco de haztivity
+     * @see _registerService
+     * @see TYPES
+     */
+    public registerSco(name:string,service,dependencies,factory?:Function){
+        this._registerService(TYPES.Sco,name,service,dependencies,factory);
+    }
+    /**
+     * Registra un servicio de tipo CorePublic de haztivity
+     * @see _registerService
+     * @see TYPES
+     */
+    public registerCorePublic(name:string,service,dependencies,factory?:Function){
+        this._registerService(TYPES.CorePublic,name,service,dependencies,factory);
+    }
+    /**
+     * Registra un servicio de tipo Module de haztivity
+     * @see _registerService
+     * @see TYPES
+     */
+    public registerModule(name:string,service,dependencies,factory?:Function){
+        this._registerService(TYPES.Module,name,service,dependencies,factory);
+    }
+    /**
+     * Registra un servicio de tipo Component de haztivity
+     * @see _registerService
+     * @see TYPES
+     */
+    public registerComponent(name:string,service,dependencies,factory?:Function){
+        this._registerService(TYPES.Component,name,service,dependencies,factory);
+    }
+
+    /**
+     * Registra una instancia. No resuelve dependencias.
+     * @param {String}          name            Nombre del servicio.
+     * @param {*}               instance        Servicio a registar
+     * @example
+     * injector.registerServiceInstance("$",$);
+     */
+    public registerServiceInstance(name:string,instance){
+        if(!this.exists(name)){
+            this._setType(instance,TYPES.Service.name);
+            this._root.constant(name,instance);
+        }else{
+            //todo throw
         }
     }
 
     /**
-     * @description Registra las depedencias en una clase
-     * @param service
-     * @param dependencies
-     * @returns {boolean}
-     * @private
+     * Obtiene una instancia del inyector
+     * @returns {Injector}
      */
-    protected _registerDependencies(service,dependencies){
-        let currentDependencies = service.prototype.$inject || [];
-        service.prototype.$inject = this.$.unique(this.$.extend(currentDependencies, dependencies || []));
-        return true;
-    }
-    /**
-     * @description Registra un servicio indicando cómo instanciarla
-     * @param {String}              name        Nombre del servicio
-     * @param {Function}            factory     Función que instancia el servicio
-     * @example
-     * class Test{
-     *      constructor(someDependencie){
-     *          this.someDependencie = someDependencie;
-     *      }
-     * }
-     * Injector.factory("Test",function(container){
-     *      let someDependencie = container.someDependencie;
-     *      return new Test(someDependencie);
-     * });
-     */
-    public factory(name:string,service,factory:Function,config){
-        if(this._check(name)){
-            this.bottle.factory(name,(container)=>{
-                this._registerDependencies(service,config.dependencies);
-                factory.call(null,container);
-            });
+    public static getInstance(){
+        if(!Injector._instance){
+            Injector._instance = new Injector();
         }
-    }
-    public instanceFactory(name:string,service,factory:Function,config){
-        if(this._check(name)){
-            this.bottle.instanceFactory(name,(container)=>{
-                this._registerDependencies(service,config.dependencies);
-                return factory.call(null,container);
-            });
-        }
-    }
-    /**
-     * @description Registra una constante inyectable
-     * @param {String}      name    Nombre de la constante
-     * @param {*}           value   Valor de la constante
-     * @example
-     * Injector.constant("someVar","someValue");
-     *
-     */
-    public constant(name:string,value:any){
-        this.bottle.constant(name,value);
-    }
-
-    /**
-     * @description Factoria base para servicios. Resuelve las dependencias y las inyecta como array al instanciar la clase.
-     * Se debe ejecutar con contexto {name,service,config}
-     * @param {Bottle}  container       Contenedor provisto por bottlejs
-     * @see service
-     * @protected
-     * @example
-     * class Test{
-     *
-     * }
-     * let config = {
-     *      dependencies:[
-     *          "someDependencie"
-     *      }
-     * }
-     * this._factory.bind({
-     *      name:"Test",
-     *      service:Test,
-     *      config:config
-     * })
-     */
-    protected _factory(container){
-        let that = <any>this;
-        debugger;
-        let service = that.service,
-            dependenciesInstances = that.injector.getFor(service);
-        return new service(...dependenciesInstances);
+        return Injector._instance;
     }
 
 }
-export class InjectorService{
-    /**
-     * @constructor
-     * @description Servicio a inyectar por DI que expone las funciones públicas que se pueden utilizar en tiempo de ejecución
-     * @param {InjectorClass}   injector       Inyector a utilizar
-     */
-    constructor(injector){
-        this.get = Injector.get.bind(injector);
-    }
-    public get(name:string|string[]){
 
-    }
-}

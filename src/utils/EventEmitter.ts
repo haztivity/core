@@ -2,33 +2,36 @@
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-import {Injector,Injectable} from "../di";
-import {BaseHaztivity} from "../base";
+import {Service} from "../di";
+import * as jqDI from "../jqueryDI";
+jqDI;//Typescript needs a reference to import the module
 import EventEmitter from "eventemitter2";
 //Register EventEmitter in DI
-Injector.getInstance().constant("EventEmitter",EventEmitter);
-export interface IEventEmitterFactoryCreate extends EventEmitter2Configuration{};
-@Injectable({
+export interface ICreateEventEmitterOptions extends EventEmitter2Configuration{};
+@Service({
     name:"EventEmitterFactory",
     dependencies:[
-        "$",
-        "EventEmitter"
+        "$"
     ]
 })
-export class EventEmitterFactory extends BaseHaztivity{
+/**
+ * Factoria de EventEmitter2. Permite generar instancias de EventEmitter2 para manipular eventos
+ * @requires $
+ */
+export class EventEmitterFactory{
     public static DEFAULTS = <EventEmitter2Configuration>{
         wildcard:true
     };
-    protected $:JQueryStatic;
-    protected EventEmitter:EventEmitter2;
+    constructor(protected $:JQueryStatic){
 
+    }
     /**
      * Genera una instancia de EventEmitter2
-     * @param options
-     * @returns {IEventEmitter}
+     * @param {ICreateEventEmitterOptions}  options     Opciones que acepta EventEmitter
+     * @returns {EventEmitter2}
      */
-    instance(options?:EventEmitter2Configuration){
+    createEventEmitter(options?:ICreateEventEmitterOptions){
         let optionsParsed = this.$.extend(true,{},EventEmitterFactory.DEFAULTS,options || {});
-        return new this.EventEmitter(optionsParsed);
+        return new EventEmitter(optionsParsed);
     }
 }
