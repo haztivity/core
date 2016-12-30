@@ -18,61 +18,61 @@ export interface IInjector{
     get(name:string):any;
     getOf(name:string,containerName:string):any;
 }
+export interface IInjectorMetadata{
+    name:string;
+    type:string;
+}
 export interface IInjectorType{
     name:string;
     allowAccess:boolean|String[];
 }
-export const TYPES ={
-    CorePublic:{
-        name:"CorePublic",
-        allowAccess:true
-    },
-    Core:{
-        name:"Core",
-        allowAccess:true
-    },
-    Module:{
-        name:"Module",
-        allowAccess:[
-            "Core",
-            "CorePublic",
-            "Service",
-            "Page"
-        ]
-    },
-    Service:{
-        name:"Service",
-        allowAccess:[
-            "CorePublic",
-            "Module"
-        ]
-    },
-    Sco:{
-        name:"Sco",
-        allowAccess:[
-            "CorePublic",
-            "Service"
-        ]
-    },
-    Resource:{
-        name:"Resource",
-        allowAccess:[
-            "Service"
-        ]
-    },
-    Component:{
-        name:"Component",
-        allowAccess:[
-            "Service"
-        ]
-    },
-    Page:{
-        name:"Page",
-        allowAccess:[
-            "Service"
-        ]
+//Create readonly types
+let TYPES:any = (function(){
+    function sealProperty(val){
+        return{
+            writable:false,
+            configurable:false,
+            value:val
+        }
     }
-};
+    function registerType(types,name,allowAccess){
+        let obj = {};
+        Object.defineProperties(obj,{
+            "name":sealProperty(name),
+            "allowAccess":sealProperty(true)
+        });
+        types[name] = obj;
+    }
+    let types = {};
+    registerType(types,"Core",true);
+    registerType(types,"CoreType",true);
+    registerType(types,"Module",[
+        "Core",
+        "CorePublic",
+        "Service",
+        "Page"
+    ]);
+    registerType(types,"Service",[
+        "CorePublic",
+        "Module"
+    ]);
+    registerType(types,"Sco",[
+        "CorePublic",
+        "Service"
+    ]);
+    registerType(types,"Resource",[
+        "Service"
+    ]);
+    registerType(types,"Component",[
+        "Service"
+    ]);
+    registerType(types,"Page",[
+        "Service"
+    ]);
+    Object.freeze(types);
+    return types;
+})();
+export {TYPES};
 /**
  * Inyector de dependencias. Api para la manipulación de contenedores y dependencias
  * @class
@@ -150,7 +150,7 @@ export class Injector implements IInjector{
 
     /**
      * Obtiene un conjunto de dependencias para un tipo concreto validando el acceso
-     * @param {IInjectorType}           type            Tipo que solicita las dependencias
+     * @param {*}                       service         Servicio para el cual obtener las dependencias
      * @param {String[]}                dependencies    Conjunto de nombres de dependencias a obtener
      * @returns {Array}
      * @protected
@@ -159,6 +159,9 @@ export class Injector implements IInjector{
         let resolvedDependencies = [];
         for (let dependencieName of dependencies) {
             let dependency = this.get(dependencieName);
+            if(dependency == undefined){
+                throw new DependencyNotRegisteredError(dependency);
+            }
             resolvedDependencies.push(dependency);
         }
         //todo Validate access
@@ -197,7 +200,7 @@ export class Injector implements IInjector{
                         that._setType(service.constructor, type.name);
                         //create getter, the getter provides the instance
                         this.$get = (container) => {
-                            let resolvedDependencies = that._getFor(type, dependencies);
+                            let resolvedDependencies = that._getFor(service, dependencies);
                             //if a custom factory function is provided
                             if (typeof factory === "function") {
                                 return factory.call(service, dependencies, resolvedDependencies);
