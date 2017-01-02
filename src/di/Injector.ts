@@ -11,6 +11,9 @@ export interface IInjector{
     get(name:string):any;
     getOf(name:string,containerName:string):any;
 }
+export interface InjectorRegister{
+
+}
 export interface IInjectorMetadata{
     name:string;
     type:string;
@@ -85,6 +88,7 @@ export const TYPES:ITypes = <ITypes>(function(){
  */
 export class Injector implements IInjector{
     protected static _instance:Injector;
+    protected static _registerInstance:InjectorRegisterService;
     /**
      * Contenedor principal
      * @member {InjectorContainer} _root
@@ -379,7 +383,7 @@ export class Injector implements IInjector{
             this._setType(instance,TYPES.Service.name);
             this._root.constant(name,instance);
         }else{
-            //todo throw
+            throw new DependencyAlreadyRegistered(name);
         }
     }
 
@@ -387,12 +391,111 @@ export class Injector implements IInjector{
      * Obtiene una instancia del inyector
      * @returns {Injector}
      */
-    public static getInstance(){
+    public static getInstance(target?){
+        let toReturn;
         if(!Injector._instance){
             Injector._instance = new Injector();
+            Injector._registerInstance = new InjectorRegisterService(Injector._instance);
         }
-        return Injector._instance;
+        if(target){
+            toReturn = new InjectorService(Injector._instance,target);
+        }else{
+            toReturn = Injector._registerInstance;
+        }
+        return toReturn;
     }
 
 }
-
+export class InjectorService{
+    constructor(injector,target){
+        this.get = function(name){
+            let result;
+            if(Array.isArray(name)){
+                result = injector._getFor(target,name);
+            }else{
+                result = injector._getFor(target,[name]);
+                if(result.length > 0){
+                    result = result[0];
+                }
+            }
+            return result;
+        }
+        this.exists = injector.exists.bind(injector);
+    }
+    /**
+     * @description Comprueba si una clase se ha registrado en el contenedor root. Equivale a injector.getContainer("root").exists("Dependencia");
+     * @param {String}  name    Nombre registrado de la clase a comprobar
+     * @returns {boolean}
+     */
+    public exists(name: string): boolean {
+        return undefined;
+    }
+    /**
+     * @description Obtiene una clase mediante el nombre registrado del contenedor root. Equivale a injector.getContainer("root").get("Dependencia");
+     * @param {String}  name    Nombre registrado de la clase a obtener
+     */
+    public get(name: string): any {
+    }
+}
+export class InjectorRegisterService{
+    constructor(injector){
+        this.registerService = injector.registerService.bind(injector);
+        this.registerCore = injector.registerCore.bind(injector);
+        this.registerSco = injector.registerSco.bind(injector);
+        this.registerCorePublic = injector.registerCorePublic.bind(injector);
+        this.registerModule = injector.registerModule.bind(injector);
+        this.registerComponent = injector.registerComponent.bind(injector);
+        this.registerServiceInstance = injector.registerServiceInstance.bind(injector);
+    }
+    /**
+     * Registra un servicio de tipo Service de haztivity
+     * @see _registerService
+     * @see TYPES
+     */
+    public registerService(name:string,service,dependencies,factory?:Function){
+    }
+    /**
+     * Registra un servicio de tipo Core de haztivity
+     * @see _registerService
+     * @see TYPES
+     */
+    public registerCore(name:string,service,dependencies,factory?:Function){
+    }
+    /**
+     * Registra un servicio de tipo Sco de haztivity
+     * @see _registerService
+     * @see TYPES
+     */
+    public registerSco(name:string,service,dependencies,factory?:Function){
+    }
+    /**
+     * Registra un servicio de tipo CorePublic de haztivity
+     * @see _registerService
+     * @see TYPES
+     */
+    public registerCorePublic(name:string,service,dependencies,factory?:Function){
+    }
+    /**
+     * Registra un servicio de tipo Module de haztivity
+     * @see _registerService
+     * @see TYPES
+     */
+    public registerModule(name:string,service,dependencies,factory?:Function){
+    }
+    /**
+     * Registra un servicio de tipo Component de haztivity
+     * @see _registerService
+     * @see TYPES
+     */
+    public registerComponent(name:string,service,dependencies,factory?:Function){
+    }
+    /**
+     * Registra una instancia. No resuelve dependencias.
+     * @param {String}          name            Nombre del servicio.
+     * @param {*}               instance        Servicio a registar
+     * @example
+     * injector.registerServiceInstance("$",$);
+     */
+    public registerServiceInstance(name:string,instance){
+    }
+}
