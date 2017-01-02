@@ -1,23 +1,15 @@
-import {ScoFactory,IScoOptions,ScoController, Sco,PageFactory,IPageOptions} from "../src/core";
-debugger;
-PageFactory.createPage({
-
+import {IPage,ScoFactory,PageFactory} from "../src/core";
+let page:IPage = PageFactory.createPage({
+    name:"page",
+    resources:[],
+    template:""
 });
-@Sco({
-    name:"MyScoController",
-    dependencies:[]
-})
-class MyScoController extends ScoController{
-    constructor(...dependencies){
-        super(...dependencies);
-    }
-    activate(config){
-        debugger;
-        super.activate(config);
-    }
-}
-ScoFactory.registerSco(MyScoController,{
-    name:"test",
-    pages:[],
+page.on();
+ScoFactory.createSco({
+    name:"sco",
+    pages:[
+        page
+    ],
     components:[]
-});
+}).run();
+console.timeEnd("Time");

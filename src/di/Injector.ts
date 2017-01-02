@@ -172,6 +172,9 @@ export class Injector implements IInjector{
             if(dependency == undefined){
                 throw new DependencyNotRegisteredError(dependencieName);
             }
+            if(dependencieName === "Injector"){
+                dependency = dependency.instance(service);
+            }
             resolvedDependencies.push(dependency);
         }
         //todo Validate access
@@ -278,12 +281,12 @@ export class Injector implements IInjector{
         if(this._validateName(name,dependencies)){
             let that = this;
             //create factory func
-            let fact = function(container){
+            let fact = function(container,params){
                 let dependenciesToInject = that._getRegisteredDependencies(service);
                 let resolvedDependencies = that._getFor(service, dependenciesToInject);
                 //if a custom factory function is provided
                 if (typeof factory === "function") {
-                    return factory.call(service, dependenciesToInject, resolvedDependencies);
+                    return factory.call(null,service, dependenciesToInject, resolvedDependencies,params);
                 } else {
                     return new service(...resolvedDependencies);
                 }
@@ -323,6 +326,7 @@ export class Injector implements IInjector{
             throw new DependencyOptionRequired("name");
         }
     }
+
     /**
      * Registra un servicio de tipo Service de haztivity
      * @param {String}          name            Nombre de la dependencia. Debe ser único
@@ -334,6 +338,34 @@ export class Injector implements IInjector{
      */
     public registerService(name:string,service,dependencies,factory?:Function){
         this._registerService(TYPES.Service,name,service,dependencies,factory);
+    }
+    /**
+     * Registra un servicio de tipo Service de haztivity instanciable.
+     * @param {String}          name            Nombre de la dependencia. Debe ser único
+     * @param {*}               service         Clase a registrar
+     * @param {String[]}        dependencies    Conjunto de nombre de dependencias a inyectar. Las dependencias que puede inyectar están restringidas por el tipo de elemento registrado
+     * @param {Function}        [factory]       Función para la instanciación de la clase. Debe devolver un objeto
+     * @see _registerService
+     * @see TYPES
+     */
+    public registerServiceTransient(name:string,service,dependencies,factory?:Function){
+        this._registerTransient(TYPES.Service,name,service,dependencies,factory);
+    }
+
+    /**
+     * Registra una instancia. No resuelve dependencias.
+     * @param {String}          name            Nombre del servicio.
+     * @param {*}               instance        Servicio a registar
+     * @example
+     * injector.registerServiceInstance("$",$);
+     */
+    public registerServiceInstance(name:string,instance){
+        if(!this.exists(name)){
+            this._setType(instance,TYPES.Service.name);
+            this._root.constant(name,instance);
+        }else{
+            throw new DependencyAlreadyRegistered(name);
+        }
     }
     /**
      * Registra un servicio de tipo Core de haztivity
@@ -360,18 +392,6 @@ export class Injector implements IInjector{
         this._registerTransient(TYPES.Core,name,Class,dependencies,factory);
     }
     /**
-     * Registra un servicio de tipo Sco de haztivity
-     * @param {String}          name            Nombre de la dependencia. Debe ser único
-     * @param {*}               service         Clase a registrar
-     * @param {String[]}        dependencies    Conjunto de nombre de dependencias a inyectar. Las dependencias que puede inyectar están restringidas por el tipo de elemento registrado
-     * @param {Function}        [factory]       Función para la instanciación de la clase. Debe devolver un objeto
-     * @see _registerService
-     * @see TYPES
-     */
-    public registerSco(name:string,service,dependencies,factory?:Function){
-        this._registerTransient(TYPES.Sco,name,service,dependencies,factory);
-    }
-    /**
      * Registra un servicio de tipo CorePublic de haztivity
      * @param {String}          name            Nombre de la dependencia. Debe ser único
      * @param {*}               service         Clase a registrar
@@ -393,6 +413,19 @@ export class Injector implements IInjector{
      */
     public registerCorePublicTransient(name:string,Class,dependencies,factory?:Function){
         this._registerTransient(TYPES.CorePublic,name,Class,dependencies,factory);
+    }
+
+    /**
+     * Registra un servicio de tipo Sco de haztivity
+     * @param {String}          name            Nombre de la dependencia. Debe ser único
+     * @param {*}               service         Clase a registrar
+     * @param {String[]}        dependencies    Conjunto de nombre de dependencias a inyectar. Las dependencias que puede inyectar están restringidas por el tipo de elemento registrado
+     * @param {Function}        [factory]       Función para la instanciación de la clase. Debe devolver un objeto
+     * @see _registerService
+     * @see TYPES
+     */
+    public registerSco(name:string,service,dependencies,factory?:Function){
+        this._registerTransient(TYPES.Sco,name,service,dependencies,factory);
     }
     /**
      * Registra un servicio de tipo Module de haztivity
@@ -419,19 +452,16 @@ export class Injector implements IInjector{
         this._registerService(TYPES.Component,name,service,dependencies,factory);
     }
     /**
-     * Registra una instancia. No resuelve dependencias.
-     * @param {String}          name            Nombre del servicio.
-     * @param {*}               instance        Servicio a registar
-     * @example
-     * injector.registerServiceInstance("$",$);
+     * Registra una clase de tipo Page de haztivity
+     * @param {String}          name            Nombre de la dependencia. Debe ser único
+     * @param {*}               service         Clase a registrar
+     * @param {String[]}        dependencies    Conjunto de nombre de dependencias a inyectar. Las dependencias que puede inyectar están restringidas por el tipo de elemento registrado
+     * @param {Function}        [factory]       Función para la instanciación de la clase. Debe devolver un objeto
+     * @see _registerTransient
+     * @see TYPES
      */
-    public registerServiceInstance(name:string,instance){
-        if(!this.exists(name)){
-            this._setType(instance,TYPES.Service.name);
-            this._root.constant(name,instance);
-        }else{
-            throw new DependencyAlreadyRegistered(name);
-        }
+    public registerPage(name:string,service,dependencies,factory?:Function){
+        this._registerTransient(TYPES.Page,name,service,dependencies,factory);
     }
 
     /**
@@ -459,6 +489,11 @@ export class Injector implements IInjector{
     }
 
 }
+
+export interface IInjectorService{
+    get(name):any;
+    exists(name):boolean;
+}
 export class InjectorService{
     constructor(injector,target){
         this.get = function(name){
@@ -472,7 +507,7 @@ export class InjectorService{
                 }
             }
             return result;
-        }
+        };
         this.exists = injector.exists.bind(injector);
     }
     /**
@@ -490,87 +525,41 @@ export class InjectorService{
     public get(name: string): any {
     }
 }
+export interface IInjectorRegisterService{
+    registerService(name:string,service,dependencies,factory?:Function):void;
+    registerServiceTransient(name:string,service,dependencies,factory?:Function):void;
+    registerCore(name:string,service,dependencies,factory?:Function):void;
+    registerCoreTransient(name:string,Class,dependencies,factory?:Function):void;
+    registerCorePublic(name:string,service,dependencies,factory?:Function):void;
+    registerCorePublicTransient(name:string,Class,dependencies,factory?:Function):void;
+    registerSco(name:string,service,dependencies,factory?:Function):void;
+    registerModule(name:string,service,dependencies,factory?:Function):void;
+    registerComponent(name:string,service,dependencies,factory?:Function):void;
+    registerServiceInstance(name:string,instance):void;
+    registerPage(name:string,service,dependencies,factory?:Function):void;
+}
+//Map dynamically the methods
 export class InjectorRegisterService{
     constructor(injector){
-        this.registerService = injector.registerService.bind(injector);
-        this.registerCore = injector.registerCore.bind(injector);
-        this.registerCoreTransient = injector.registerCoreTransient.bind(injector);
-        this.registerCorePublic = injector.registerCorePublic.bind(injector);
-        this.registerCorePublicTransient = injector.registerCorePublicTransient.bind(injector);
-        this.registerSco = injector.registerSco.bind(injector);
-        this.registerModule = injector.registerModule.bind(injector);
-        this.registerComponent = injector.registerComponent.bind(injector);
-        this.registerServiceInstance = injector.registerServiceInstance.bind(injector);
-    }
-    /**
-     * Registra un servicio de tipo Service de haztivity
-     * @see _registerService
-     * @see TYPES
-     */
-    public registerService(name:string,service,dependencies,factory?:Function){
-    }
-    /**
-     * Registra un servicio de tipo Core de haztivity
-     * @see _registerService
-     * @see TYPES
-     */
-    public registerCore(name:string,service,dependencies,factory?:Function){
-    }
-    /**
-     * Registra un servicio de tipo Sco de haztivity
-     * @see _registerService
-     * @see TYPES
-     */
-    public registerSco(name:string,service,dependencies,factory?:Function){
-    }
-    /**
-     * Registra un servicio de tipo CorePublic de haztivity
-     * @see _registerService
-     * @see TYPES
-     */
-    public registerCorePublic(name:string,service,dependencies,factory?:Function){
-    }
-    /**
-     * Registra un servicio de tipo Module de haztivity
-     * @see _registerService
-     * @see TYPES
-     */
-    public registerModule(name:string,service,dependencies,factory?:Function){
-    }
-    /**
-     * Registra un servicio de tipo Component de haztivity
-     * @see _registerService
-     * @see TYPES
-     */
-    public registerComponent(name:string,service,dependencies,factory?:Function){
-    }
-    /**
-     * Registra una instancia. No resuelve dependencias.
-     * @param {String}          name            Nombre del servicio.
-     * @param {*}               instance        Servicio a registar
-     * @example
-     * injector.registerServiceInstance("$",$);
-     */
-    public registerServiceInstance(name:string,instance){
-    }
-    /**
-     * Registra una clase de tipo Core de haztivity instanciable
-     * @param {String}              name            Nombre con el cual registrar la clase
-     * @param {*}                   Class          Clase a registrar
-     * @param {String[]}            dependencies    Dependencias de la clase a registrar
-     * @param {Function}            [factory]       Función que aplique la lógica de instanciación
-     * @see _registerTransient
-     */
-    public registerCoreTransient(name:string,Class,dependencies,factory?:Function){
-    }
-    /**
-     * Registra una clase de tipo CorePublic de haztivity instanciable
-     * @param {String}              name            Nombre con el cual registrar la clase
-     * @param {*}                   Class           Clase a registrar
-     * @param {String[]}            dependencies    Dependencias de la clase a registrar
-     * @param {Function}            [factory]       Función que aplique la lógica de instanciación
-     * @see _registerTransient
-     */
-    public registerCorePublicTransient(name:string,Class,dependencies,factory?:Function){
+        let publish = [
+            "registerService",
+            "registerServiceTransient",
+            "registerCore",
+            "registerCoreTransient",
+            "registerCorePublic",
+            "registerCorePublicTransient",
+            "registerSco",
+            "registerModule",
+            "registerComponent",
+            "registerServiceInstance",
+            "registerPage"
+        ];
+        for (let method of publish) {
+            this[method] = injector[method].bind(injector);
+        }
     }
 }
+//Register Injector as a instantiable service.
+Injector.getInstance().registerServiceTransient("Injector",InjectorService,[],(service,dependencies,resolvedDependencies,requester)=>{
+    return Injector.getInstance(requester);
+});
