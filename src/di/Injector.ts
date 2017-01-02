@@ -325,6 +325,10 @@ export class Injector implements IInjector{
     }
     /**
      * Registra un servicio de tipo Service de haztivity
+     * @param {String}          name            Nombre de la dependencia. Debe ser único
+     * @param {*}               service         Clase a registrar
+     * @param {String[]}        dependencies    Conjunto de nombre de dependencias a inyectar. Las dependencias que puede inyectar están restringidas por el tipo de elemento registrado
+     * @param {Function}        [factory]       Función para la instanciación de la clase. Debe devolver un objeto
      * @see _registerService
      * @see TYPES
      */
@@ -333,14 +337,34 @@ export class Injector implements IInjector{
     }
     /**
      * Registra un servicio de tipo Core de haztivity
+     * @param {String}          name            Nombre de la dependencia. Debe ser único
+     * @param {*}               service         Clase a registrar
+     * @param {String[]}        dependencies    Conjunto de nombre de dependencias a inyectar. Las dependencias que puede inyectar están restringidas por el tipo de elemento registrado
+     * @param {Function}        [factory]       Función para la instanciación de la clase. Debe devolver un objeto
      * @see _registerService
      * @see TYPES
      */
     public registerCore(name:string,service,dependencies,factory?:Function){
         this._registerService(TYPES.Core,name,service,dependencies,factory);
     }
+
+    /**
+     * Registra una clase de tipo Core de haztivity instanciable
+     * @param {String}              name            Nombre con el cual registrar la clase
+     * @param {*}                   Class          Clase a registrar
+     * @param {String[]}            dependencies    Dependencias de la clase a registrar
+     * @param {Function}            [factory]       Función que aplique la lógica de instanciación
+     * @see _registerTransient
+     */
+    public registerCoreTransient(name:string,Class,dependencies,factory?:Function){
+        this._registerTransient(TYPES.Core,name,Class,dependencies,factory);
+    }
     /**
      * Registra un servicio de tipo Sco de haztivity
+     * @param {String}          name            Nombre de la dependencia. Debe ser único
+     * @param {*}               service         Clase a registrar
+     * @param {String[]}        dependencies    Conjunto de nombre de dependencias a inyectar. Las dependencias que puede inyectar están restringidas por el tipo de elemento registrado
+     * @param {Function}        [factory]       Función para la instanciación de la clase. Debe devolver un objeto
      * @see _registerService
      * @see TYPES
      */
@@ -349,6 +373,10 @@ export class Injector implements IInjector{
     }
     /**
      * Registra un servicio de tipo CorePublic de haztivity
+     * @param {String}          name            Nombre de la dependencia. Debe ser único
+     * @param {*}               service         Clase a registrar
+     * @param {String[]}        dependencies    Conjunto de nombre de dependencias a inyectar. Las dependencias que puede inyectar están restringidas por el tipo de elemento registrado
+     * @param {Function}        [factory]       Función para la instanciación de la clase. Debe devolver un objeto
      * @see _registerService
      * @see TYPES
      */
@@ -356,7 +384,22 @@ export class Injector implements IInjector{
         this._registerService(TYPES.CorePublic,name,service,dependencies,factory);
     }
     /**
+     * Registra una clase de tipo CorePublic de haztivity instanciable
+     * @param {String}              name            Nombre con el cual registrar la clase
+     * @param {*}                   Class           Clase a registrar
+     * @param {String[]}            dependencies    Dependencias de la clase a registrar
+     * @param {Function}            [factory]       Función que aplique la lógica de instanciación
+     * @see _registerTransient
+     */
+    public registerCorePublicTransient(name:string,Class,dependencies,factory?:Function){
+        this._registerTransient(TYPES.CorePublic,name,Class,dependencies,factory);
+    }
+    /**
      * Registra un servicio de tipo Module de haztivity
+     * @param {String}          name            Nombre de la dependencia. Debe ser único
+     * @param {*}               service         Clase a registrar
+     * @param {String[]}        dependencies    Conjunto de nombre de dependencias a inyectar. Las dependencias que puede inyectar están restringidas por el tipo de elemento registrado
+     * @param {Function}        [factory]       Función para la instanciación de la clase. Debe devolver un objeto
      * @see _registerService
      * @see TYPES
      */
@@ -365,6 +408,10 @@ export class Injector implements IInjector{
     }
     /**
      * Registra un servicio de tipo Component de haztivity
+     * @param {String}          name            Nombre de la dependencia. Debe ser único
+     * @param {*}               service         Clase a registrar
+     * @param {String[]}        dependencies    Conjunto de nombre de dependencias a inyectar. Las dependencias que puede inyectar están restringidas por el tipo de elemento registrado
+     * @param {Function}        [factory]       Función para la instanciación de la clase. Debe devolver un objeto
      * @see _registerService
      * @see TYPES
      */
@@ -388,8 +435,12 @@ export class Injector implements IInjector{
     }
 
     /**
-     * Obtiene una instancia del inyector
+     * Obtiene una instancia del inyector. Si se indica el parámetro target se obtiene una instancia del servicio InjectorService para ese target indicado.
+     * Si no se indica target se obtiene una instancia de InjectorRegisterService
+     * @param   {*}         [target]            Target para el cual obtener el servicio
      * @returns {Injector}
+     * @see InjectorService
+     * @see InjectorRegisterService
      */
     public static getInstance(target?){
         let toReturn;
@@ -397,6 +448,8 @@ export class Injector implements IInjector{
             Injector._instance = new Injector();
             Injector._registerInstance = new InjectorRegisterService(Injector._instance);
         }
+        //The injector has a internal permission resolver, this resolver requires an haztivity type to work because each type has access to different dependencies.
+        //To get the InjectorService that could get dependencies is required tell what type of element is requiring the dependency, to prevent that anyone could get any dependency, is necessary pass the element that want to get dependencies
         if(target){
             toReturn = new InjectorService(Injector._instance,target);
         }else{
@@ -441,8 +494,10 @@ export class InjectorRegisterService{
     constructor(injector){
         this.registerService = injector.registerService.bind(injector);
         this.registerCore = injector.registerCore.bind(injector);
-        this.registerSco = injector.registerSco.bind(injector);
+        this.registerCoreTransient = injector.registerCoreTransient.bind(injector);
         this.registerCorePublic = injector.registerCorePublic.bind(injector);
+        this.registerCorePublicTransient = injector.registerCorePublicTransient.bind(injector);
+        this.registerSco = injector.registerSco.bind(injector);
         this.registerModule = injector.registerModule.bind(injector);
         this.registerComponent = injector.registerComponent.bind(injector);
         this.registerServiceInstance = injector.registerServiceInstance.bind(injector);
@@ -497,5 +552,25 @@ export class InjectorRegisterService{
      * injector.registerServiceInstance("$",$);
      */
     public registerServiceInstance(name:string,instance){
+    }
+    /**
+     * Registra una clase de tipo Core de haztivity instanciable
+     * @param {String}              name            Nombre con el cual registrar la clase
+     * @param {*}                   Class          Clase a registrar
+     * @param {String[]}            dependencies    Dependencias de la clase a registrar
+     * @param {Function}            [factory]       Función que aplique la lógica de instanciación
+     * @see _registerTransient
+     */
+    public registerCoreTransient(name:string,Class,dependencies,factory?:Function){
+    }
+    /**
+     * Registra una clase de tipo CorePublic de haztivity instanciable
+     * @param {String}              name            Nombre con el cual registrar la clase
+     * @param {*}                   Class           Clase a registrar
+     * @param {String[]}            dependencies    Dependencias de la clase a registrar
+     * @param {Function}            [factory]       Función que aplique la lógica de instanciación
+     * @see _registerTransient
+     */
+    public registerCorePublicTransient(name:string,Class,dependencies,factory?:Function){
     }
 }

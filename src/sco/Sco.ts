@@ -4,13 +4,16 @@
  */
 import {EventEmitterFactory} from "../utils";
 import {Sco} from "../di";
+import {Page} from "../page";
 EventEmitterFactory;
 export interface ISco{
     on():void;
     run():void;
 }
-export interface IScoConfig{
-
+export interface IScoOptions{
+    name:string;
+    pages:Page[];
+    components:Component[];
 }
 @Sco({
     name:"ScoController",
@@ -23,7 +26,7 @@ export class ScoController implements ISco{
     constructor (protected EventEmitterFactory:EventEmitterFactory){
         this.eventEmitter = EventEmitterFactory.createEmitter();
     }
-    public activate(config:IScoConfig):ScoController{
+    public activate(config:IScoOptions):ScoController{
         return this;
     }
     public on():ScoController{

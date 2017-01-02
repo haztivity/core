@@ -2,7 +2,7 @@
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-import {ScoController, IScoConfig} from "./Sco";
+import {ScoController, IScoOptions} from "./Sco";
 import {TYPES,Injector,Core} from "../di";
 
 @Core({
@@ -10,16 +10,16 @@ import {TYPES,Injector,Core} from "../di";
     dependencies:[]
 })
 export class ScoFactory{
-    public static createSco(config:IScoConfig):ScoController{
+    public static createSco(options:IScoOptions):ScoController{
         let ScoControllerFactory = Injector.getInstance(ScoFactory).get("ScoController");
         let sco = ScoControllerFactory.instance();
-        sco.activate(config);
+        sco.activate(options);
         return sco;
     }
-    public static registerSco(scoController,config:IScoConfig){
+    public static registerSco(scoController,options:IScoOptions){
         let ScoControllerFactory = Injector.getInstance(ScoFactory).get(scoController.name);
         let sco = ScoControllerFactory.instance();
-        sco.activate(config);
+        sco.activate(options);
         return sco;
     }
 }

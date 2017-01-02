@@ -11,6 +11,7 @@ interface IBaseParams {
 }
 export interface ICoreParams extends IBaseParams{
     public?:boolean;
+    instantiable?:boolean;
 }
 export interface IModuleParams extends IBaseParams{}
 export interface IServiceParams extends IBaseParams{}
@@ -20,7 +21,9 @@ export interface IServiceInstanceParams {
     instance:any;
 }
 /**
- * Decorador para registrar una clase como Core
+ * Decorador para registrar una clase como Core.
+ * Si se indica el parámetro public se registrará la clase como CorePublic, en caso contrario como Core
+ * Si se indica el parámetro instantiable se registrará la clase como transient, en caso contrario como service
  * @param {ICoreParams}     params
  * @static
  * @function
@@ -28,9 +31,17 @@ export interface IServiceInstanceParams {
 export function Core (params:ICoreParams){
     return (target)=> {
         if (params.public) {
-            injectorInstance.registerCorePublic(params.name, target,params.dependencies,params.factory);
+            if(params.instantiable){
+                injectorInstance.registerCoreTransient(params.name,target,params.dependencies,params.factory);
+            }else {
+                injectorInstance.registerCorePublic(params.name, target, params.dependencies, params.factory);
+            }
         } else {
-            injectorInstance.registerCore(params.name, target,params.dependencies,params.factory);
+            if(params.instantiable){
+                injectorInstance.registerCoreTransient(params.name, target, params.dependencies, params.factory);
+            }else {
+                injectorInstance.registerCore(params.name, target, params.dependencies, params.factory);
+            }
         }
     }
 }

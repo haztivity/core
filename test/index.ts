@@ -1,5 +1,8 @@
-import {ScoFactory,IScoConfig,ScoController} from "../src/core";
-import {Sco} from "../src/core";
+import {ScoFactory,IScoOptions,ScoController, Sco,PageFactory,IPageOptions} from "../src/core";
+debugger;
+PageFactory.createPage({
+
+});
 @Sco({
     name:"MyScoController",
     dependencies:[]
@@ -14,5 +17,7 @@ class MyScoController extends ScoController{
     }
 }
 ScoFactory.registerSco(MyScoController,{
-    id:"test"
+    name:"test",
+    pages:[],
+    components:[]
 });
