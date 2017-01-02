@@ -23,7 +23,7 @@ export class ScoController implements ISco{
     constructor (protected EventEmitterFactory:EventEmitterFactory){
         this.eventEmitter = EventEmitterFactory.createEmitter();
     }
-    public config(config:IScoConfig):ScoController{
+    public activate(config:IScoConfig):ScoController{
         return this;
     }
     public on():ScoController{

@@ -206,19 +206,44 @@ export class Injector implements IInjector{
                 that._setType(this, type.name);
                 //create getter, the getter provides the instance
                 this.$get = (container) => {
-                    let resolvedDependencies = that._getFor(service, dependencies);
+                    let dependenciesToInject = that._getRegisteredDependencies(service);
+                    let resolvedDependencies = that._getFor(service, dependenciesToInject);
                     //if a custom factory function is provided
                     if (typeof factory === "function") {
-                        return factory.call(service, dependencies, resolvedDependencies);
+                        return factory.call(service, dependenciesToInject, resolvedDependencies);
                     } else {
                         return new service(...resolvedDependencies);
                     }
                 }
             };
             //store type in the constructor to manage permisions
-            that._setType(service.prototype.constructor, type.name);
+            this._setType(service.prototype.constructor, type.name);
+            let registeredDependencies = this._getRegisteredDependencies(service);
+            //if the element already has dependencies, concat
+            dependencies = $.unique(dependencies.concat(registeredDependencies));
+            this._registerDependencies(service,dependencies);
             this._root.provider(name,fact)
         }
+    }
+
+    /**
+     * Registra dependencias en una clase
+     * @param {*}                   service         Servicio en el cual registrar las dependencias
+     * @param {String[]}            dependencies    Dependencias a registrar
+     * @private
+     */
+    protected _registerDependencies(service,dependencies){
+        service.prototype.$inject = dependencies;
+    }
+
+    /**
+     * Recupera las dependencias registradas en una clase
+     * @param {*}   service     Servicio del cual recuperar las dependencias
+     * @returns {Array<string>}
+     * @private
+     */
+    protected _getRegisteredDependencies(service):string[]{
+        return service.prototype.$inject || [];
     }
     /**
      * Registra una clase instanciable generando un factory. Funciona de forma similar a _registerService con la diferencia de que la función factory indicada se ejecutará cada vez
@@ -250,10 +275,11 @@ export class Injector implements IInjector{
             let that = this;
             //create factory func
             let fact = function(container){
-                let resolvedDependencies = that._getFor(service, dependencies);
+                let dependenciesToInject = that._getRegisteredDependencies(service);
+                let resolvedDependencies = that._getFor(service, dependenciesToInject);
                 //if a custom factory function is provided
                 if (typeof factory === "function") {
-                    return factory.call(service, dependencies, resolvedDependencies);
+                    return factory.call(service, dependenciesToInject, resolvedDependencies);
                 } else {
                     return new service(...resolvedDependencies);
                 }
@@ -261,6 +287,10 @@ export class Injector implements IInjector{
             //store type in the factory and in the constructor to manage permisions
             this._setType(fact, type.name);
             this._setType(service.prototype.constructor, type.name);
+            let registeredDependencies = this._getRegisteredDependencies(service);
+            //if the element already has dependencies, concat
+            dependencies = $.unique(dependencies.concat(registeredDependencies));
+            this._registerDependencies(service,dependencies);
             this._root.instanceFactory(name,fact);
         }
     }
