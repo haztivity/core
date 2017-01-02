@@ -1,4 +1,5 @@
-import {Service} from "../src/core";
-import {Injector,TYPES} from "../src/di";
-TYPES.Component.name="b";
-console.log(TYPES);
+import {ScoFactory,IScoConfig,ScoController} from "../src/core";
+debugger;
+ScoFactory.createSco({
+
+}).on().run();

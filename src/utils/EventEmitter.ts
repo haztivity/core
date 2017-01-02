@@ -14,14 +14,14 @@ export interface ICreateEventEmitterOptions extends EventEmitter2Configuration{}
         "$"
     ]
 })
-/**
- * Factoria de EventEmitter2. Permite generar instancias de EventEmitter2 para manipular eventos
- * @requires $
- */
 export class EventEmitterFactory{
     public static DEFAULTS = <EventEmitter2Configuration>{
         wildcard:true
     };
+    /**
+     * Factoria de EventEmitter2. Permite generar instancias de EventEmitter2 para manipular eventos
+     * @requires $
+     */
     constructor(protected $:JQueryStatic){
 
     }
@@ -30,8 +30,8 @@ export class EventEmitterFactory{
      * @param {ICreateEventEmitterOptions}  options     Opciones que acepta EventEmitter
      * @returns {EventEmitter2}
      */
-    createEventEmitter(options?:ICreateEventEmitterOptions){
+    createEmitter(options?:ICreateEventEmitterOptions):EventEmitter2{
         let optionsParsed = this.$.extend(true,{},EventEmitterFactory.DEFAULTS,options || {});
-        return new EventEmitter(optionsParsed);
+        return <EventEmitter2>new EventEmitter(optionsParsed);
     }
 }

@@ -5,13 +5,6 @@
 import {Bottle} from "bottlejs";
 import {DependencyHasItsOwnAsDependency,DependencyAlreadyRegistered,DependencyNotRegisteredError,DependencyOptionRequired} from "./Errors";
 import * as IBottle from "../../jspm_packages/npm/bottlejs@1.5.0/dist/bottle";
-export const TYPES = {
-    core:"Core",
-    page:"Page",
-    service:"Service",
-    resource:"Resourece",
-    component:"Component"
-};
 export interface IInjector{
     exists(name:string):boolean;
     existsIn(name:string,containerName:string):boolean;
@@ -26,8 +19,20 @@ export interface IInjectorType{
     name:string;
     allowAccess:boolean|String[];
 }
+
+export interface ITypes{
+    Core:IInjectorType;
+    CorePublic:IInjectorType;
+    Service:IInjectorType;
+    Page:IInjectorType;
+    Module:IInjectorType;
+    Sco:IInjectorType;
+    Component:IInjectorType;
+    Resource:IInjectorType;
+
+}
 //Create readonly types
-let TYPES:any = (function(){
+export const TYPES:ITypes = <ITypes>(function(){
     function sealProperty(val){
         return{
             writable:false,
@@ -45,9 +50,8 @@ let TYPES:any = (function(){
     }
     let types = {};
     registerType(types,"Core",true);
-    registerType(types,"CoreType",true);
+    registerType(types,"CorePublic",true);
     registerType(types,"Module",[
-        "Core",
         "CorePublic",
         "Service",
         "Page"
@@ -57,7 +61,10 @@ let TYPES:any = (function(){
         "Module"
     ]);
     registerType(types,"Sco",[
+        "Core",
         "CorePublic",
+        "Resource",
+        "Component",
         "Service"
     ]);
     registerType(types,"Resource",[
@@ -72,7 +79,6 @@ let TYPES:any = (function(){
     Object.freeze(types);
     return types;
 })();
-export {TYPES};
 /**
  * Inyector de dependencias. Api para la manipulación de contenedores y dependencias
  * @class
@@ -155,12 +161,12 @@ export class Injector implements IInjector{
      * @returns {Array}
      * @protected
      */
-    protected _getFor(type:IInjectorType,dependencies){
+    protected _getFor(service,dependencies){
         let resolvedDependencies = [];
         for (let dependencieName of dependencies) {
             let dependency = this.get(dependencieName);
             if(dependency == undefined){
-                throw new DependencyNotRegisteredError(dependency);
+                throw new DependencyNotRegisteredError(dependencieName);
             }
             resolvedDependencies.push(dependency);
         }
@@ -182,33 +188,97 @@ export class Injector implements IInjector{
      * let myServiceDependencies = [
      *      "SomeDependency"
      * ]
-     * injector.registerService("MyService",MyService,myServiceDependencies,(service,dependencies,resolvedDependencies)=>{
+     * injector._registerService("MyService",MyService,myServiceDependencies,(service,dependencies,resolvedDependencies)=>{
      *      let instance = new service(...resolvedDependencies);
      *      instance.doSomething();
      *      return instance;
      * })
      * @protected
+     * @throws DependencyHasItsOwnAsDependency
+     * @throws DependencyAlreadyRegistered
+     * @throws DependencyOptionRequired
      */
-    protected _registerService(type:IInjectorType,name:string,service,dependencies,factory?:Function){
+    protected  _registerService(type:IInjectorType,name:string,service,dependencies,factory?:Function){
+        if(this._validateName(name,dependencies)){
+            let that = this;
+            let fact = function() {
+                //store type in the factory to manage permisions
+                that._setType(this, type.name);
+                //create getter, the getter provides the instance
+                this.$get = (container) => {
+                    let resolvedDependencies = that._getFor(service, dependencies);
+                    //if a custom factory function is provided
+                    if (typeof factory === "function") {
+                        return factory.call(service, dependencies, resolvedDependencies);
+                    } else {
+                        return new service(...resolvedDependencies);
+                    }
+                }
+            };
+            //store type in the constructor to manage permisions
+            that._setType(service.prototype.constructor, type.name);
+            this._root.provider(name,fact)
+        }
+    }
+    /**
+     * Registra una clase instanciable generando un factory. Funciona de forma similar a _registerService con la diferencia de que la función factory indicada se ejecutará cada vez
+     * que se solicite la dependencia generando una instancia nueva de la clase.
+     * @param {IInjectorType}   type            Tipo de elemento de haztivity
+     * @param {String}          name            Nombre de la dependencia. Debe ser único
+     * @param {*}               service         Clase a registrar
+     * @param {String[]}        dependencies    Conjunto de nombre de dependencias a inyectar. Las dependencias que puede inyectar están restringidas por el tipo de elemento registrado
+     * @param {Function}        [factory]       Función para la instanciación de la clase. Debe devolver un objeto
+     * @example
+     * class MyClass{
+     *
+     * }
+     * let myClassDependencies = [
+     *      "SomeDependency"
+     * ]
+     * injector._registerTransient("MyClass",MyClass,myClassDependencies,(service,dependencies,resolvedDependencies)=>{
+     *      let instance = new service(...resolvedDependencies);
+     *      instance.doSomething();
+     *      return instance;
+     * })
+     * @protected
+     * @throws DependencyHasItsOwnAsDependency
+     * @throws DependencyAlreadyRegistered
+     * @throws DependencyOptionRequired
+     */
+    protected _registerTransient(type:IInjectorType,name:string,service,dependencies,factory?:Function){
+        if(this._validateName(name,dependencies)){
+            let that = this;
+            //create factory func
+            let fact = function(container){
+                let resolvedDependencies = that._getFor(service, dependencies);
+                //if a custom factory function is provided
+                if (typeof factory === "function") {
+                    return factory.call(service, dependencies, resolvedDependencies);
+                } else {
+                    return new service(...resolvedDependencies);
+                }
+            };
+            //store type in the factory and in the constructor to manage permisions
+            this._setType(fact, type.name);
+            this._setType(service.prototype.constructor, type.name);
+            this._root.instanceFactory(name,fact);
+        }
+    }
+    /**
+     * Valida la disponibilidad de un nombre y las dependencias. El nombre no debe estar registrado y el propio nombre no puede estar registrado como una dependencia
+     * @param {String}      name                Nombre a validar
+     * @param {Stirng[]}    dependencies        Dependencias
+     * @returns {boolean}
+     * @protected
+     * @throws DependencyHasItsOwnAsDependency
+     * @throws DependencyAlreadyRegistered
+     * @throws DependencyOptionRequired
+     */
+    protected _validateName(name,dependencies){
         if(!!name) {
             if (!this.exists(name)) {
                 if (dependencies.indexOf(name) === -1) {
-                    let that = this;
-                    this._root.provider(name,function() {
-                        //store type in the factory and in the constructor to manage permisions
-                        that._setType(this, type.name);
-                        that._setType(service.constructor, type.name);
-                        //create getter, the getter provides the instance
-                        this.$get = (container) => {
-                            let resolvedDependencies = that._getFor(service, dependencies);
-                            //if a custom factory function is provided
-                            if (typeof factory === "function") {
-                                return factory.call(service, dependencies, resolvedDependencies);
-                            } else {
-                                return new service(...resolvedDependencies);
-                            }
-                        }
-                    })
+                    return true;
                 } else {
                     throw new DependencyHasItsOwnAsDependency(name);
                 }
@@ -219,7 +289,6 @@ export class Injector implements IInjector{
             throw new DependencyOptionRequired("name");
         }
     }
-
     /**
      * Registra un servicio de tipo Service de haztivity
      * @see _registerService
@@ -242,7 +311,7 @@ export class Injector implements IInjector{
      * @see TYPES
      */
     public registerSco(name:string,service,dependencies,factory?:Function){
-        this._registerService(TYPES.Sco,name,service,dependencies,factory);
+        this._registerTransient(TYPES.Sco,name,service,dependencies,factory);
     }
     /**
      * Registra un servicio de tipo CorePublic de haztivity
@@ -268,7 +337,6 @@ export class Injector implements IInjector{
     public registerComponent(name:string,service,dependencies,factory?:Function){
         this._registerService(TYPES.Component,name,service,dependencies,factory);
     }
-
     /**
      * Registra una instancia. No resuelve dependencias.
      * @param {String}          name            Nombre del servicio.
