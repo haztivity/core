@@ -25,7 +25,7 @@ export class PageFactory{
         let page = PageDIFactory.instance();
         //Set PageController as default
         if(!options.controller){
-            options.controller=PageController.name;
+            options.controller="PageController";
         }
         page.activate(options);
         return page;

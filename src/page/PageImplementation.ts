@@ -38,6 +38,7 @@ export class PageImplementation{
         this.store = {};
         this.state = {};
         this.page = page;
+        $(document.body).append(this.render());
     }
 
     /**
@@ -56,26 +57,23 @@ export class PageImplementation{
         return this.page.getName();
     }
     public getController(){
-        return this.currentController;
-    }
-    /**
-     * Si hay controlador instanciado lo devuelve. En caso contrario genera una instancia nueva
-     * @param {PageImplementation}      oldPage     Página desactivada
-     * @param {number}                  oldPageIs   Posición relativa de la página desactivada en relación con la actual
-     * @returns {PageController}
-     */
-    public run(oldPage:PageImplementation,oldPageIs){
         if(!this.currentController) {
+            let pageOptions = this.page.options;
             if (!this.controllerFactory) {
-                this.controllerFactory = this.Injector.get(this.page.options.name);
+                this.controllerFactory = this.Injector.get(pageOptions.controller);
             }
             let controller: PageController = this.controllerFactory.instance();
-            controller.activate(this.page.options, this.state, this.store);
-            let oldPageElement = oldPage != undefined? oldPage.getController().getElement() : null;
-            controller.show(oldPageElement,oldPageIs);
+            controller.activate(pageOptions, this.state, this.store);
             this.currentController = controller;
         }
         return this.currentController;
+    }
+    public render(){
+        return this.getController().render();
+    }
+    public show(oldPage,oldPageIs):JQueryPromise{
+        let oldPageElement = oldPage != undefined? oldPage.getController().getElement() : null;
+        return this.getController().show(oldPageElement,oldPageIs);
     }
 
     /**

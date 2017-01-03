@@ -49,14 +49,16 @@ export class PageController{
         this.store = store;
         this.eventEmitter = options.eventEmitter;
     }
-
+    public render(){
+        return this._renderTemplate();
+    }
     /**
      * Gestiona la transición entre la página anterior y la nueva
      * @param {JQuery}          $oldPage    Página anterior
      * @param {number}          oldPageIs   Posición relativa de la página desactivada en relación con la actual
      * @return {JQueryPromise}  Promesa resulta al finalizarse la animación
      */
-    public show($oldPage,oldPageIs){
+    public show($oldPage,oldPageIs):JQueryPromise{
         let defer = $.Deferred();
         if($oldPage){
             $oldPage.hide(400).then(()=>{

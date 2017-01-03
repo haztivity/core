@@ -9,11 +9,13 @@ System.config({
 
   map: {
     "bottlejs": "npm:bottlejs@1.5.0",
+    "css": "github:systemjs/plugin-css@0.1.32",
     "es6-shim": "npm:es6-shim@0.35.2",
     "eventemitter2": "npm:eventemitter2@2.2.1",
     "jquery": "npm:jquery@3.1.1",
     "json": "github:systemjs/plugin-json@0.2.3",
     "loglevel": "npm:loglevel@1.4.1",
+    "text": "github:systemjs/plugin-text@0.0.9",
     "typescript": "npm:typescript@2.1.4",
     "github:jspm/nodelibs-assert@0.1.0": {
       "assert": "npm:assert@1.4.1"
