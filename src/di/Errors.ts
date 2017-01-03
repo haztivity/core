@@ -37,3 +37,11 @@ export class DependencyHasItsOwnAsDependency extends BaseError{
         super("DependencyHasItsOwnAsDependency",`${dependency} has its own as dependency`);
     }
 }
+/**
+ * Error al intentar inyectar una dependencia a la que no se tiene acceso
+ */
+export class DependencyAccessDenied extends BaseError{
+    constructor(dependency:string,target:string){
+        super("DependencyAccessDenied",`${target} has not access to ${dependency}`)
+    }
+}

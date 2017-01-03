@@ -3,7 +3,7 @@
  * Copyright Davinchi. All Rights Reserved.
  */
 import {Bottle} from "bottlejs";
-import {DependencyHasItsOwnAsDependency,DependencyAlreadyRegistered,DependencyNotRegisteredError,DependencyOptionRequired} from "./Errors";
+import {DependencyHasItsOwnAsDependency,DependencyAlreadyRegistered,DependencyNotRegisteredError,DependencyOptionRequired,DependencyAccessDenied} from "./Errors";
 import * as IBottle from "../../jspm_packages/npm/bottlejs@1.5.0/dist/bottle";
 export interface IInjector{
     exists(name:string):boolean;
@@ -41,13 +41,14 @@ export const TYPES:ITypes = <ITypes>(function(){
             writable:false,
             configurable:false,
             value:val
-        }
+        };
+        Object.freeze(val);
     }
     function registerType(types,name,allowAccess){
         let obj = {};
         Object.defineProperties(obj,{
             "name":sealProperty(name),
-            "allowAccess":sealProperty(true)
+            "allowAccess":sealProperty(allowAccess)
         });
         types[name] = obj;
     }
@@ -61,6 +62,7 @@ export const TYPES:ITypes = <ITypes>(function(){
     ]);
     registerType(types,"Service",[
         "CorePublic",
+        "Service",
         "Module"
     ]);
     registerType(types,"Sco",[
@@ -150,6 +152,9 @@ export class Injector implements IInjector{
         }
         return result;
     }
+    public getProvider(name){
+        return this._root.container[`${name}Provider`];
+    }
     protected _setType(target,type){
         Object.defineProperty(target,"haztivityType",{
             configurable:false,
@@ -157,7 +162,13 @@ export class Injector implements IInjector{
             value:type
         });
     }
-
+    protected _getType(target){
+        if(typeof target === "function") {
+            return target.prototype.constructor.haztivityType;
+        }else{
+            return target.haztivityType || target.constructor.haztivityType;
+        }
+    }
     /**
      * Obtiene un conjunto de dependencias para un tipo concreto validando el acceso
      * @param {*}                       service         Servicio para el cual obtener las dependencias
@@ -167,15 +178,31 @@ export class Injector implements IInjector{
      */
     protected _getFor(service,dependencies){
         let resolvedDependencies = [];
-        for (let dependencieName of dependencies) {
-            let dependency = this.get(dependencieName);
-            if(dependency == undefined){
-                throw new DependencyNotRegisteredError(dependencieName);
+        for (let dependencyName of dependencies) {
+            let provider = this.getProvider(dependencyName),//try to get the provider
+            dependency,
+            serviceType,
+            dependencyType;
+            //bottle js removes the provider of services after the first invocation. In that case, is necessary obtain the type of the dependency
+            if(provider){
+                dependencyType = TYPES[this._getType(provider)]
+            }else{
+                dependency = this.get(dependencyName);
+                if (dependency == undefined) {
+                    throw new DependencyNotRegisteredError(dependencyName);
+                }
+                dependencyType = TYPES[this._getType(dependency)];
             }
-            if(dependencieName === "Injector"){
-                dependency = dependency.instance(service);
+            serviceType = TYPES[this._getType(service)];
+            if(serviceType && dependencyType && (serviceType.allowAccess === true || serviceType.allowAccess.indexOf(dependencyType.name) !== -1)) {
+                dependency = dependency || this.get(dependencyName);
+                if (dependencyName === "Injector") {
+                    dependency = dependency.instance(service);
+                }
+                resolvedDependencies.push(dependency);
+            }else{
+                throw new DependencyAccessDenied(service.name,dependencyName);
             }
-            resolvedDependencies.push(dependency);
         }
         //todo Validate access
         return resolvedDependencies;
@@ -207,29 +234,24 @@ export class Injector implements IInjector{
      */
     protected  _registerService(type:IInjectorType,name:string,service,dependencies,factory?:Function){
         if(this._validateName(name,dependencies)){
-            let that = this;
-            let fact = function() {
-                //store type in the factory to manage permisions
-                that._setType(this, type.name);
-                //create getter, the getter provides the instance
-                this.$get = (container) => {
-                    let dependenciesToInject = that._getRegisteredDependencies(service);
-                    let resolvedDependencies = that._getFor(service, dependenciesToInject);
-                    //if a custom factory function is provided
-                    if (typeof factory === "function") {
-                        return factory.call(service, dependenciesToInject, resolvedDependencies);
-                    } else {
-                        return new service(...resolvedDependencies);
-                    }
-                }
-            };
             //store type in the constructor to manage permisions
             this._setType(service.prototype.constructor, type.name);
             let registeredDependencies = this._getRegisteredDependencies(service);
             //if the element already has dependencies, concat
             dependencies = $.unique(dependencies.concat(registeredDependencies));
             this._registerDependencies(service,dependencies);
-            this._root.provider(name,fact)
+            let bottleInstance = this._root.factory(name,(container)=>{
+                let dependenciesToInject = this._getRegisteredDependencies(service);
+                let resolvedDependencies = this._getFor(service, dependenciesToInject);
+                //if a custom factory function is provided
+                if (typeof factory === "function") {
+                    return factory.call(null,service, dependenciesToInject, resolvedDependencies);
+                } else {
+                    return new service(...resolvedDependencies);
+                }
+            });
+            let provider = bottleInstance.container[name+"Provider"];
+            this._setType(provider, type.name);
         }
     }
 
@@ -292,13 +314,16 @@ export class Injector implements IInjector{
                 }
             };
             //store type in the factory and in the constructor to manage permisions
-            this._setType(fact, type.name);
             this._setType(service.prototype.constructor, type.name);
             let registeredDependencies = this._getRegisteredDependencies(service);
             //if the element already has dependencies, concat
             dependencies = $.unique(dependencies.concat(registeredDependencies));
             this._registerDependencies(service,dependencies);
-            this._root.instanceFactory(name,fact);
+            let bottleInstance = this._root.instanceFactory(name,fact);
+            let provider = bottleInstance.container[name+"Provider"];
+            this._setType(provider, type.name);
+            let dep = this.get(name);
+            this._setType(dep, type.name);
         }
     }
     /**
@@ -362,6 +387,9 @@ export class Injector implements IInjector{
     public registerServiceInstance(name:string,instance){
         if(!this.exists(name)){
             this._setType(instance,TYPES.Service.name);
+            this._registerService(TYPES.Service,name, instance, [],()=>{
+                return instance;
+            });
             this._root.constant(name,instance);
         }else{
             throw new DependencyAlreadyRegistered(name);
