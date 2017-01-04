@@ -5,13 +5,12 @@
 import {Core} from "../di";
 import {Page,IPageOptions} from "./Page";
 import {PageController,IPageState,IPageStore} from "./PageController";
-import * as Bottle from "../../jspm_packages/npm/bottlejs@1.5.0/dist/bottle";
-import {IInjectorService} from "../di";
+import {InjectorService} from "../di";
 
 @Core({
     name:"PageImplementation",
     dependencies:[
-        "Injector"
+        InjectorService
     ],
     instantiable:true
 })
@@ -27,7 +26,7 @@ export class PageImplementation{
      * @class
      * @param Injector
      */
-    constructor(protected Injector:IInjectorService){
+    constructor(protected Injector:InjectorService){
     }
 
     /**
@@ -38,7 +37,6 @@ export class PageImplementation{
         this.store = {};
         this.state = {};
         this.page = page;
-        $(document.body).append(this.render());
     }
 
     /**
@@ -56,6 +54,13 @@ export class PageImplementation{
     public getPageName(){
         return this.page.getName();
     }
+
+    /**
+     * Obtiene una instancia del controlador.
+     * Si se solicita y no hay controlador actual se instancia uno nuevo iniciando el ciclo de vida.
+     * @returns {PageController}
+     * @see PageController
+     */
     public getController(){
         if(!this.currentController) {
             let pageOptions = this.page.options;
@@ -63,7 +68,7 @@ export class PageImplementation{
                 this.controllerFactory = this.Injector.get(pageOptions.controller);
             }
             let controller: PageController = this.controllerFactory.instance();
-            controller.activate(pageOptions, this.state, this.store);
+            controller.activate(pageOptions, this.page.eventEmitter, this.state, this.store);
             this.currentController = controller;
         }
         return this.currentController;
@@ -76,6 +81,13 @@ export class PageImplementation{
         return this.getController().show(oldPageElement,oldPageIs);
     }
 
+    /**
+     * Finaliza el ciclo de vida actual invocando al método "destroy" del controlador de la página y liberando la instancia del controlador
+     */
+    public detach(){
+        this.currentController._destroy();
+        this.currentController = null;
+    }
     /**
      * Desecha la instancia del controlador actual
      */

@@ -3,9 +3,12 @@
  * Copyright Davinchi. All Rights Reserved.
  */
 import {Page as PageDecorator} from "../di";
+import {$} from "../jqueryDI";
 import {IPageOptions} from "./Page";
+import {EventEmitter} from "../utils";
 export interface IPageControllerOptions extends IPageOptions{
-    eventEmitter:EventEmitter2;
+    name:string;
+    template:string;
 }
 export interface IPageStore{
 
@@ -16,13 +19,19 @@ export interface IPageState{
 @PageDecorator({
     name:"PageController",
     dependencies:[
-        "$"
+        $
     ]
 })
 export class PageController{
+    public static readonly NAMESPACE="pageController";
+    public static readonly ON_RENDERING=`${PageController.NAMESPACE}:rendering`;
+    public static readonly ON_RENDERED=`${PageController.NAMESPACE}:rendered`;
+    public static readonly ON_SHOW=`${PageController.NAMESPACE}:show`;
+    public static readonly ON_SHOWN = `${PageController.NAMESPACE}:shown`;
+    public static readonly ON_COMPLETE = `${PageController.NAMESPACE}:completed`;
     protected $element;
     protected options:IPageOptions;
-    protected eventEmitter:EventEmitter2;
+    protected eventEmitter:EventEmitter;
     protected state:IPageState;
     protected store:IPageStore;
 
@@ -39,18 +48,26 @@ export class PageController{
 
     /**
      * Configura la clase nada más instanciarla
-     * @param {IPageControllerOptions}  options     Opciones para el controlador
-     * @param {IPageState}              state       Estado del controlador. Se comparte entre instancias de un mismo controlador permitiendo almacenar el estado de los elementos internos
-     * @param {IPageStore}              store       Almacén de datos. Se comparte entre instancias de un mismo controlador. Permite compartir información con otros controladores.
+     * @param {IPageControllerOptions}  options         Opciones para el controlador
+     * @param {EventEmitter}            eventEmitter    Contexto para el manejo de eventos
+     * @param {IPageState}              state           Estado del controlador. Se comparte entre instancias de un mismo controlador permitiendo almacenar el estado de los elementos internos
+     * @param {IPageStore}              store           Almacén de datos. Se comparte entre instancias de un mismo controlador. Permite compartir información con otros controladores.
      */
-    public activate(options:IPageControllerOptions,state:IPageState,store:IPageStore){
+    public activate(options:IPageControllerOptions,eventEmitter:EventEmitter,state:IPageState,store:IPageStore){
         this.options = options;
         this.state = state;
         this.store = store;
-        this.eventEmitter = options.eventEmitter;
+        this.eventEmitter = eventEmitter;
     }
     public render(){
-        return this._renderTemplate();
+        let $element = this.$(this.options.template),
+            //allow to user to change the object returned
+            result = this.eventEmitter.trigger(PageController.ON_RENDERING,[$element,this]);
+        if(result instanceof this.$){
+            $element = result;
+        }
+        this.$element = $element;
+        return $element;
     }
     /**
      * Gestiona la transición entre la página anterior y la nueva
@@ -60,13 +77,7 @@ export class PageController{
      */
     public show($oldPage,oldPageIs):JQueryPromise{
         let defer = $.Deferred();
-        if($oldPage){
-            $oldPage.hide(400).then(()=>{
-                this.$element.show(400).then(()=>{
-                    defer.resolve();
-                });
-            });
-        }
+
         return defer.promise();
     }
     /**
@@ -76,13 +87,11 @@ export class PageController{
     public getElement():JQuery{
         return this.$element;
     }
+
     /**
-     * Renderiza la template
-     * @returns {JQuery}
-     * @private
+     * Invocado al solicitarse la destruccion de la página
      */
-    protected _renderTemplate():JQuery{
-        this.$element = this.$(this.options.template);
-        return this.$element;
+    protected _destroy(){
+
     }
 }

@@ -5,3 +5,4 @@
 import {Injector} from "./di";
 import $ from "jquery";
 Injector.getInstance().registerServiceInstance("$",$);
+export {$ as $};

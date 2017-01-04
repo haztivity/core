@@ -8,5 +8,5 @@
  * @description
  * El módulo "utils" contiene utilidades para el desarrollo
  */
-export {Logger} from "./utils/Logger";
-export {EventEmitterFactory,ICreateEventEmitterOptions} from "./utils/EventEmitter";
+export {EventEmitterFactory} from "./utils/EventEmitterFactory";
+export {IEventHandler,EventEmitter} from "./utils/EventEmitter";

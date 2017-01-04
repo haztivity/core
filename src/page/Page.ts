@@ -3,10 +3,7 @@
  * Copyright Davinchi. All Rights Reserved.
  */
 import {Core} from "../di";
-export interface IPage{
-    on():void;
-    off():void;
-}
+import {IEventHandler,EventEmitter,EventEmitterFactory} from "../utils";
 export interface IPageOptions{
     name:string;
     template:string;
@@ -17,12 +14,13 @@ export interface IPageOptions{
     name:"Page",
     instantiable:true,
     dependencies:[
-        "EventEmitterFactory"
+        EventEmitterFactory
     ]
 })
-export class Page implements IPage{
+export class Page implements IEventHandler{
+    public static readonly NAMESPACE = "page";
     protected options:IPageOptions;
-    protected eventEmitter:EventEmitter2;
+    protected eventEmitter:EventEmitter;
 
     /**
      * Almacena la información de una página.
@@ -30,8 +28,7 @@ export class Page implements IPage{
      * @class
      * @param EventEmitterFactory
      */
-    constructor(protected EventEmitterFactory){
-
+    constructor(protected EventEmitterFactory:EventEmitterFactory){
     }
 
     /**
@@ -40,12 +37,19 @@ export class Page implements IPage{
      */
     public activate(options:IPageOptions){
         this.options=options;
+        this.eventEmitter = this.EventEmitterFactory.createEmitter();
     }
-    public on(){
-
+    public on(events:string,data:any,handler: (eventObject: JQueryEventObject, ...args: any[]) => any){
+        this.eventEmitter.on(events+"."+Page.NAMESPACE,data,handler);
+        return this;
     }
-    public off(){
-
+    public one(events: string, data: any, handler: (eventObject: JQueryEventObject) => any){
+        this.eventEmitter.one(events+"."+Page.NAMESPACE,data,handler);
+        return this;
+    }
+    public off(events: string,handler?: (eventObject: JQueryEventObject) => any){
+        this.eventEmitter.off(events+"."+Page.NAMESPACE,handler);
+        return this;
     }
 
     /**

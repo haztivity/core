@@ -3,35 +3,63 @@
  * Copyright Davinchi. All Rights Reserved.
  */
 import {Service} from "../di";
-import * as jqDI from "../jqueryDI";
-jqDI;//Typescript needs a reference to import the module
+import {$ as jquery} from "../jqueryDI";
 import EventEmitter from "eventemitter2";
 //Register EventEmitter in DI
-export interface ICreateEventEmitterOptions extends EventEmitter2Configuration{};
-@Service({
-    name:"EventEmitterFactory",
+import {Core} from "../di";
+export interface IEventHandler{
+    on(events:string,data:any,handler: (eventObject: JQueryEventObject, ...args: any[]) => any):any;
+    one(events: string, data: any, handler: (eventObject: JQueryEventObject) => any):any;
+    off(events: string,handler?: (eventObject: JQueryEventObject) => any):any;
+}
+@Core({
+    name:"EventEmitter",
+    instantiable:true,
     dependencies:[
-        "$"
+        jquery
     ]
 })
-export class EventEmitterFactory{
-    public static DEFAULTS = <EventEmitter2Configuration>{
-        wildcard:true
-    };
-    /**
-     * Factoria de EventEmitter2. Permite generar instancias de EventEmitter2 para manipular eventos
-     * @requires $
-     */
+export class EventEmitter{
+    protected $context:JQuery;
+    public globalEmitter:EventEmitter;
     constructor(protected $:JQueryStatic){
 
     }
+    public activate(global:EventEmitter,bind:Object={}){
+        this.$context = $(bind);
+        this.globalEmitter = global;
+    }
+    public trigger(eventType:string|JQueryEventObject,...extraParameters:any[]):any{
+        return this.$context.triggerHandler.apply(this.$context,arguments);
+    }
+    public on(events:string,data:any,handler: (eventObject: JQueryEventObject, ...args: any[]) => any):EventEmitter{
+        if(typeof data === "function" && typeof handler !== "function"){
+            this.$context.on(events,handler);
+        }else{
+            this.$context.on(events,data,handler);
+        }
+        return this;
+    }
+    public off(events: string,handler?: (eventObject: JQueryEventObject) => any):EventEmitter{
+        this.$context.off(events,handler);
+        return this;
+    }
+    public one(events: string, data: any, handler: (eventObject: JQueryEventObject) => any):EventEmitter{
+        if(typeof data === "function" && typeof handler !== "function"){
+            this.$context.one(events,handler);
+        }else{
+            this.$context.one(events,data,handler);
+        }
+        return this;
+    }
+
+
     /**
-     * Genera una instancia de EventEmitter2
-     * @param {ICreateEventEmitterOptions}  options     Opciones que acepta EventEmitter
-     * @returns {EventEmitter2}
+     * Crea un objeto JQueryEvent para utilizarse con EventEmitter
+     * @param {String}  name    Nombre del evento
+     * @returns {JQueryEventObject}
      */
-    createEmitter(options?:ICreateEventEmitterOptions):EventEmitter2{
-        let optionsParsed = this.$.extend(true,{},EventEmitterFactory.DEFAULTS,options || {});
-        return <EventEmitter2>new EventEmitter(optionsParsed);
+    createEvent(name:string):JQueryEventObject{
+        return this.$.Event(name);
     }
 }

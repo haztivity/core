@@ -21,7 +21,7 @@ export class PageFactory{
      * @returns {Page}
      */
     public static createPage(options:IPageOptions){
-        let PageDIFactory = Injector.getInstance(PageFactory).get("Page");
+        let PageDIFactory = Injector.getInstance(PageFactory).get(Page);
         let page = PageDIFactory.instance();
         //Set PageController as default
         if(!options.controller){

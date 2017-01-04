@@ -41,7 +41,15 @@ export class DependencyHasItsOwnAsDependency extends BaseError{
  * Error al intentar inyectar una dependencia a la que no se tiene acceso
  */
 export class DependencyAccessDenied extends BaseError{
-    constructor(dependency:string,target:string){
+    constructor(target:string,dependency:string){
         super("DependencyAccessDenied",`${target} has not access to ${dependency}`)
+    }
+}
+/**
+ * Error al intentar inyectar una dependencia a la que no se tiene acceso
+ */
+export class DependencyNotValid extends BaseError{
+    constructor(target:string,dependencies){
+        super("DependencyNotValid",`Some dependency for ${target} is undefined. Dependencies:${JSON.stringify(dependencies||{},null,4)}`)
     }
 }

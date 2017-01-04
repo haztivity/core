@@ -6,7 +6,7 @@ import {Injector} from "./Injector";
 const injectorInstance = Injector.getInstance();
 interface IBaseParams {
     name: string;
-    dependencies: string[];
+    dependencies: any[];
     factory?: Function;
 }
 export interface ICoreParams extends IBaseParams{
@@ -33,7 +33,7 @@ export function Core (params:ICoreParams){
     return (target)=> {
         if (params.public) {
             if(params.instantiable){
-                injectorInstance.registerCoreTransient(params.name,target,params.dependencies,params.factory);
+                injectorInstance.registerCorePublicTransient(params.name,target,params.dependencies,params.factory);
             }else {
                 injectorInstance.registerCorePublic(params.name, target, params.dependencies, params.factory);
             }

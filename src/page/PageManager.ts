@@ -5,18 +5,18 @@
 import {Core} from "../di";
 import {Page} from "./Page";
 import {PageImplementation} from "./PageImplementation";
-import {EventEmitterFactory} from "../utils";
+import {EventEmitter,EventEmitterFactory} from "../utils";
 @Core({
     name:"PageManager",
     dependencies:[
-        "EventEmitterFactory",
-        "PageImplementation"
+        EventEmitterFactory,
+        PageImplementation
     ]
 })
 export class PageManager{
     protected pages:PageImplementation[] = [];
     protected pagesMap:Map<string,number> = new Map<string,number>();
-    protected eventEmitter:EventEmitter2;
+    protected eventEmitter:EventEmitter;
     constructor(protected EventEmitterFactory:EventEmitterFactory, protected PageImplementationFactory){
         this.eventEmitter = EventEmitterFactory.createEmitter();
     }

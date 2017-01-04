@@ -1,13 +1,15 @@
-import {IPage,ScoFactory,PageFactory} from "../src/core";
-//import template from "./test.html!text";
-//import css from "./test.css!css";
-//css;
-let page:IPage = PageFactory.createPage({
+import {ScoFactory,Page,PageController,PageFactory} from "../src/core";
+import template from "./test.html!text";
+import css from "./test.css!css";
+css;
+let page:Page = PageFactory.createPage({
     name:"page",
     resources:[],
-    template:""
+    template:template
 });
-page.on();
+page.on(PageController.ON_RENDERING,null,(event,$page,pageController)=>{
+    debugger;
+});
 ScoFactory.createSco({
     name:"sco",
     pages:[
