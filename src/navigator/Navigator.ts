@@ -47,8 +47,10 @@ export class Navigator{
         if(newPage){
             if(newPage !== this.currentPage) {
                 //todo check if page is complete
-                let currentPageElement = this.currentPage ? this.currentPage.getController().getElement() : null,
-                    currentPageIndex = this.currentPage ? this.PageManager.getPageIndex(this.currentPage.getPageName()) : null,
+                let currentPage = this.currentPage;
+                this.currentPage = newPage;
+                let currentPageElement = currentPage ? currentPage.getController().getElement() : null,
+                    currentPageIndex = currentPage ? this.PageManager.getPageIndex(currentPage.getPageName()) : null,
                     newPageController = newPage.getController(),
                     newPageElement = newPageController.render(),
                     newPageName = newPage.getPageName(),
@@ -65,9 +67,9 @@ export class Navigator{
                 let showPromise = newPageController.show(currentPageElement, currentPageIs);
                 //if the function returns a promise
                 if (typeof showPromise.then === "function") {
-                    newPageController.show(currentPageElement, currentPageIs).then(this._onPageShowEnd.bind(this, newPage, this.currentRenderProcess));
+                    newPageController.show(currentPageElement, currentPageIs).then(this._onPageShowEnd.bind(this, newPage,currentPage, this.currentRenderProcess));
                 } else {//otherwise, execute immediately
-                    this._onPageShowEnd(newPage, this.currentRenderProcess);
+                    this._onPageShowEnd(newPage,currentPage, this.currentRenderProcess);
                 }
             }else{
                 this.currentRenderProcess.reject();
@@ -77,11 +79,12 @@ export class Navigator{
             //todo throw
         }
     }
-    protected _onPageShowEnd(newPage:PageImplementation,defer){
-        if(this.currentPage) {
-            this.currentPage.detach().getElement().remove();
+    protected _onPageShowEnd(newPage:PageImplementation,oldPage:PageImplementation,defer){
+        if(oldPage) {
+            let controller = oldPage.getController();
+            oldPage.detach();
+            controller.getElement().remove();
         }
-        this.currentPage = newPage;
     }
 
 }

@@ -2,7 +2,7 @@
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-import {Page as PageDecorator} from "../di";
+import {Page as PageDecorator,InjectorService} from "../di";
 import {$} from "../jqueryDI";
 import {IPageOptions} from "./Page";
 import {EventEmitter} from "../utils";
@@ -19,7 +19,8 @@ export interface IPageState{
 @PageDecorator({
     name:"PageController",
     dependencies:[
-        $
+        $,
+        InjectorService
     ]
 })
 export class PageController{
@@ -29,20 +30,21 @@ export class PageController{
     public static readonly ON_SHOW=`${PageController.NAMESPACE}:show`;
     public static readonly ON_SHOWN = `${PageController.NAMESPACE}:shown`;
     public static readonly ON_COMPLETE = `${PageController.NAMESPACE}:completed`;
-    protected $element;
-    protected options:IPageOptions;
-    protected eventEmitter:EventEmitter;
-    protected state:IPageState;
-    protected store:IPageStore;
+    public $element;
+    public options:IPageOptions;
+    public eventEmitter:EventEmitter;
+    public state:IPageState;
+    public store:IPageStore;
 
     /**
      * Controller base para todas las páginas.
      * Tipo Page
      * @class
-     * @param {JQueryStatic}    $   Objeto JQuery
+     * @param {JQueryStatic}    $                   Objeto JQuery
+     * @param {InjectorService} InjectorService     Servicio del inyector
      * @see Injector.TYPES
      */
-    constructor(protected $){
+    constructor(public $,public InjectorService:InjectorService){
 
     }
 
@@ -77,7 +79,7 @@ export class PageController{
      */
     public show($oldPage,oldPageIs):JQueryPromise{
         let defer = $.Deferred();
-
+        defer.resolve();
         return defer.promise();
     }
     /**

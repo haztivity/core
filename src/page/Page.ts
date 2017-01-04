@@ -39,15 +39,15 @@ export class Page implements IEventHandler{
         this.options=options;
         this.eventEmitter = this.EventEmitterFactory.createEmitter();
     }
-    public on(events:string,data:any,handler: (eventObject: JQueryEventObject, ...args: any[]) => any){
+    public on(events:string,data:any,handler: (eventObject: JQueryEventObject, ...args: any[]) => any):Page{
         this.eventEmitter.on(events+"."+Page.NAMESPACE,data,handler);
         return this;
     }
-    public one(events: string, data: any, handler: (eventObject: JQueryEventObject) => any){
+    public one(events: string, data: any, handler: (eventObject: JQueryEventObject) => any):Page{
         this.eventEmitter.one(events+"."+Page.NAMESPACE,data,handler);
         return this;
     }
-    public off(events: string,handler?: (eventObject: JQueryEventObject) => any){
+    public off(events: string,handler?: (eventObject: JQueryEventObject) => any):Page{
         this.eventEmitter.off(events+"."+Page.NAMESPACE,handler);
         return this;
     }
