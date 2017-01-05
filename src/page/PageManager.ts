@@ -38,7 +38,7 @@ export class PageManager{
      */
     public addPage(page:Page){
         let pageName = page.getName();
-        if(this.pagesMap.get(pageName) != undefined){
+        if(this.getPageIndex(pageName) === -1){
             if(this._validatePageName(pageName)) {
                 let pageImplementation: PageImplementation = this.PageImplementationFactory.instance();
                 pageImplementation.activate(page);
@@ -72,7 +72,7 @@ export class PageManager{
      */
     public getPageIndex(name:string){
         let result = this.pagesMap.get(name);
-        result = result || -1;
+        result = result != undefined ? result : -1;
         return result;
     }
 

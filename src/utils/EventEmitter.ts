@@ -2,8 +2,7 @@
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-import {Service} from "../di";
-import {$ as jquery} from "../jqueryDI";
+import {$ as jquery} from "../jquery";
 import EventEmitter from "eventemitter2";
 //Register EventEmitter in DI
 import {Core} from "../di";

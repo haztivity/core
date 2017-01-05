@@ -2,7 +2,7 @@
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-import {$ as jquery} from "../jqueryDI";
+import {$ as jquery} from "../jquery";
 import {Core} from "../di";
 import {PageManager,PageImplementation,PageController} from "../page";
 import {EventEmitter, EventEmitterFactory} from "../utils";

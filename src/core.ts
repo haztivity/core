@@ -3,7 +3,7 @@
  * Copyright Davinchi. All Rights Reserved.
  */
 
-import * as jqDI from "./jqueryDI";
+import * as jqDI from "./jquery";
 jqDI;//Typescript doesn't import the module if isn't used
 export {IInjectorService,IInjectorRegisterService,Service,IServiceParams,ServiceInstance,IServiceInstanceParams,Module,IModuleParams,Sco,IScoParams} from "./di";
 export {EventEmitter,EventEmitterFactory} from "./utils";

@@ -3,7 +3,7 @@
  * Copyright Davinchi. All Rights Reserved.
  */
 import {Page as PageDecorator,InjectorService} from "../di";
-import {$} from "../jqueryDI";
+import {$} from "../jquery";
 import {IPageOptions} from "./Page";
 import {EventEmitter} from "../utils";
 import {PageController} from "./PageController";

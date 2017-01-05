@@ -4,7 +4,7 @@
  */
 import {Core} from "../di";
 import {EventEmitter} from "./EventEmitter";
-import {$ as jquery} from "../jqueryDI";
+import {$ as jquery} from "../jquery";
 @Core({
     name:"EventEmitterFactory",
     public:true,
