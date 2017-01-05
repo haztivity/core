@@ -6,6 +6,7 @@ import {Core} from "../di";
 import {Page} from "./Page";
 import {PageImplementation} from "./PageImplementation";
 import {EventEmitter,EventEmitterFactory} from "../utils";
+import {HaztivityPageAlreadyRegistered,HaztivityPageNameInvalid} from "./Errors";
 @Core({
     name:"PageManager",
     dependencies:[
@@ -36,16 +37,23 @@ export class PageManager{
      * @param {Page}    page        Página a añadir
      */
     public addPage(page:Page){
-        if(!this.pagesMap.get(page.getName())){
-            let pageImplementation:PageImplementation = this.PageImplementationFactory.instance();
-            pageImplementation.activate(page);
-            this.pages.push(pageImplementation);
-            this.pagesMap.set(page.getName(),this.pages.length-1);
+        let pageName = page.getName();
+        if(this.pagesMap.get(pageName) != undefined){
+            if(this._validatePageName(pageName)) {
+                let pageImplementation: PageImplementation = this.PageImplementationFactory.instance();
+                pageImplementation.activate(page);
+                this.pages.push(pageImplementation);
+                this.pagesMap.set(pageName, this.pages.length - 1);
+            }else{
+                throw new HaztivityPageNameInvalid(pageName);
+            }
         }else{
-            //todo throw error
+            throw new HaztivityPageAlreadyRegistered(pageName);
         }
     }
-
+    protected _validatePageName(name:string){
+        return name.search(/[^\w|-]/g) == -1;
+    }
     /**
      * Actualiza el mapa de nombre-índice de las páginas
      */
