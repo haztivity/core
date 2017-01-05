@@ -54,7 +54,7 @@ export class Navigator{
                     newPageController = newPage.getController(),
                     newPageElement = newPageController.render(),
                     newPageName = newPage.getPageName(),
-                    currentPageIs = index - currentPageIndex < 0 ? -1 : 1;
+                    currentPageIs = currentPageIndex - index < 0 ? -1 : 1;
                 //if the new page is before to the current page
                 if (currentPageIndex === -1) {
                     this.$context.prepend(newPageElement);

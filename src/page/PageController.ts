@@ -30,6 +30,7 @@ export class PageController{
     public static readonly ON_SHOW=`${PageController.NAMESPACE}:show`;
     public static readonly ON_SHOWN = `${PageController.NAMESPACE}:shown`;
     public static readonly ON_COMPLETE = `${PageController.NAMESPACE}:completed`;
+    public static readonly CLASS_PAGE = "hz-page";
     public $element;
     public options:IPageOptions;
     public eventEmitter:EventEmitter;
@@ -72,6 +73,7 @@ export class PageController{
         }else{
             $element = this._render(this.options.template);
         }
+        $element.addClass(`${PageController.CLASS_PAGE} ${PageController.CLASS_PAGE}-${this.options.name}`);
         this.$element = $element;
         return $element;
     }
@@ -95,36 +97,21 @@ export class PageController{
         let promise,
             deferred = $.Deferred(),
             event = this.eventEmitter.createEvent(PageController.ON_SHOW),
-            result = this.eventEmitter.trigger(event, [this.$element,$oldPage,oldPageRelativePosition]);
+            result = this.eventEmitter.trigger(event, [this.$element,$oldPage,oldPageRelativePosition,this]);
         if(!event.isDefaultPrevented()){
             //if the user doesn't prevent default
             this._show($oldPage,oldPageRelativePosition).then(()=>{
                 if(typeof result === "function") {
-                    //call the user's function
-                    let eventPromise = result();
-                    //check if returns a promise
-                    if (eventPromise != undefined && typeof eventPromise.then === "function") {
-                        eventPromise.then(()=>{
-                            deferred.resolve();
-                        })
-                    }else{
-                        //todo throw
-                    }
+                    //call the event's function
+                    result(deferred);
                 }else{//if any function is provided by the event
                     deferred.resolve();
                 }
             });
-
         }else{
             //if is default prevented, check if the user returns a function
             if(typeof result === "function") {
-                let eventPromise = result();//call the user function and check if returns a promise
-                if (eventPromise == undefined || typeof eventPromise.then !== "function") {
-                    //if the event returns a promise, sync deferred
-                    eventPromise.then(()=>{
-                        deferred.resolve();
-                    });
-                }
+                result(deferred);//call the event's function
             }else{
                 //if not, return a resolved promise
                 deferred.resolve();
