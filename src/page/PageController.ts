@@ -2,7 +2,7 @@
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-import {Page as PageDecorator,InjectorService} from "../di";
+import {Dependencies,InjectorService} from "../di";
 import {$} from "../jqueryDI";
 import {IPageOptions} from "./Page";
 import {EventEmitter} from "../utils";
@@ -16,20 +16,20 @@ export interface IPageStore{
 export interface IPageState{
 
 }
-@PageDecorator({
-    name:"PageController",
+@Dependencies({
     dependencies:[
         $,
         InjectorService
     ]
 })
-export class PageController{
+export abstract class PageController{
     public static readonly NAMESPACE="pageController";
     public static readonly ON_RENDERING=`${PageController.NAMESPACE}:rendering`;
     public static readonly ON_RENDERED=`${PageController.NAMESPACE}:rendered`;
     public static readonly ON_SHOW=`${PageController.NAMESPACE}:show`;
     public static readonly ON_SHOWN = `${PageController.NAMESPACE}:shown`;
     public static readonly ON_COMPLETE = `${PageController.NAMESPACE}:completed`;
+    public static readonly ON_DESTROY = `${PageController.NAMESPACE}:destroy`;
     public static readonly CLASS_PAGE = "hz-page";
     public $element;
     public options:IPageOptions;
@@ -79,7 +79,6 @@ export class PageController{
     }
     protected _render(template){
         let $element = $(template);
-        $element.hide();
         return $element;
     }
 
@@ -90,10 +89,6 @@ export class PageController{
      * @return {JQueryPromise}  Promesa resulta al finalizarse la animación
      */
     public show($oldPage,oldPageRelativePosition):JQueryPromise{
-        //Se lanza el evento show para poder manipular la animación
-        //Se puede devolver null o una función (la función ha de devolver una promesa)
-        //si se devuelve una función se ejecutará al completarse la animación predefinida
-        //Se puede también hacer un prevent default, en cuyo caso no se ejecutará la animación predefinida
         let promise,
             deferred = $.Deferred(),
             event = this.eventEmitter.createEvent(PageController.ON_SHOW),
@@ -121,18 +116,7 @@ export class PageController{
     }
     protected _show($oldPage,oldPageRelativePosition):JQueryPromise{
         let defer = $.Deferred();
-        if($oldPage){
-            $oldPage.fadeOut(400,()=>{
-                this.$element.fadeIn(400,()=>{
-                    defer.resolve();
-                })
-            });
-        }else{
-            this.$element.fadeIn(400,()=>{
-                defer.resolve();
-            });
-        }
-
+        defer.resolve();
         return defer.promise();
     }
     /**
@@ -142,11 +126,10 @@ export class PageController{
     public getElement():JQuery{
         return this.$element;
     }
-
     /**
      * Invocado al solicitarse la destruccion de la página
      */
     protected _destroy(){
-
+        this.eventEmitter.trigger(PageController.ON_DESTROY,[this.$element,this]);
     }
 }

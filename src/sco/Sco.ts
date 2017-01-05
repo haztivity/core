@@ -4,15 +4,16 @@
  */
 import {EventEmitter,EventEmitterFactory} from "../utils";
 import {Sco} from "../di";
-import {IPage,Page,PageManager} from "../page";
+import {Page,PageManager} from "../page";
 import {Navigator} from "../navigator";
+import {HaztivityAppContextNotFound,HaztivityPagesContextNotFound} from "./Errors";
 export interface ISco{
     on():void;
     run():void;
 }
 export interface IScoOptions{
     name:string;
-    pages:Page[]|IPage[];
+    pages:Page[];
 }
 @Sco({
     name:"ScoController",
@@ -23,9 +24,12 @@ export interface IScoOptions{
     ]
 })
 export class ScoController implements ISco{
+    public static readonly CLASS_CONTEXT="hz-container";
+    public static readonly CLASS_PAGES="hz-pages-container";
     protected eventEmitter:EventEmitter;
     protected options:IScoOptions;
     protected $context:JQuery;
+    protected $pagesContainer:JQuery;
     constructor (protected Navigator:Navigator,protected PageManager:PageManager,protected EventEmitterFactory:EventEmitterFactory){
         this.eventEmitter = EventEmitterFactory.createEmitter();
     }
@@ -36,9 +40,26 @@ export class ScoController implements ISco{
     public on():ScoController{
         return this;
     }
+    protected _init(){
+        this.$context = $("[data-hz-app]");
+        //context must exists
+        if(this.$context.length > 0) {
+            this.$context.addClass(ScoController.CLASS_CONTEXT);
+            this.$pagesContainer = this.$context.find("[data-hz-pages]");
+            //page contexts must exists
+            if(this.$pagesContainer.length > 0) {
+                return true;
+            }else{
+                throw new HaztivityPagesContextNotFound();
+            }
+        }else{
+            throw new HaztivityAppContextNotFound();
+        }
+    }
     public run():ScoController{
-        this.$context = $("[data-hz-pages]");
-        this.Navigator.activate(this.$context);
+        this._init();
+        this.$pagesContainer.addClass(ScoController.CLASS_PAGES);
+        this.Navigator.activate(this.$pagesContainer);
         //init components
         this.PageManager.addPages(this.options.pages);
         this.Navigator.goTo(0);

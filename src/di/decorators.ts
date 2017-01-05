@@ -101,3 +101,14 @@ export function Page(params:IPageParams){
         injectorInstance.registerPage(params.name,target,params.dependencies,params.factory);
     }
 }
+/**
+ * Decorador para registrar las dependencias sin registrar la clase como inyectable
+ * @param {{dependencies:any[]}}     params
+ * @static
+ * @function
+ */
+export function Dependencies(params:{dependencies:any[]}){
+    return (target) =>{
+        injectorInstance.registerDependencies(target,params.dependencies);
+    }
+}

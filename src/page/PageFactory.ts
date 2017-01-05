@@ -4,14 +4,16 @@
  */
 import {Core,Injector} from "../di";
 import {Page,IPageOptions} from "./Page";
-import {PageController} from "./PageController";
+import {GenericPageController} from "./GenericPageController";
 /**
  * Factory para crear páginas genéricas
  * @class PageFactory
  */
 @Core({
     name:"PageFactory",
-    dependencies:[]
+    dependencies:[
+        GenericPageController
+    ]
 })
 export class PageFactory{
     /**
@@ -25,7 +27,7 @@ export class PageFactory{
         let page = PageDIFactory.instance();
         //Set PageController as default
         if(!options.controller){
-            options.controller="PageController";
+            options.controller="GenericPageController";
         }
         page.activate(options);
         return page;

@@ -34,7 +34,10 @@ export class PageImplementation{
      * @param {Page}    page    Página registrada en el PageManager.
      */
     activate(page:Page){
-        this.store = {};
+        this.store = {
+            public:{},
+            private:{}
+        };
         this.state = {};
         this.page = page;
     }

@@ -73,6 +73,7 @@ export const TYPES:ITypes = <ITypes>(function(){
         "Service"
     ]);
     registerType(types,"Page",[
+        "CorePublic",
         "Service"
     ]);
     Object.freeze(types);
@@ -285,10 +286,7 @@ export class Injector{
             //store type in the constructor to manage permisions
             this._setType(service, type.name);
             this._setName(service, name);
-            let registeredDependencies = this._getRegisteredDependencies(service);
-            //if the element already has dependencies, concat
-            dependencies = $.unique(dependencies.concat(registeredDependencies));
-            this._registerDependencies(service,dependencies);
+            this.registerDependencies(service,dependencies);
             let bottleInstance = this._root.factory(name,(container)=>{
                 let dependenciesToInject = this._getRegisteredDependencies(service);
                 let resolvedDependencies = this._getFor(service, dependenciesToInject);
@@ -310,8 +308,12 @@ export class Injector{
      * @param {String[]}            dependencies    Dependencias a registrar
      * @private
      */
-    protected _registerDependencies(service,dependencies){
+    protected registerDependencies(service,dependencies){
+        let registeredDependencies = this._getRegisteredDependencies(service);
+        //if the element already has dependencies, concat
+        dependencies = $.unique(dependencies.concat(registeredDependencies));
         service.prototype.$inject = dependencies;
+        return dependencies;
     }
 
     /**
@@ -365,11 +367,8 @@ export class Injector{
             };
             //store type in the factory and in the constructor to manage permisions
             this._setType(service, type.name);
-            let registeredDependencies = this._getRegisteredDependencies(service);
-            //if the element already has dependencies, concat
-            dependencies = $.unique(dependencies.concat(registeredDependencies));
             //store the dependencies
-            this._registerDependencies(service,dependencies);
+            this.registerDependencies(service,dependencies);
             //register element and get the instance of bottle
             let bottleInstance = this._root.instanceFactory(name,GenericFactory);
             //get the generated provider
@@ -620,6 +619,7 @@ export interface IInjectorRegisterService{
     registerComponent(name:string,service,dependencies,factory?:Function):void;
     registerServiceInstance(name:string,instance):void;
     registerPage(name:string,service,dependencies,factory?:Function):void;
+    registerDependencies(service:any,dependencies:any[]);
 }
 //Map dynamically the methods
 export class InjectorRegisterService{
@@ -635,7 +635,8 @@ export class InjectorRegisterService{
             "registerModule",
             "registerComponent",
             "registerServiceInstance",
-            "registerPage"
+            "registerPage",
+            "registerDependencies"
         ];
         for (let method of publish) {
             this[method] = injector[method].bind(injector);
