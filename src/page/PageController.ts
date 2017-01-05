@@ -62,24 +62,90 @@ export class PageController{
         this.eventEmitter = eventEmitter;
     }
     public render(){
-        let $element = this.$(this.options.template),
-            //allow to user to change the object returned
-            result = this.eventEmitter.trigger(PageController.ON_RENDERING,[$element,this]);
+        let event = this.eventEmitter.createEvent(PageController.ON_RENDERING),
+            $element,
+            //allow to user to custom render the template
+            result = this.eventEmitter.trigger(event,[this.options.template,this]);
+        //if a result is provided, ignore the default render function
         if(result instanceof this.$){
             $element = result;
+        }else{
+            $element = this._render(this.options.template);
         }
         this.$element = $element;
         return $element;
     }
+    protected _render(template){
+        let $element = $(template);
+        $element.hide();
+        return $element;
+    }
+
     /**
      * Gestiona la transición entre la página anterior y la nueva
-     * @param {JQuery}          $oldPage    Página anterior
-     * @param {number}          oldPageIs   Posición relativa de la página desactivada en relación con la actual
+     * @param {JQuery}          $oldPage                    Página anterior
+     * @param {number}          oldPageRelativePosition     Posición de la página desactivada en relación con la actual. -1 si la pagina anterior es inferior a la actual, 1 si la pagina anterior es posterior a la actual
      * @return {JQueryPromise}  Promesa resulta al finalizarse la animación
      */
-    public show($oldPage,oldPageIs):JQueryPromise{
+    public show($oldPage,oldPageRelativePosition):JQueryPromise{
+        //Se lanza el evento show para poder manipular la animación
+        //Se puede devolver null o una función (la función ha de devolver una promesa)
+        //si se devuelve una función se ejecutará al completarse la animación predefinida
+        //Se puede también hacer un prevent default, en cuyo caso no se ejecutará la animación predefinida
+        let promise,
+            deferred = $.Deferred(),
+            event = this.eventEmitter.createEvent(PageController.ON_SHOW),
+            result = this.eventEmitter.trigger(event, [this.$element,$oldPage,oldPageRelativePosition]);
+        if(!event.isDefaultPrevented()){
+            //if the user doesn't prevent default
+            this._show($oldPage,oldPageRelativePosition).then(()=>{
+                if(typeof result === "function") {
+                    //call the user's function
+                    let eventPromise = result();
+                    //check if returns a promise
+                    if (eventPromise != undefined && typeof eventPromise.then === "function") {
+                        eventPromise.then(()=>{
+                            deferred.resolve();
+                        })
+                    }else{
+                        //todo throw
+                    }
+                }else{//if any function is provided by the event
+                    deferred.resolve();
+                }
+            });
+
+        }else{
+            //if is default prevented, check if the user returns a function
+            if(typeof result === "function") {
+                let eventPromise = result();//call the user function and check if returns a promise
+                if (eventPromise == undefined || typeof eventPromise.then !== "function") {
+                    //if the event returns a promise, sync deferred
+                    eventPromise.then(()=>{
+                        deferred.resolve();
+                    });
+                }
+            }else{
+                //if not, return a resolved promise
+                deferred.resolve();
+            }
+        }
+        return deferred.promise();
+    }
+    protected _show($oldPage,oldPageRelativePosition):JQueryPromise{
         let defer = $.Deferred();
-        defer.resolve();
+        if($oldPage){
+            $oldPage.fadeOut(400,()=>{
+                this.$element.fadeIn(400,()=>{
+                    defer.resolve();
+                })
+            });
+        }else{
+            this.$element.fadeIn(400,()=>{
+                defer.resolve();
+            });
+        }
+
         return defer.promise();
     }
     /**

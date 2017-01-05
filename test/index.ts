@@ -1,30 +1,22 @@
 import {ScoFactory,Page,PageController,PageFactory} from "../src/core";
-import template from "./test.html!text";
-import template2 from "./test2.html!text";
-import template3 from "./test3.html!text";
-import css from "./test.css!css";
-css;
-
-function a(){
-
-}
 let page:Page = PageFactory.createPage({
     name:"page",
     resources:[],
-    template:template
+    template:"<p>page 1</p>"
 });
 page.on(PageController.ON_RENDERING,null,<PageController>(event,$page,pageController:PageController)=>{
     let navigator = pageController.InjectorService.get("Navigator");
+    window.n = navigator;
 });
 let page2:Page = PageFactory.createPage({
     name:"page2",
     resources:[],
-    template:template2
+    template:"<p>page 2</p>"
 });
 let page3:Page = PageFactory.createPage({
     name:"page3",
     resources:[],
-    template:template3
+    template:"<p>page 3</p>"
 });
 ScoFactory.createSco({
     name:"sco",
@@ -37,9 +29,3 @@ ScoFactory.createSco({
 }).run();
 console.timeEnd("Page");
 console.timeEnd("Complete");
-
-
-if(true){
-    var a = true;
-}
-console.log(a)//true
