@@ -89,8 +89,8 @@ export abstract class PageController{
      * @return {JQueryPromise}  Promesa resulta al finalizarse la animación
      */
     public show($oldPage,oldPageRelativePosition):JQueryPromise{
-        let promise,
-            deferred = $.Deferred(),
+        let deferred = $.Deferred(),
+            promise = deferred.promise(),
             event = this.eventEmitter.createEvent(PageController.ON_SHOW),
             result = this.eventEmitter.trigger(event, [this.$element,$oldPage,oldPageRelativePosition,this]);
         if(!event.isDefaultPrevented()){
@@ -112,8 +112,25 @@ export abstract class PageController{
                 deferred.resolve();
             }
         }
-        return deferred.promise();
+        promise.then(this._onShowEnd.bind(this));
+        return promise;
     }
+
+    /**
+     * Invocado al finalizar el proceso de animación
+     * @protected
+     */
+    protected _onShowEnd(){
+        this.eventEmitter.trigger(PageController.ON_SHOWN,[this.$element,this]);
+    }
+
+    /**
+     * Realiza la animación correspondiente
+     * @param {JQuery}              $oldPage                Página anterior.
+     * @param {number}              oldPageRelativePosition Indica la posición de la página anterior en relación a la nueva. -1 si es anterior. 1 si es posterior
+     * @returns {JQueryPromise<T>}  Promesa que se resuelve al finalizar la animación
+     * @protected
+     */
     protected _show($oldPage,oldPageRelativePosition):JQueryPromise{
         let defer = $.Deferred();
         defer.resolve();

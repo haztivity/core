@@ -23,6 +23,13 @@ export class PageManager{
     }
 
     /**
+     * Indica el número de páginas registradas
+     * @returns {number}
+     */
+    public count(){
+        return this.pages.length;
+    }
+    /**
      * Añade un conjunto de páginas.
      * @param {Page[]}          pages       Conjunto de páginas a añadir
      */
