@@ -7,9 +7,11 @@ import {Page} from "./Page";
 import {PageImplementation} from "./PageImplementation";
 import {EventEmitter,EventEmitterFactory} from "../utils";
 import {HaztivityPageAlreadyRegistered,HaztivityPageNameInvalid} from "./Errors";
+import {ResourceManager} from "../resource";
 @Core({
     name:"PageManager",
     dependencies:[
+        ResourceManager,
         EventEmitterFactory,
         PageImplementation
     ]
@@ -18,7 +20,7 @@ export class PageManager{
     protected pages:PageImplementation[] = [];
     protected pagesMap:Map<string,number> = new Map<string,number>();
     protected eventEmitter:EventEmitter;
-    constructor(protected EventEmitterFactory:EventEmitterFactory, protected PageImplementationFactory){
+    constructor(protected ResourceManager, protected EventEmitterFactory:EventEmitterFactory, protected PageImplementationFactory){
         this.eventEmitter = EventEmitterFactory.createEmitter();
     }
 
@@ -47,6 +49,7 @@ export class PageManager{
         let pageName = page.getName();
         if(this.getPageIndex(pageName) === -1){
             if(this._validatePageName(pageName)) {
+                this.ResourceManager.addAll(page.getResources());
                 let pageImplementation: PageImplementation = this.PageImplementationFactory.instance();
                 pageImplementation.activate(page);
                 this.pages.push(pageImplementation);

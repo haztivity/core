@@ -1,12 +1,17 @@
 import {ScoFactory,Page,PageController,PageFactory} from "../src/core";
+import {TestResource} from "./ResourceTest";
 let page:Page = PageFactory.createPage({
     name:"page",
     resources:[],
-    template:"<p>page 1</p>"
+    template:"<p>page 1</p>",
+    resources:[
+        TestResource
+    ]
 });
 page.on(PageController.ON_RENDERING,null,(event:JQueryEventObject,template:String,pageController:PageController)=>{
     let navigator = pageController.InjectorService.get("Navigator");
     window.n = navigator;
+    navigator.disable();
 });
 let page2:Page = PageFactory.createPage({
     name:"page2",

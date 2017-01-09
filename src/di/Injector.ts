@@ -568,7 +568,18 @@ export class Injector {
     public registerPage(name: string, service, dependencies, factory?: Function) {
         this._registerTransient(TYPES.Page, name, service, dependencies, factory);
     }
-
+    /**
+     * Registra una clase de tipo Resource de haztivity
+     * @param {String}          name            Nombre de la dependencia. Debe ser único
+     * @param {*}               service         Clase a registrar
+     * @param {String[]}        dependencies    Conjunto de nombre de dependencias a inyectar. Las dependencias que puede inyectar están restringidas por el tipo de elemento registrado
+     * @param {Function}        [factory]       Función para la instanciación de la clase. Debe devolver un objeto
+     * @see _registerTransient
+     * @see TYPES
+     */
+    public registerResource(name: string, service, dependencies, factory?: Function) {
+        this._registerTransient(TYPES.Resource, name, service, dependencies, factory);
+    }
     /**
      * Obtiene una instancia del inyector. Si se indica el parámetro target se obtiene una instancia del servicio InjectorService para ese target indicado.
      * Si no se indica target se obtiene una instancia de InjectorRegisterService
@@ -644,6 +655,7 @@ export interface IInjectorRegisterService {
     registerComponent(name: string, service, dependencies, factory?: Function): void;
     registerServiceInstance(name: string, instance): void;
     registerPage(name: string, service, dependencies, factory?: Function): void;
+    registerResource(name: string, service, dependencies, factory?: Function): void;
     registerDependencies(service: any, dependencies: any[]);
 }
 //Map dynamically the methods
@@ -661,6 +673,7 @@ export class InjectorRegisterService {
             "registerComponent",
             "registerServiceInstance",
             "registerPage",
+            "registerResource",
             "registerDependencies"
         ];
         for (let method of publish) {

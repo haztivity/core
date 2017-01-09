@@ -6,10 +6,12 @@ import {Core} from "../di";
 import {Page,IPageOptions} from "./Page";
 import {PageController,IPageState,IPageStore} from "./PageController";
 import {InjectorService} from "../di";
+import {ResourceManager,ResourceController} from "../resource";
 
 @Core({
     name:"PageImplementation",
     dependencies:[
+        ResourceManager,
         InjectorService
     ],
     instantiable:true
@@ -20,13 +22,13 @@ export class PageImplementation{
     protected page:Page;
     protected controllerFactory:any;
     protected currentController:PageController;
-
+    protected resources:ResourceController[];
     /**
      * Gestiona el ciclo de vida de una página una vez registrada en el PageManager. Almacena el estado y el store y gestiona el ciclo de vida del controlador.
      * @class
      * @param Injector
      */
-    constructor(protected Injector:InjectorService){
+    constructor(protected ResourceManager, protected Injector:InjectorService){
     }
 
     /**
@@ -39,6 +41,7 @@ export class PageImplementation{
             private:{}
         };
         this.state = {};
+        this.resources = page.getResources();
         this.page = page;
     }
 

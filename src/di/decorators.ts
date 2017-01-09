@@ -17,6 +17,7 @@ export interface IModuleParams extends IBaseParams{}
 export interface IServiceParams extends IBaseParams{}
 export interface IScoParams extends IBaseParams{}
 export interface IPageParams extends IBaseParams{}
+export interface IResourceParams extends IBaseParams{}
 export interface IServiceInstanceParams {
     name:string;
     instance:any;
@@ -99,6 +100,17 @@ export function Sco(params:IScoParams){
 export function Page(params:IPageParams){
     return (target) =>{
         injectorInstance.registerPage(params.name,target,params.dependencies,params.factory);
+    }
+}
+/**
+ * Decorador para registrar una clase como Recurso
+ * @param {IResourceParams}     params
+ * @static
+ * @function
+ */
+export function Resource(params:IPageParams){
+    return (target) =>{
+        injectorInstance.registerResource(params.name,target,params.dependencies,params.factory);
     }
 }
 /**

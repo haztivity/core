@@ -4,11 +4,12 @@
  */
 import {Core} from "../di";
 import {IEventHandler,EventEmitter,EventEmitterFactory} from "../utils";
+import {ResourceController} from "../resource";
 export interface IPageOptions{
     name:string;
     template:string;
     controller?:string;
-    resources?:Resource[]
+    resources?:ResourceController[]
 }
 @Core({
     name:"Page",
@@ -30,7 +31,9 @@ export class Page implements IEventHandler{
      */
     constructor(protected EventEmitterFactory:EventEmitterFactory){
     }
-
+    public getResources():ResourceController[]{
+        return this.options.resources;
+    }
     /**
      * Configura la clase nada más instanciarla
      * @param options

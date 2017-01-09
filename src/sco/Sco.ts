@@ -7,6 +7,7 @@ import {Sco} from "../di";
 import {Page,PageManager} from "../page";
 import {Navigator} from "../navigator";
 import {HaztivityAppContextNotFound,HaztivityPagesContextNotFound} from "./Errors";
+import {ResourceManager} from "../resource";
 export interface ISco{
     on():void;
     run():void;
@@ -20,6 +21,7 @@ export interface IScoOptions{
     dependencies:[
         Navigator,
         PageManager,
+        ResourceManager,
         EventEmitterFactory
     ]
 })
@@ -30,7 +32,10 @@ export class ScoController implements ISco{
     protected options:IScoOptions;
     protected $context:JQuery;
     protected $pagesContainer:JQuery;
-    constructor (protected Navigator:Navigator,protected PageManager:PageManager,protected EventEmitterFactory:EventEmitterFactory){
+    constructor (protected Navigator:Navigator,
+                 protected PageManager:PageManager,
+                 protected ResourceManager:ResourceManager,
+                 protected EventEmitterFactory:EventEmitterFactory){
         this.eventEmitter = EventEmitterFactory.createEmitter();
     }
     public activate(options:IScoOptions):ScoController{
