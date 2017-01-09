@@ -79,13 +79,6 @@ export class PageImplementation{
         }
         return this.currentController;
     }
-    public render(){
-        return this.getController().render();
-    }
-    public show(oldPage,oldPageIs):JQueryPromise{
-        let oldPageElement = oldPage != undefined? oldPage.getController().getElement() : null;
-        return this.getController().show(oldPageElement,oldPageIs);
-    }
 
     /**
      * Finaliza el ciclo de vida actual invocando al método "destroy" del controlador de la página y liberando la instancia del controlador

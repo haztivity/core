@@ -49,24 +49,26 @@ export class Navigator{
             if (newPage) {
                 if (newPage !== this.currentPage) {
                     //todo check if page is complete
-                    let currentPage = this.currentPage,
+                    let currentPage = this.currentPage,//get current page and index
                         currentPageIndex = this.currentPageIndex;
-                    this.currentPage = newPage;
+                    this.currentPage = newPage;//set new page as current
                     this.currentPageIndex = index;
-                    let currentPageElement = currentPage ? currentPage.getController().getElement() : null,
-                        newPageController = newPage.getController(),
-                        newPageElement = newPageController.render(),
-                        newPageName = newPage.getPageName(),
-                        currentPageIs = currentPageIndex - index < 0 ? -1 : 1;
+                    let currentPageElement = currentPage ? currentPage.getController().getElement() : null, //get current element
+                        newPageController = newPage.getController(),//create a controller for new page
+                        newPageElement = newPageController.render(),//request render for the new controller
+                        newPageName = newPage.getPageName(),//get name of new controller
+                        currentPageIs = currentPageIndex - index < 0 ? -1 : 1;//check the position of the old page relative to the new page
                     //if the new page is before to the current page
                     if (currentPageIndex === -1) {
                         this.$context.prepend(newPageElement);
                     } else {//if the new page is after the current page
                         this.$context.append(newPageElement);
                     }
+                    //trigger event in navigator
                     this.eventEmitter.trigger(Navigator.ON_RENDER_PAGE, newPageName);
                     //trigger a global event that could be listened by anyone
                     this.eventEmitter.globalEmitter.trigger(Navigator.ON_RENDER_PAGE, newPageName);
+                    //request animations
                     let showPromise = newPageController.show(currentPageElement, currentPageIs);
                     //if the function returns a promise
                     if (typeof showPromise.then === "function") {

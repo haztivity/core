@@ -23,4 +23,4 @@ export {IInjectorService,
 export {EventEmitter,EventEmitterFactory} from "./utils";
 export {ScoFactory,ISco,IScoOptions,ScoController} from "./sco";
 export {PageController,Page,IPageOptions,PageFactory} from "./page";
-export {ResourceController} from "./resource";
+export {ResourceInitializerService,ResourceController,ResourceManager} from "./resource";

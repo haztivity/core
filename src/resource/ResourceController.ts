@@ -10,6 +10,7 @@ import $ from "../jquery";
     ]
 })
 export abstract class ResourceController{
+    protected _destroyed:boolean=false;
     /**
      * Controlador base para los recursos
      * @param {JQueryStatic}    $
@@ -36,10 +37,24 @@ export abstract class ResourceController{
     public abstract getInstance();
 
     /**
+     * Indica si se ha invocado al método destroy
+     * @returns {boolean}
+     */
+    public isDestroyed():boolean{
+        return this._destroyed;
+    }
+    /**
      * Realiza la comprobación de objetivo completado
      * @returns {boolean}
      */
     public isCompleted():boolean{
         return true;
+    }
+
+    /**
+     * Destruye el componente. Se ha de extender en cada recurso con las acciones pertinentes
+     */
+    public destroy(){
+        this._destroyed = true;
     }
 }

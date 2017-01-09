@@ -1,17 +1,19 @@
-import {ScoFactory,Page,PageController,PageFactory} from "../src/core";
+import {ScoFactory,Page,PageController,PageFactory,ResourceInitializerService} from "../src/core";
 import {TestResource} from "./ResourceTest";
 let page:Page = PageFactory.createPage({
     name:"page",
     resources:[],
-    template:"<p>page 1</p>",
+    template:"<p data-hz-resource='test' data-opt-test-testopt='test2'>page 1</p>",
     resources:[
         TestResource
     ]
 });
 page.on(PageController.ON_RENDERING,null,(event:JQueryEventObject,template:String,pageController:PageController)=>{
     let navigator = pageController.InjectorService.get("Navigator");
-    window.n = navigator;
-    navigator.disable();
+    let $element = $(template);
+    let ris:ResourceInitializerService = pageController.InjectorService.get("ResourceInitializerService");
+    ris.initialize($element);
+    return $element;
 });
 let page2:Page = PageFactory.createPage({
     name:"page2",

@@ -17,6 +17,7 @@
     "@types/core-js": "^0.9.35",
     "@types/jquery": "^2.0.34",
     "@types/loglevel": "^1.4.29",
+    "@types/string": "0.0.28",
     "autoprefixer": "^6.5.1",
     "body-parser": "^1.15.2",
     "commander": "^2.9.0",
@@ -57,6 +58,7 @@
       "jquery": "npm:jquery@^3.1.1",
       "json": "github:systemjs/plugin-json@^0.2.3",
       "loglevel": "npm:loglevel@^1.4.1",
+      "string": "npm:string@^3.3.3",
       "text": "github:systemjs/plugin-text@^0.0.9"
     },
     "devDependencies": {

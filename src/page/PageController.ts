@@ -148,5 +148,6 @@ export abstract class PageController{
      */
     protected _destroy(){
         this.eventEmitter.trigger(PageController.ON_DESTROY,[this.$element,this]);
+        this.eventEmitter.off(PageController.NAMESPACE);
     }
 }

@@ -15,6 +15,7 @@ System.config({
     "jquery": "npm:jquery@3.1.1",
     "json": "github:systemjs/plugin-json@0.2.3",
     "loglevel": "npm:loglevel@1.4.1",
+    "string": "npm:string@3.3.3",
     "text": "github:systemjs/plugin-text@0.0.9",
     "typescript": "npm:typescript@2.1.4",
     "github:jspm/nodelibs-assert@0.1.0": {
