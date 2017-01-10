@@ -4,13 +4,14 @@
  */
 import {Page as PageDecorator,InjectorService} from "../di";
 import {$} from "../jquery";
-import {IPageOptions} from "./Page";
-import {EventEmitter} from "../utils";
 import {PageController} from "./PageController";
 
 @PageDecorator({
     name:"GenericPageController",
-    dependencies:[]
+    dependencies:[
+        $,
+        InjectorService
+    ]
 })
 export class GenericPageController extends PageController{
 

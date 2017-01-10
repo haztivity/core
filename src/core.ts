@@ -2,9 +2,7 @@
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-
-import * as jqDI from "./jquery";
-jqDI;//Typescript doesn't import the module if isn't used
+export * from "./jquery";
 export {IInjectorService,
         IInjectorRegisterService,
         Service,

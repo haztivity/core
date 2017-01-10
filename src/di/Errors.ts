@@ -48,6 +48,6 @@ export class HaztivityDependencyAccessDenied extends BaseError{
  */
 export class HaztivityDependencyNotValid extends BaseError{
     constructor(target:string,dependencies){
-        super("HaztivityDependencyNotValid",`Some dependency for ${target} is undefined. Dependencies:${JSON.stringify(dependencies||{},null,4)}`)
+        super("HaztivityDependencyNotValid",`Some dependency for ${target} is undefined.`)
     }
 }

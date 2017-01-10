@@ -1,9 +1,16 @@
 import {ScoFactory,Page,PageController,PageFactory,ResourceInitializerService} from "../src/core";
 import {TestResource} from "./ResourceTest";
+let t = "<p data-hz-resource='test' data-opt-test-testopt='test2'>page 1</p>";
+let r ="<div>";
+for (let i = 0; i < 1; i++) {
+    r+=t;
+
+}
+r+="</div>";
 let page:Page = PageFactory.createPage({
     name:"page",
     resources:[],
-    template:"<p data-hz-resource='test' data-opt-test-testopt='test2'>page 1</p>",
+    template:r,
     resources:[
         TestResource
     ]

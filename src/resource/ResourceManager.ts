@@ -6,7 +6,7 @@ import {Core} from "../di";
 import {ResourceController} from "./ResourceController";
 import {InjectorService} from "../di";
 import {HaztivityResourceInvalidError,HaztivityResourceAlreadyRegisteredError,HaztivityResourceNameInvalidError} from "./Errors";
-import {S} from "../string";
+import {S} from "../utils";
 @Core({
     name:"ResourceManager",
     dependencies:[
@@ -16,7 +16,7 @@ import {S} from "../string";
 })
 export class ResourceManager{
     //store available resources
-    protected resources:Map<string,ResourceController> = new Map<string,ResourceController>();
+    protected _Resources:Map<string,ResourceController> = new Map<string,ResourceController>();
     constructor(protected Injector:InjectorService,protected S){
 
     }
@@ -30,11 +30,11 @@ export class ResourceManager{
         //resource must exists
         if(resource){
             //resource must have a name registered by the injector
-            let name = resource.prototype._injectorName;
+            let name = resource._resourceName;
             if(!!name){
                 if(this.nameIsValid(name)) {
                     //check if already exists
-                    let current = this.resources.get(name);
+                    let current = this._Resources.get(name);
                     //if exists, should be equal
                     if (current != undefined) {
                         if (current != resource) {
@@ -42,7 +42,7 @@ export class ResourceManager{
                         }
                     } else {
                         //if not exists, register
-                        this.resources.set(name, resource)
+                        this._Resources.set(name, resource)
                     }
                 }else{
                     throw new HaztivityResourceNameInvalidError(name);
@@ -58,7 +58,7 @@ export class ResourceManager{
         return this.S(name).camelize().s == name;
     }
     public exists(name:string):ResourceController{
-        return this.resources.get(name) != undefined;
+        return this._Resources.get(name) != undefined;
     }
     /**
      * Añade un conjunto de recursos.

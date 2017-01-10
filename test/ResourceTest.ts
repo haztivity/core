@@ -11,6 +11,7 @@ import {Resource,ResourceController,$} from "../src/core";
 })
 export class TestResource extends ResourceController{
     init(options) {
+        this.$element.text(options.testopt);
     }
 
     getInstance() {

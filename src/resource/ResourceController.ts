@@ -11,6 +11,7 @@ import $ from "../jquery";
 })
 export abstract class ResourceController{
     protected _destroyed:boolean=false;
+    protected $element:JQuery;
     /**
      * Controlador base para los recursos
      * @param {JQueryStatic}    $
@@ -23,8 +24,8 @@ export abstract class ResourceController{
      * Invocado al obtenerse el factory del DI para establecer las opciones
      * @param {*}       options         Parámetros para el componente
      */
-    public activate(options){
-
+    public activate($element){
+        this.$element = $element;
     }
     /**
      * Inicializa el componente

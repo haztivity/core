@@ -5,7 +5,8 @@
 import {Core,InjectorService} from "../di";
 import {ResourceManager} from "./ResourceManager";
 import {ResourceController} from "./ResourceController";
-import {S} from "../string";
+import {S} from "../utils"
+import {DataOptions} from "../utils";
 export interface IResourceInitializer{
     initialize($context:JQuery):void;
 }
@@ -14,13 +15,15 @@ export interface IResourceInitializer{
     dependencies:[
         ResourceManager,
         InjectorService,
-        S
-    ]
+        S,
+        DataOptions
+    ],
+    public:true
 })
 export class ResourceInitializer{
     protected prefix:string="hz-resource";
     protected camelPrefix:string = this.S(this.prefix).camelize().s;
-    constructor(protected ResourceManager:ResourceManager, protected InjectorService:InjectorService, protected S){
+    constructor(protected ResourceManager:ResourceManager, protected InjectorService:InjectorService, protected S, protected DataOptions:DataOptions){
     }
 
     /**
@@ -30,7 +33,7 @@ export class ResourceInitializer{
     public initialize($context:JQuery){
         let $elements = this._findElementsInContext($context);
         for (let $element of $elements) {
-            this._initializeOne($element);
+            this._initializeOne($($element));
         }
     }
 
@@ -52,9 +55,10 @@ export class ResourceInitializer{
                     let controllerInstance: ResourceController = $element.data(`${this.camelPrefix}Instance`);
                     if (controllerInstance == undefined || controllerInstance.isDestroyed()) {
                         //extract options
-                        let options = $element.getDataOptions();
+                        let options = this.DataOptions.getDataOptions($element,name);
                         //get controller instance
                         controllerInstance = factory.instance();
+                        controllerInstance.activate($element);
                         $element.data(`${this.camelPrefix}Instance`, controllerInstance);
                         //init controller
                         controllerInstance.init(options);

@@ -10,3 +10,5 @@
  */
 export {EventEmitterFactory} from "./utils/EventEmitterFactory";
 export {IEventHandler,EventEmitter} from "./utils/EventEmitter";
+export {S} from "./utils/String";
+export {DataOptions} from "./utils/DataOptions";

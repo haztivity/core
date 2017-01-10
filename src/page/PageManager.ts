@@ -5,7 +5,7 @@
 import {Core} from "../di";
 import {Page} from "./Page";
 import {PageImplementation} from "./PageImplementation";
-import {EventEmitter,EventEmitterFactory} from "../utils";
+import {EventEmitter,EventEmitterFactory,} from "../utils";
 import {HaztivityPageAlreadyRegistered,HaztivityPageNameInvalid} from "./Errors";
 import {ResourceManager} from "../resource";
 @Core({
