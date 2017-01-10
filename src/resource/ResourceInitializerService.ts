@@ -4,6 +4,7 @@
  */
 import {ResourceInitializer,IResourceInitializer} from "./ResourceInitializer";
 import {Service} from "../di";
+import {ResourceController} from "./ResourceController";
 @Service({
     name:"ResourceInitializerService",
     dependencies:[
@@ -11,6 +12,7 @@ import {Service} from "../di";
     ]
 })
 export class ResourceInitializerService implements IResourceInitializer{
+
     /**
      * Servicio del inicializador de recursos
      * @class
@@ -18,13 +20,22 @@ export class ResourceInitializerService implements IResourceInitializer{
      */
     constructor(ResourceInitializer:ResourceInitializer){
         let publish = [
-            "initialize"
+            "initialize",
+            "getResources",
+            "getResourcesControllers"
         ];
         for (let method of publish) {
             this[method] = ResourceInitializer[method].bind(ResourceInitializer);
         }
     }
-    public initialize($context:JQuery):void{
+    public initialize($context:JQuery):ResourceController[]{
+        return undefined;
+    }
+    public getResources($context: JQuery, initState?: number): JQuery {
+        return undefined;
+    }
 
+    public getResourcesControllers($context): ResourceController[] {
+        return undefined;
     }
 }

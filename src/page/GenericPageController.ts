@@ -5,12 +5,13 @@
 import {Page as PageDecorator,InjectorService} from "../di";
 import {$} from "../jquery";
 import {PageController} from "./PageController";
-
+import {ResourceInitializerService} from "../resource";
 @PageDecorator({
     name:"GenericPageController",
     dependencies:[
         $,
-        InjectorService
+        InjectorService,
+        ResourceInitializerService
     ]
 })
 export class GenericPageController extends PageController{

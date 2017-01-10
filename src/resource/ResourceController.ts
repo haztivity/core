@@ -11,6 +11,7 @@ import $ from "../jquery";
 })
 export abstract class ResourceController{
     protected _destroyed:boolean=false;
+    protected _completed:boolean=false;
     protected $element:JQuery;
     /**
      * Controlador base para los recursos
@@ -49,9 +50,11 @@ export abstract class ResourceController{
      * @returns {boolean}
      */
     public isCompleted():boolean{
-        return true;
+        return this._completed;
     }
-
+    protected _markAsCompleted(){
+        this._completed = true;
+    }
     /**
      * Destruye el componente. Se ha de extender en cada recurso con las acciones pertinentes
      */

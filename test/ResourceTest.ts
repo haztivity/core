@@ -4,16 +4,19 @@
  */
 import {Resource,ResourceController,$} from "../src/core";
 @Resource({
-    name:"test",
+    name:"btn",
     dependencies:[
         $
     ]
 })
-export class TestResource extends ResourceController{
+export class HzButtonResource extends ResourceController{
     init(options) {
-        this.$element.text(options.testopt);
+        this.$element.on("click",{instance:this},this._onClick);
     }
-
+    protected _onClick(e){
+        let instance = e.data.instance;
+        instance._markAsCompleted();
+    }
     getInstance() {
     }
 }

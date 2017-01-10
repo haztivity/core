@@ -6,6 +6,7 @@ import {Dependencies,InjectorService} from "../di";
 import {$} from "../jquery";
 import {IPageOptions} from "./Page";
 import {EventEmitter} from "../utils";
+import {ResourceController,ResourceInitializerService} from "../resource";
 export interface IPageControllerOptions extends IPageOptions{
     name:string;
     template:string;
@@ -19,7 +20,8 @@ export interface IPageState{
 @Dependencies({
     dependencies:[
         $,
-        InjectorService
+        InjectorService,
+        ResourceInitializerService
     ]
 })
 export abstract class PageController{
@@ -36,7 +38,7 @@ export abstract class PageController{
     public eventEmitter:EventEmitter;
     public state:IPageState;
     public store:IPageStore;
-
+    protected resources:ResourceController[] = [];
     /**
      * Controller base para todas las páginas.
      * Tipo Page
@@ -45,7 +47,7 @@ export abstract class PageController{
      * @param {InjectorService} InjectorService     Servicio del inyector
      * @see Injector.TYPES
      */
-    constructor(public $,public InjectorService:InjectorService){
+    constructor(public $,public InjectorService:InjectorService, protected ResourceInitializerService:ResourceInitializerService){
 
     }
 
@@ -61,6 +63,13 @@ export abstract class PageController{
         this.state = state;
         this.store = store;
         this.eventEmitter = eventEmitter;
+    }
+    public isCompleted(){
+        let completed = 0;
+        for (let resource of this.resources) {
+            completed +=resource.isCompleted() ? 1 : 0;
+        }
+        return completed === this.resources.length;
     }
     public render(){
         let event = this.eventEmitter.createEvent(PageController.ON_RENDERING),
@@ -81,7 +90,10 @@ export abstract class PageController{
         let $element = $(template);
         return $element;
     }
-
+    public initializeResources(){
+        this.resources = this.ResourceInitializerService.initialize(this.$element);
+        return this.resources;
+    }
     /**
      * Gestiona la transición entre la página anterior y la nueva
      * @param {JQuery}          $oldPage                    Página anterior

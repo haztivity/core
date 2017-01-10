@@ -39,10 +39,6 @@ export class Navigator{
      */
     public goTo(index:number){
         if(this.disabled !== true) {
-            if (this.currentRenderProcess && this.currentRenderProcess.state() === "pending") {
-                this.currentRenderProcess.reject();
-            }
-            this.currentRenderProcess = $.Deferred();
             //get the page requested
             let newPage: PageImplementation = this.PageManager.getPage(index);
             //the page must be provided and different of the current page
@@ -50,35 +46,41 @@ export class Navigator{
                 if (newPage !== this.currentPage) {
                     //todo check if page is complete
                     let currentPage = this.currentPage,//get current page and index
-                        currentPageIndex = this.currentPageIndex;
-                    this.currentPage = newPage;//set new page as current
-                    this.currentPageIndex = index;
-                    let currentPageElement = currentPage ? currentPage.getController().getElement() : null, //get current element
-                        newPageController = newPage.getController(),//create a controller for new page
-                        newPageElement = newPageController.render(),//request render for the new controller
-                        newPageName = newPage.getPageName(),//get name of new controller
+                        currentPageIndex = this.currentPageIndex,
                         currentPageIs = currentPageIndex - index < 0 ? -1 : 1;//check the position of the old page relative to the new page
-                    //if the new page is before to the current page
-                    if (currentPageIndex === -1) {
-                        this.$context.prepend(newPageElement);
-                    } else {//if the new page is after the current page
-                        this.$context.append(newPageElement);
+                    //check if resources are completed to go to the next page
+                    if (currentPageIs === 1 && (currentPage == undefined || currentPage.getController().isCompleted())) {
+                        if (this.currentRenderProcess && this.currentRenderProcess.state() === "pending") {
+                            this.currentRenderProcess.reject();
+                        }
+                        this.currentRenderProcess = $.Deferred();
+                        this.currentPage = newPage;//set new page as current
+                        this.currentPageIndex = index;
+                        let currentPageElement = currentPage ? currentPage.getController().getElement() : null, //get current element
+                            newPageController = newPage.getController(),//create a controller for new page
+                            newPageElement = newPageController.render(),//request render for the new controller
+                            newPageName = newPage.getPageName();//get name of new controller
+
+                        //if the new page is before to the current page
+                        if (currentPageIndex === -1) {
+                            this.$context.prepend(newPageElement);
+                        } else {//if the new page is after the current page
+                            this.$context.append(newPageElement);
+                        }
+                        newPageController.initializeResources();//init resources
+                        //trigger event in navigator
+                        this.eventEmitter.trigger(Navigator.ON_RENDER_PAGE, newPageName);
+                        //trigger a global event that could be listened by anyone
+                        this.eventEmitter.globalEmitter.trigger(Navigator.ON_RENDER_PAGE, newPageName);
+                        //request animations
+                        let showPromise = newPageController.show(currentPageElement, currentPageIs);
+                        //if the function returns a promise
+                        if (typeof showPromise.then === "function") {
+                            newPageController.show(currentPageElement, currentPageIs).then(this._onPageShowEnd.bind(this, newPage, currentPage, this.currentRenderProcess));
+                        } else {//otherwise, execute immediately
+                            this._onPageShowEnd(newPage, currentPage, this.currentRenderProcess);
+                        }
                     }
-                    //trigger event in navigator
-                    this.eventEmitter.trigger(Navigator.ON_RENDER_PAGE, newPageName);
-                    //trigger a global event that could be listened by anyone
-                    this.eventEmitter.globalEmitter.trigger(Navigator.ON_RENDER_PAGE, newPageName);
-                    //request animations
-                    let showPromise = newPageController.show(currentPageElement, currentPageIs);
-                    //if the function returns a promise
-                    if (typeof showPromise.then === "function") {
-                        newPageController.show(currentPageElement, currentPageIs).then(this._onPageShowEnd.bind(this, newPage, currentPage, this.currentRenderProcess));
-                    } else {//otherwise, execute immediately
-                        this._onPageShowEnd(newPage, currentPage, this.currentRenderProcess);
-                    }
-                } else {
-                    this.currentRenderProcess.reject();
-                    return this.currentRenderProcess;
                 }
             } else {
                 //todo throw

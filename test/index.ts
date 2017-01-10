@@ -1,26 +1,16 @@
 import {ScoFactory,Page,PageController,PageFactory,ResourceInitializerService} from "../src/core";
-import {TestResource} from "./ResourceTest";
-let t = "<p data-hz-resource='test' data-opt-test-testopt='test2'>page 1</p>";
-let r ="<div>";
-for (let i = 0; i < 1; i++) {
-    r+=t;
-
-}
-r+="</div>";
+import {HzButtonResource} from "./ResourceTest";
 let page:Page = PageFactory.createPage({
     name:"page",
     resources:[],
-    template:r,
+    template:"<p>page 1</p><button data-hz-resource='btn'>Click</button>",
     resources:[
-        TestResource
+        HzButtonResource
     ]
 });
 page.on(PageController.ON_RENDERING,null,(event:JQueryEventObject,template:String,pageController:PageController)=>{
     let navigator = pageController.InjectorService.get("Navigator");
-    let $element = $(template);
-    let ris:ResourceInitializerService = pageController.InjectorService.get("ResourceInitializerService");
-    ris.initialize($element);
-    return $element;
+    window.n = navigator;
 });
 let page2:Page = PageFactory.createPage({
     name:"page2",
