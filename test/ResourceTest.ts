@@ -3,15 +3,17 @@
  * Copyright Davinchi. All Rights Reserved.
  */
 import {Resource,ResourceController,$} from "../src/core";
+import {EventEmitterFactory} from "../src/core";
 @Resource({
     name:"btn",
     dependencies:[
-        $
+        $,
+        EventEmitterFactory
     ]
 })
 export class HzButtonResource extends ResourceController{
     init(options) {
-        this.$element.on("click",{instance:this},this._onClick);
+        this._$element.on("click",{instance:this},this._onClick);
     }
     protected _onClick(e){
         let instance = e.data.instance;

@@ -59,6 +59,7 @@ export const TYPES: ITypes = <ITypes>(function () {
     registerType(types, "Core", true);
     registerType(types, "CorePublic", true);
     registerType(types, "Module", [
+        "Core",
         "CorePublic",
         "Service",
         "Page"

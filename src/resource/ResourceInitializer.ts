@@ -11,7 +11,9 @@ import {$} from "../jquery";
 export interface IResourceInitializer{
     initialize($context:JQuery):ResourceController[];
     getResources($context:JQuery,initState?:number):JQuery;
-    getResourcesControllers($context):ResourceController[];
+    getResourcesControllers($context):ResourceController[]
+    initializeOne($element,config:any={}):ResourceController;
+
 }
 @Core({
     name:"ResourceInitializer",
@@ -39,7 +41,7 @@ export class ResourceInitializer{
         let $elements = this._findElementsInContext($context),
             results = [];
         for (let $element of $elements) {
-            let result = this._initializeOne($($element));
+            let result = this.initializeOne($($element));
             if(result != undefined){
                 results.push(result);
             }
@@ -49,10 +51,12 @@ export class ResourceInitializer{
 
     /**
      * Inicializa un recurso en un elemento en concreto. El elemento ha de tener un recurso válido indicado
-     * @param {JQuery}  $element    Elemento en el que inicializar el recurso
-     * @private
+     * @param {JQuery}  $element            Elemento en el que inicializar el recurso
+     * @param {*}       [config]            Configuración para la inicialización. Acepta:
+     * @param {*}       [config.options]    Opciones para el componente. Si una misma opción se indica a través de config.options y mediante un atributo data- predomina el indicado mediante config.options
+     * @param {*}       [config.data]       Datos y configuración para el controlador del recurso
      */
-    protected _initializeOne($element){
+    public initializeOne($element,config:any={}){
         //get name
         let name = $element.data(this._prefix),
             result;
@@ -67,12 +71,13 @@ export class ResourceInitializer{
                     if (controllerInstance == undefined || controllerInstance.isDestroyed()) {
                         //extract options
                         let options = this.DataOptions.getDataOptions($element,name);
+                        options = $.extend({},options,config.options);
                         //get controller instance
                         controllerInstance = factory.instance();
                         controllerInstance.activate($element);
                         $element.data(this._instanceDataName, controllerInstance);
                         //init controller
-                        controllerInstance.init(options);
+                        controllerInstance.init(options,config.data);
                     } else {
                         //warn
                     }

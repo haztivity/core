@@ -21,6 +21,7 @@ export class ResourceInitializerService implements IResourceInitializer{
     constructor(ResourceInitializer:ResourceInitializer){
         let publish = [
             "initialize",
+            "initializeOne",
             "getResources",
             "getResourcesControllers"
         ];
@@ -36,6 +37,16 @@ export class ResourceInitializerService implements IResourceInitializer{
     }
 
     public getResourcesControllers($context): ResourceController[] {
+        return undefined;
+    }
+    /**
+     * Inicializa un recurso en un elemento en concreto. El elemento ha de tener un recurso válido indicado
+     * @param {JQuery}  $element            Elemento en el que inicializar el recurso
+     * @param {*}       [config]            Configuración para la inicialización. Acepta:
+     * @param {*}       [config.options]    Opciones para el componente. Si una misma opción se indica a través de config.options y mediante un atributo data- predomina el indicado mediante config.options
+     * @param {*}       [config.data]       Datos y configuración para el controlador del recurso
+     */
+    public initializeOne($element,config:any={}){
         return undefined;
     }
 }

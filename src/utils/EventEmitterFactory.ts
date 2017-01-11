@@ -2,12 +2,11 @@
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-import {Core} from "../di";
+import {Service} from "../di";
 import {EventEmitter} from "./EventEmitter";
 import {$ as jquery} from "../jquery";
-@Core({
+@Service({
     name:"EventEmitterFactory",
-    public:true,
     dependencies:[
         jquery,
         EventEmitter

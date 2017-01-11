@@ -58,7 +58,7 @@ export class Navigator{
                         this.currentPageIndex = index;
                         let currentPageElement = currentPage ? currentPage.getController().getElement() : null, //get current element
                             newPageController = newPage.getController(),//create a controller for new page
-                            newPageElement = newPageController.render(),//request render for the new controller
+                            newPageElement = newPageController.getElement(),//get the rendered element
                             newPageName = newPage.getPageName();//get name of new controller
 
                         //if the new page is before to the current page
@@ -67,7 +67,6 @@ export class Navigator{
                         } else {//if the new page is after the current page
                             this.$context.append(newPageElement);
                         }
-                        newPageController.initializeResources();//init resources
                         //trigger event in navigator
                         this.eventEmitter.trigger(Navigator.ON_RENDER_PAGE, newPageName);
                         //trigger a global event that could be listened by anyone

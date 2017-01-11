@@ -14,6 +14,7 @@ export interface IEventHandler{
 @Core({
     name:"EventEmitter",
     instantiable:true,
+    public:true,
     dependencies:[
         jquery
     ]

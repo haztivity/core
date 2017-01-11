@@ -17,9 +17,13 @@ import {ResourceManager,ResourceController} from "../resource";
     instantiable:true
 })
 export class PageImplementation{
-    protected store:IPageStore;
+    protected store:IPageStore={
+        public:{},
+        private:{}
+    };
     protected state:IPageState;
     protected page:Page;
+    protected _resourcesState;
     protected controllerFactory:any;
     protected currentController:PageController;
     protected resources:ResourceController[];
@@ -36,10 +40,6 @@ export class PageImplementation{
      * @param {Page}    page    Página registrada en el PageManager.
      */
     activate(page:Page){
-        this.store = {
-            public:{},
-            private:{}
-        };
         this.state = {};
         this.resources = page.getResources();
         this.page = page;
@@ -75,6 +75,8 @@ export class PageImplementation{
             }
             let controller: PageController = this.controllerFactory.instance();
             controller.activate(pageOptions, this.page.eventEmitter, this.state, this.store);
+            controller.render();
+            controller.initializeResources();
             this.currentController = controller;
         }
         return this.currentController;
