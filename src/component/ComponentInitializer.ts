@@ -78,7 +78,7 @@ export class ComponentInitializer {
                         let options = this.DataOptions.getDataOptions($element, name);
                         options = $.extend({}, options, config.options);
                         //get controller instance
-                        controllerInstance = controllerInstance.activate($element);
+                        controllerInstance.activate($element);
                         $element.data(this._instanceDataName, controllerInstance);
                         //init controller
                         controllerInstance.init(options, config.data);

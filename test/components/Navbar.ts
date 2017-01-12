@@ -2,25 +2,26 @@
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-import {$, Navigator, Component} from "../../src/core";
+import {$, Navigator, Component, ComponentController,EventEmitterFactory} from "../../src/core";
 @Component(
     {
         name: "hzNavbar",
         dependencies: [
             $,
+            EventEmitterFactory,
             Navigator
         ]
     }
 )
 export class HzNavbarComponent extends ComponentController {
-    constructor(protected _$: JQuery, protected _Navigator: Navigator) {
-        super();
+    constructor(_$: JQueryStatic, _EventEmitterFactory, protected _Navigator: Navigator) {
+        super(_$,_EventEmitterFactory);
     }
 
     init(options) {
+        debugger;
         this._assignEvents();
     }
-
     protected _assignEvents() {
         this._Navigator.on(Navigator.ON_DISABLE, {instance: this}, this._onDisabled);
         this._Navigator.on(Navigator.ON_ENABLE, {instance: this}, this._onEnabled);

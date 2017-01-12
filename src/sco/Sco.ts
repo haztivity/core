@@ -72,9 +72,9 @@ export class ScoController implements ISco{
     }
     public run():ScoController{
         this._init();
+        this.Navigator.activate(this.$pagesContainer);
         this.$pagesContainer.addClass(ScoController.CLASS_PAGES);
         this.ComponentInitializer.initialize(this.$context);
-        this.Navigator.activate(this.$pagesContainer);
         //init components
         this.Navigator.goTo(0);
         return this;

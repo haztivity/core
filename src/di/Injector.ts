@@ -91,7 +91,8 @@ export const TYPES: ITypes = <ITypes>(function () {
     );
     registerType(
         types, "Component", [
-            "Service"
+            "Service",
+            "CorePublic"
         ]
     );
     registerType(
