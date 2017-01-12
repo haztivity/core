@@ -21,18 +21,19 @@ export class Navigator implements IEventHandler{
     public static readonly ON_DRAW_PAGE=`${Navigator.NAMESPACE}:draw`;
     public static readonly ON_DISABLE=`${Navigator.NAMESPACE}:disable`;
     public static readonly ON_ENABLE=`${Navigator.NAMESPACE}:enable`;
-    protected $context:JQuery;
-    protected currentPage:PageImplementation;
-    protected currentPageIndex:number;
-    protected currentRenderProcess:JQueryDeferred;
-    protected eventEmitter:EventEmitter;
-    protected disabled:boolean;
+    public static readonly ON_CHANGE_PAGE_END = `${Navigator.NAMESPACE}:changend`;
+    protected _$context: JQuery;
+    protected _currentPage: PageImplementation;
+    protected _currentPageIndex: number;
+    protected _currentRenderProcess: JQueryDeferred;
+    protected _eventEmitter: EventEmitter;
+    protected _disabled: boolean;
     constructor(protected $:JQueryStatic,protected PageManager:PageManager, protected EventEmitterFactory:EventEmitterFactory){
 
     }
     public activate ($context:JQuery){
-        this.$context = $context;
-        this.eventEmitter = this.EventEmitterFactory.createEmitter();
+        this._$context = $context;
+        this._eventEmitter = this.EventEmitterFactory.createEmitter();
     }
     /**
      * Navega a la página solicitada.
@@ -41,24 +42,24 @@ export class Navigator implements IEventHandler{
      * @returns {JQueryDeferred} Promesa que es resuelta al finalizarse el proceso completo de cambio de página
      */
     public goTo(index:number){
-        if(this.disabled !== true) {
+        if (this.isDisabled() !== true) {
             //get the page requested
             let newPage: PageImplementation = this.PageManager.getPage(index);
             //the page must be provided and different of the current page
             if (newPage) {
-                if (newPage !== this.currentPage) {
+                if (newPage !== this._currentPage) {
                     //todo check if page is complete
-                    let currentPage = this.currentPage,//get current page and index
-                        currentPageIndex = this.currentPageIndex,
+                    let currentPage = this.getCurrentPage(),//get current page and index
+                        currentPageIndex = this.getCurrentPageIndex(),
                         currentPageIs = currentPageIndex - index < 0 ? -1 : 1;//check the position of the old page relative to the new page
                     //check if resources are completed to go to the next page
-                    if (currentPageIs === 1 && (currentPage == undefined || currentPage.getController().isCompleted())) {
-                        if (this.currentRenderProcess && this.currentRenderProcess.state() === "pending") {
-                            this.currentRenderProcess.reject();
+                    if (currentPageIs === 1 || (currentPage == undefined || currentPage.getController().isCompleted())) {
+                        if (this._currentRenderProcess && this._currentRenderProcess.state() === "pending") {
+                            this._currentRenderProcess.reject();
                         }
-                        this.currentRenderProcess = $.Deferred();
-                        this.currentPage = newPage;//set new page as current
-                        this.currentPageIndex = index;
+                        this._currentRenderProcess = $.Deferred();
+                        this._currentPage = newPage;//set new page as current
+                        this._currentPageIndex = index;
                         let currentPageElement = currentPage ? currentPage.getController().getElement() : null, //get current element
                             newPageController = newPage.getController(),//create a controller for new page
                             newPageElement = newPageController.getElement(),//get the rendered element
@@ -66,21 +67,47 @@ export class Navigator implements IEventHandler{
 
                         //if the new page is before to the current page
                         if (currentPageIndex === -1) {
-                            this.$context.prepend(newPageElement);
+                            this._$context.prepend(newPageElement);
                         } else {//if the new page is after the current page
-                            this.$context.append(newPageElement);
+                            this._$context.append(newPageElement);
                         }
                         //trigger event in navigator
-                        this.eventEmitter.trigger(Navigator.ON_DRAW_PAGE, newPageName);
+                        this._eventEmitter.trigger(Navigator.ON_DRAW_PAGE, newPageName);
                         //trigger a global event that could be listened by anyone
-                        this.eventEmitter.globalEmitter.trigger(Navigator.ON_DRAW_PAGE, newPageName);
+                        this._eventEmitter.globalEmitter.trigger(Navigator.ON_DRAW_PAGE, newPageName);
                         //request animations
-                        let showPromise = newPageController.show(currentPageElement, currentPageIs);
+                        let showPromise = newPageController.show(currentPageElement, currentPageIs),
+                            newPageData = {
+                                index: index,
+                                name: newPageName
+                            },
+                            currentPageData;
+                        if (currentPage) {
+                            currentPageData = {
+                                index: currentPageIndex,
+                                name: currentPage.getPageName()
+                            }
+                        }
                         //if the function returns a promise
                         if (typeof showPromise.then === "function") {
-                            showPromise.then(this._onPageShowEnd.bind(this, newPage, currentPage, this.currentRenderProcess));
+                            showPromise.then(
+                                this._onPageShowEnd.bind(
+                                    this,
+                                    newPage,
+                                    newPageData,
+                                    currentPage,
+                                    currentPageData,
+                                    this._currentRenderProcess
+                                )
+                            );
                         } else {//otherwise, execute immediately
-                            this._onPageShowEnd(newPage, currentPage, this.currentRenderProcess);
+                            this._onPageShowEnd(
+                                newPage,
+                                newPageData,
+                                currentPage,
+                                currentPageData,
+                                this._currentRenderProcess
+                            );
                         }
                     }
                 }
@@ -96,19 +123,19 @@ export class Navigator implements IEventHandler{
      * @returns {boolean}
      */
     public isDisabled(){
-        return this.disabled;
+        return this._disabled;
     }
     /**
      * Establece el estado de deshabilitado
      * @param {boolean}     disabled        Estado a establecer
      */
     public setDisabled(disabled:boolean){
-        if(this.disabled !== disabled) {
-            this.disabled = disabled;
+        if (this._disabled !== disabled) {
+            this._disabled = disabled;
             if(disabled){
-                this.eventEmitter.trigger(Navigator.ON_ENABLE);
+                this._eventEmitter.trigger(Navigator.ON_ENABLE);
             }else{
-                this.eventEmitter.trigger(Navigator.ON_DISABLE);
+                this._eventEmitter.trigger(Navigator.ON_DISABLE);
             }
         }
     }
@@ -129,9 +156,10 @@ export class Navigator implements IEventHandler{
      * @returns {JQueryPromise|boolean} Devuelve una promsea si el proceso se inicia. False si está deshabilitado o no hay página posterior
      */
     public next(){
-        let numPages = this.PageManager.count();
-        if(this.currentPageIndex < numPages-1){
-            return this.goTo(this.currentPageIndex+1);
+        let numPages = this.PageManager.count(),
+            currentPageIndex = this.getCurrentPageIndex();
+        if (currentPageIndex < numPages - 1) {
+            return this.goTo(currentPageIndex + 1);
         }else{
             return false;
         }
@@ -143,9 +171,9 @@ export class Navigator implements IEventHandler{
      * @returns {JQueryPromise|boolean} Devuelve una promsea si el proceso se inicia. False si está deshabilitado o no hay página anterior
      */
     public prev(){
-        let numPages = this.PageManager.count();
-        if(this.currentPageIndex > 0){
-            return this.goTo(this.currentPageIndex-1);
+        let currentPageIndex = this.getCurrentPageIndex();
+        if (currentPageIndex > 0) {
+            return this.goTo(currentPageIndex - 1);
         }else{
             return false;
         }
@@ -159,25 +187,37 @@ export class Navigator implements IEventHandler{
      * @param defer
      * @private
      */
-    protected _onPageShowEnd(newPage:PageImplementation,oldPage:PageImplementation,defer){
+    protected _onPageShowEnd(newPage: PageImplementation, newPageData, oldPage: PageImplementation, oldPageData, defer) {
         if(oldPage) {
             let controller = oldPage.getController();
             oldPage.detach();
             controller.getElement().remove();
         }
+        //trigger event in navigator
+        this._eventEmitter.trigger(Navigator.ON_CHANGE_PAGE_END, [newPageData, oldPageData]);
+        //trigger a global event that could be listened by anyone
+        this._eventEmitter.globalEmitter.trigger(Navigator.ON_CHANGE_PAGE_END, [newPageData, oldPageData]);
+    }
+
+    public getCurrentPageIndex() {
+        return this._currentPageIndex;
+    }
+
+    public getCurrentPage() {
+        return this._currentPage;
     }
     on(events: string, data: any, handler: (eventObject: JQueryEventObject, ...args: any[]) => any): Navigator {
-        this.eventEmitter.on(events,data,handler);
+        this._eventEmitter.on(events, data, handler);
         return this;
     }
 
     one(events: string, data: any, handler: (eventObject: JQueryEventObject) => any): Navigator {
-        this.eventEmitter.one(events,data,handler);
+        this._eventEmitter.one(events, data, handler);
         return this;
     }
 
     off(events: string, handler?: (eventObject: JQueryEventObject) => any): Navigator {
-        this.eventEmitter.off(events,handler);
+        this._eventEmitter.off(events, handler);
         return this;
     }
 }
