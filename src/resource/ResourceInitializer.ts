@@ -8,6 +8,7 @@ import {ResourceController} from "./ResourceController";
 import {S} from "../utils"
 import {DataOptions} from "../utils";
 import {$} from "../jquery";
+import {HaztivityResourceNameRequiredError,HaztivityResourceNotRegisteredError,HaztivityInvalidResourceControllerError} from "./Errors";
 export interface IResourceInitializer{
     initialize($context:JQuery):ResourceController[];
     getResources($context:JQuery,initState?:number):JQuery;
@@ -83,13 +84,13 @@ export class ResourceInitializer{
                     }
                         result = controllerInstance;
                 } else {
-                    console.log("ERROR");
+                    throw new HaztivityInvalidResourceControllerError(name);
                 }
             } else {
-                console.log("ERROR");
+                throw new HaztivityResourceNotRegisteredError(name);
             }
         }else{
-            console.log("ERROR");
+            throw new HaztivityResourceNameRequiredError($element);
         }
         return result;
     }

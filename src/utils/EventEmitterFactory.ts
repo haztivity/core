@@ -4,27 +4,20 @@
  */
 import {Service} from "../di";
 import {EventEmitter} from "./EventEmitter";
-import {$ as jquery} from "../jquery";
 @Service({
     name:"EventEmitterFactory",
     dependencies:[
-        jquery,
         EventEmitter
     ]
 })
 export class EventEmitterFactory{
-
-    public static DEFAULTS = <EventEmitter2Configuration>{
-        wildcard:true
-    };
-    public globalEmitter:EventEmitter;
+    protected _globalEmitter:EventEmitter;
     /**
-     * Factoria de EventEmitter2. Permite generar instancias de EventEmitter2 para manipular eventos
-     * @requires $
-     * @requires EventEmitter
+     * Factoria de EventEmitter. Permite generar instancias de EventEmitter para manipular eventos
+     * @requires _EventEmitter
      */
-    constructor(protected $:JQueryStatic,protected EventEmitter:EventEmitter){
-        this.globalEmitter = this.createEmitter();
+    constructor(protected _EventEmitter:EventEmitter){
+        this._globalEmitter = this.createEmitter();
     }
     /**
      * Genera una instancia de EventEmitter2
@@ -32,8 +25,8 @@ export class EventEmitterFactory{
      * @returns {EventEmitter}
      */
     createEmitter(bind?:Object):EventEmitter{
-        let eventEmitter= this.EventEmitter.instance();
-        eventEmitter.activate(this.globalEmitter,bind);
+        let eventEmitter= this._EventEmitter.instance();
+        eventEmitter.activate(this._globalEmitter,bind);
         return eventEmitter;
     }
 }

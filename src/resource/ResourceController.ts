@@ -18,7 +18,7 @@ export abstract class ResourceController implements IEventHandler{
     protected _completed:boolean=false;
     protected _$element:JQuery;
     protected _eventEmitter:EventEmitter;
-    protected _options = {};
+    protected _options:any = {};
     /**
      * Controlador base para los recursos
      * @param {JQueryStatic}            $

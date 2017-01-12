@@ -124,7 +124,7 @@ export abstract class PageController{
                 deferred.resolve();
             }
         }
-        promise.then(this._onShowEnd.bind(this));
+        promise.then(this._onShowEnd.bind(this,$oldPage,oldPageRelativePosition));
         return promise;
     }
 
@@ -132,8 +132,8 @@ export abstract class PageController{
      * Invocado al finalizar el proceso de animación
      * @protected
      */
-    protected _onShowEnd(){
-        this.eventEmitter.trigger(PageController.ON_SHOWN,[this.$element,this]);
+    protected _onShowEnd($oldPage,oldPageRelativePosition){
+        this.eventEmitter.trigger(PageController.ON_SHOWN,[this.$element,$oldPage,oldPageRelativePosition,this]);
     }
 
     /**
@@ -160,6 +160,5 @@ export abstract class PageController{
      */
     protected _destroy(){
         this.eventEmitter.trigger(PageController.ON_DESTROY,[this.$element,this]);
-        this.eventEmitter.off(PageController.NAMESPACE);
     }
 }

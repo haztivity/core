@@ -8,6 +8,8 @@ import {Page,PageManager} from "../page";
 import {Navigator} from "../navigator";
 import {HaztivityAppContextNotFound,HaztivityPagesContextNotFound} from "./Errors";
 import {ResourceManager} from "../resource";
+import {ComponentManager,ComponentInitializer} from "../component";
+import {ComponentController} from "../component/ComponentController";
 export interface ISco{
     on():void;
     run():void;
@@ -15,6 +17,7 @@ export interface ISco{
 export interface IScoOptions{
     name:string;
     pages:Page[];
+    components?:ComponentController[];
 }
 @Sco({
     name:"ScoController",
@@ -22,7 +25,9 @@ export interface IScoOptions{
         Navigator,
         PageManager,
         ResourceManager,
-        EventEmitterFactory
+        EventEmitterFactory,
+        ComponentManager,
+        ComponentInitializer
     ]
 })
 export class ScoController implements ISco{
@@ -35,11 +40,15 @@ export class ScoController implements ISco{
     constructor (protected Navigator:Navigator,
                  protected PageManager:PageManager,
                  protected ResourceManager:ResourceManager,
-                 protected EventEmitterFactory:EventEmitterFactory){
+                 protected EventEmitterFactory:EventEmitterFactory,
+                 protected ComponentManager:ComponentManager,
+                 protected ComponentInitializer:ComponentInitializer){
         this.eventEmitter = EventEmitterFactory.createEmitter();
     }
     public activate(options:IScoOptions):ScoController{
         this.options = options;
+        this.ComponentManager.addAll(this.options.components||[]);
+        this.PageManager.addPages(this.options.pages);
         return this;
     }
     public on():ScoController{
@@ -64,9 +73,9 @@ export class ScoController implements ISco{
     public run():ScoController{
         this._init();
         this.$pagesContainer.addClass(ScoController.CLASS_PAGES);
+        this.ComponentInitializer.initialize(this.$context);
         this.Navigator.activate(this.$pagesContainer);
         //init components
-        this.PageManager.addPages(this.options.pages);
         this.Navigator.goTo(0);
         return this;
     }

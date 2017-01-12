@@ -16,7 +16,7 @@ import {S} from "../utils";
 })
 export class ResourceManager{
     //store available resources
-    protected _Resources:Map<string,ResourceController> = new Map<string,ResourceController>();
+    protected _resources:Map<string,ResourceController> = new Map<string,ResourceController>();
     constructor(protected Injector:InjectorService,protected S){
 
     }
@@ -30,11 +30,11 @@ export class ResourceManager{
         //resource must exists
         if(resource){
             //resource must have a name registered by the injector
-            let name = resource._resourceName;
+            let name = (<any>resource)._resourceName;
             if(!!name){
                 if(this.nameIsValid(name)) {
                     //check if already exists
-                    let current = this._Resources.get(name);
+                    let current = this._resources.get(name);
                     //if exists, should be equal
                     if (current != undefined) {
                         if (current != resource) {
@@ -42,7 +42,7 @@ export class ResourceManager{
                         }
                     } else {
                         //if not exists, register
-                        this._Resources.set(name, resource)
+                        this._resources.set(name, resource)
                     }
                 }else{
                     throw new HaztivityResourceNameInvalidError(name);
@@ -55,10 +55,10 @@ export class ResourceManager{
         }
     }
     public nameIsValid(name:string):boolean{
-        return this.S(name).camelize().s == name;
+        return this.S(name).camelize().s === name;
     }
     public exists(name:string):ResourceController{
-        return this._Resources.get(name) != undefined;
+        return this._resources.get(name) != undefined;
     }
     /**
      * Añade un conjunto de recursos.

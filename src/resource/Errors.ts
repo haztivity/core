@@ -25,6 +25,31 @@ export class HaztivityResourceAlreadyRegisteredError extends BaseError{
 export class HaztivityResourceNameInvalidError extends BaseError{
     constructor(resource:string){
         //todo LINK
-        super("HaztivityResourceNameInvalidError",`Invalid name '${resource}'. Please use camelCase nomenclature. For more details go to LINK`);
+        super("HaztivityResourceNameInvalidError",`Invalid name '${resource}'. Please use camelCase nomenclature.`);
+    }
+}
+/**
+ * Error al intentar inicializar un recurso sin indicar el nombre del recurso a inicializar
+ */
+export class HaztivityResourceNameRequiredError extends BaseError{
+    constructor($element:string){
+        super("HaztivityResourceNameRequiredError",`Resource name not provider in data-* attribute. ${$element}`);
+    }
+}
+/**
+ * Error al intentar inicializar un recurso no registrado
+ */
+export class HaztivityResourceNotRegisteredError extends BaseError{
+    constructor(resource:string){
+        super("HaztivityResourceNotRegisteredError",`Attempt to initialize ${resource} but is not registered`);
+    }
+}
+
+/**
+ * Error de controlador invalido
+ */
+export class HaztivityInvalidResourceControllerError extends BaseError{
+    constructor(resource:string){
+        super("HaztivityInvalidResourceControllerError",`Invalid controller for ${resource} resource`);
     }
 }

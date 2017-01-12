@@ -5,7 +5,7 @@
 import {$ as jquery} from "../jquery";
 import {Core} from "../di";
 import {PageManager,PageImplementation,PageController} from "../page";
-import {EventEmitter, EventEmitterFactory} from "../utils";
+import {EventEmitter, EventEmitterFactory,IEventHandler} from "../utils";
 @Core({
     name:"Navigator",
     public:true,
@@ -15,9 +15,12 @@ import {EventEmitter, EventEmitterFactory} from "../utils";
         EventEmitterFactory
     ]
 })
-export class Navigator{
+export class Navigator implements IEventHandler{
+
     public static readonly NAMESPACE="navigator";
-    public static readonly ON_RENDER_PAGE=`${Navigator.NAMESPACE}:render`;
+    public static readonly ON_DRAW_PAGE=`${Navigator.NAMESPACE}:draw`;
+    public static readonly ON_DISABLE=`${Navigator.NAMESPACE}:disable`;
+    public static readonly ON_ENABLE=`${Navigator.NAMESPACE}:enable`;
     protected $context:JQuery;
     protected currentPage:PageImplementation;
     protected currentPageIndex:number;
@@ -68,14 +71,14 @@ export class Navigator{
                             this.$context.append(newPageElement);
                         }
                         //trigger event in navigator
-                        this.eventEmitter.trigger(Navigator.ON_RENDER_PAGE, newPageName);
+                        this.eventEmitter.trigger(Navigator.ON_DRAW_PAGE, newPageName);
                         //trigger a global event that could be listened by anyone
-                        this.eventEmitter.globalEmitter.trigger(Navigator.ON_RENDER_PAGE, newPageName);
+                        this.eventEmitter.globalEmitter.trigger(Navigator.ON_DRAW_PAGE, newPageName);
                         //request animations
                         let showPromise = newPageController.show(currentPageElement, currentPageIs);
                         //if the function returns a promise
                         if (typeof showPromise.then === "function") {
-                            newPageController.show(currentPageElement, currentPageIs).then(this._onPageShowEnd.bind(this, newPage, currentPage, this.currentRenderProcess));
+                            showPromise.then(this._onPageShowEnd.bind(this, newPage, currentPage, this.currentRenderProcess));
                         } else {//otherwise, execute immediately
                             this._onPageShowEnd(newPage, currentPage, this.currentRenderProcess);
                         }
@@ -100,7 +103,14 @@ export class Navigator{
      * @param {boolean}     disabled        Estado a establecer
      */
     public setDisabled(disabled:boolean){
-        this.disabled = !!disabled;
+        if(this.disabled !== disabled) {
+            this.disabled = disabled;
+            if(disabled){
+                this.eventEmitter.trigger(Navigator.ON_ENABLE);
+            }else{
+                this.eventEmitter.trigger(Navigator.ON_DISABLE);
+            }
+        }
     }
     /**
      * Habilita la navegación
@@ -156,5 +166,18 @@ export class Navigator{
             controller.getElement().remove();
         }
     }
+    on(events: string, data: any, handler: (eventObject: JQueryEventObject, ...args: any[]) => any): Navigator {
+        this.eventEmitter.on(events,data,handler);
+        return this;
+    }
 
+    one(events: string, data: any, handler: (eventObject: JQueryEventObject) => any): Navigator {
+        this.eventEmitter.one(events,data,handler);
+        return this;
+    }
+
+    off(events: string, handler?: (eventObject: JQueryEventObject) => any): Navigator {
+        this.eventEmitter.off(events,handler);
+        return this;
+    }
 }
