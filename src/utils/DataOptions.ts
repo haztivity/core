@@ -5,23 +5,27 @@
 import {Service} from "../di";
 import {$} from "../jquery";
 import {S} from "./String";
-@Service({
-    name:"DataOptions",
-    dependencies:[
-        $,
-        S
-    ]
-})
-export class DataOptions{
-    constructor(protected $,protected S:S){
+@Service(
+    {
+        name: "DataOptions",
+        dependencies: [
+            $,
+            S
+        ]
+    }
+)
+export class DataOptions {
+    constructor(protected $, protected S: S) {
 
     }
-    public static readonly EXTRACT_DATA_MODE={
-        underscore:"underscore",
-        hypen:"hypen",
-        camel:"camel"
+
+    public static readonly EXTRACT_DATA_MODE = {
+        underscore: "underscore",
+        hypen: "hypen",
+        camel: "camel"
     };
-    public getDataOptions (element:JQuery,prefix:string,optPrefix="opt",mode?:string) {
+
+    public getDataOptions(element: JQuery, prefix: string, optPrefix = "opt", mode?: string) {
         //extract data-_attributes with jquery data
         let $element = this.$(element),
             params = $element.data(), parsedParams = {},

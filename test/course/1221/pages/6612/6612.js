@@ -1,10 +1,10 @@
-System.register(["../../../../../src/core", "../../../../resources/hzButton/hzButton", "./6612.html!text"], function (exports_1, context_1) {
+System.register(["../../../../../src/core", "../../../../resources/hzButton/hzButton", "./6612.html!text"], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var core_1, hzButton_1, _6612_html_text_1;
     var page;
     return {
-        setters: [
+        setters:[
             function (core_1_1) {
                 core_1 = core_1_1;
             },
@@ -14,7 +14,7 @@ System.register(["../../../../../src/core", "../../../../resources/hzButton/hzBu
             function (_6612_html_text_1_1) {
                 _6612_html_text_1 = _6612_html_text_1_1;
             }],
-        execute: function () {
+        execute: function() {
             page = core_1.PageFactory.createPage({
                 name: "6612",
                 resources: [

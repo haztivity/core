@@ -5,19 +5,26 @@
 import {Core} from "../di";
 import {ResourceController} from "./ResourceController";
 import {InjectorService} from "../di";
-import {HaztivityResourceInvalidError,HaztivityResourceAlreadyRegisteredError,HaztivityResourceNameInvalidError} from "./Errors";
+import {
+    HaztivityResourceInvalidError,
+    HaztivityResourceAlreadyRegisteredError,
+    HaztivityResourceNameInvalidError
+} from "./Errors";
 import {S} from "../utils";
-@Core({
-    name:"ResourceManager",
-    dependencies:[
-        InjectorService,
-        S
-    ]
-})
-export class ResourceManager{
+@Core(
+    {
+        name: "ResourceManager",
+        dependencies: [
+            InjectorService,
+            S
+        ]
+    }
+)
+export class ResourceManager {
     //store available resources
-    protected _resources:Map<string,ResourceController> = new Map<string,ResourceController>();
-    constructor(protected Injector:InjectorService,protected S){
+    protected _resources: Map<string,ResourceController> = new Map<string,ResourceController>();
+
+    constructor(protected Injector: InjectorService, protected S) {
 
     }
 
@@ -26,13 +33,13 @@ export class ResourceManager{
      * @param {ResourceController}  resource        Controlador del recurso. Debe extender de ResourceController y estar registrado en el DI con el tipo Resource
      * @see Injector.registerResource
      */
-    public add(resource:ResourceController){
+    public add(resource: ResourceController) {
         //resource must exists
-        if(resource){
+        if (resource) {
             //resource must have a name registered by the injector
             let name = (<any>resource)._resourceName;
-            if(!!name){
-                if(this.nameIsValid(name)) {
+            if (!!name) {
+                if (this.nameIsValid(name)) {
                     //check if already exists
                     let current = this._resources.get(name);
                     //if exists, should be equal
@@ -44,28 +51,31 @@ export class ResourceManager{
                         //if not exists, register
                         this._resources.set(name, resource)
                     }
-                }else{
+                } else {
                     throw new HaztivityResourceNameInvalidError(name);
                 }
-            }else{
+            } else {
                 throw new HaztivityResourceInvalidError();
             }
-        }else{
+        } else {
             throw new HaztivityResourceInvalidError();
         }
     }
-    public nameIsValid(name:string):boolean{
+
+    public nameIsValid(name: string): boolean {
         return this.S(name).camelize().s === name;
     }
-    public exists(name:string):ResourceController{
+
+    public exists(name: string): ResourceController {
         return this._resources.get(name) != undefined;
     }
+
     /**
      * Añade un conjunto de recursos.
      * @see ResourceManager#add
      * @param {ResourceController[]}    resources       Recursos a añadir
      */
-    public addAll(resources:ResourceController[]){
+    public addAll(resources: ResourceController[]) {
         for (let resource of resources) {
             this.add(resource);
         }

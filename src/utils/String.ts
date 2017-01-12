@@ -9,5 +9,5 @@
 //Ha sido necesario extraer String.js al proyecto y modificar la exportación
 import {S} from "../libs/String";
 import {Injector} from "../di";
-Injector.getInstance().registerServiceInstance("S",S);
+Injector.getInstance().registerServiceInstance("S", S);
 export {S as S};

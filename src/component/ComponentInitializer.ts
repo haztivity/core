@@ -8,7 +8,11 @@ import {ComponentController} from "./ComponentController";
 import {S} from "../utils"
 import {DataOptions} from "../utils";
 import {$} from "../jquery";
-import {HaztivityComponentNameRequiredError,HaztivityComponentNotRegisteredError,HaztivityInvalidComponentControllerError} from "./Errors";
+import {
+    HaztivityComponentNameRequiredError,
+    HaztivityComponentNotRegisteredError,
+    HaztivityInvalidComponentControllerError
+} from "./Errors";
 @Core(
     {
         name: "ComponentInitializer",
@@ -73,7 +77,7 @@ export class ComponentInitializer {
                 if (controllerInstance == undefined || controllerInstance.isDestroyed()) {
                     controllerInstance = this.InjectorService.get(name);
                     if (controllerInstance) {
-                    //check if is already instanciated
+                        //check if is already instanciated
                         //extract options
                         let options = this.DataOptions.getDataOptions($element, name);
                         options = $.extend({}, options, config.options);

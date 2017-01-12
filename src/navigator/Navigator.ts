@@ -4,23 +4,25 @@
  */
 import {$ as jquery} from "../jquery";
 import {Core} from "../di";
-import {PageManager,PageImplementation,PageController} from "../page";
-import {EventEmitter, EventEmitterFactory,IEventHandler} from "../utils";
-@Core({
-    name:"Navigator",
-    public:true,
-    dependencies:[
-        jquery,
-        PageManager,
-        EventEmitterFactory
-    ]
-})
-export class Navigator implements IEventHandler{
+import {PageManager, PageImplementation, PageController} from "../page";
+import {EventEmitter, EventEmitterFactory, IEventHandler} from "../utils";
+@Core(
+    {
+        name: "Navigator",
+        public: true,
+        dependencies: [
+            jquery,
+            PageManager,
+            EventEmitterFactory
+        ]
+    }
+)
+export class Navigator implements IEventHandler {
 
-    public static readonly NAMESPACE="navigator";
-    public static readonly ON_DRAW_PAGE=`${Navigator.NAMESPACE}:draw`;
-    public static readonly ON_DISABLE=`${Navigator.NAMESPACE}:disable`;
-    public static readonly ON_ENABLE=`${Navigator.NAMESPACE}:enable`;
+    public static readonly NAMESPACE = "navigator";
+    public static readonly ON_DRAW_PAGE = `${Navigator.NAMESPACE}:draw`;
+    public static readonly ON_DISABLE = `${Navigator.NAMESPACE}:disable`;
+    public static readonly ON_ENABLE = `${Navigator.NAMESPACE}:enable`;
     public static readonly ON_CHANGE_PAGE_END = `${Navigator.NAMESPACE}:changend`;
     protected _$context: JQuery;
     protected _currentPage: PageImplementation;
@@ -28,20 +30,23 @@ export class Navigator implements IEventHandler{
     protected _currentRenderProcess: JQueryDeferred;
     protected _eventEmitter: EventEmitter;
     protected _disabled: boolean;
-    constructor(protected $:JQueryStatic,protected PageManager:PageManager, protected EventEmitterFactory:EventEmitterFactory){
+
+    constructor(protected $: JQueryStatic, protected PageManager: PageManager, protected EventEmitterFactory: EventEmitterFactory) {
 
     }
-    public activate ($context:JQuery){
+
+    public activate($context: JQuery) {
         this._$context = $context;
         this._eventEmitter = this.EventEmitterFactory.createEmitter();
     }
+
     /**
      * Navega a la página solicitada.
      * Debe estar registrada en PageManager
      * @param {Number} index    Índice de la página a navegar
      * @returns {JQueryDeferred} Promesa que es resuelta al finalizarse el proceso completo de cambio de página
      */
-    public goTo(index:number){
+    public goTo(index: number) {
         if (this.isDisabled() !== true) {
             //get the page requested
             let newPage: PageImplementation = this.PageManager.getPage(index);
@@ -51,7 +56,9 @@ export class Navigator implements IEventHandler{
                     //todo check if page is complete
                     let currentPage = this.getCurrentPage(),//get current page and index
                         currentPageIndex = this.getCurrentPageIndex(),
-                        currentPageIs = currentPageIndex - index < 0 ? -1 : 1;//check the position of the old page relative to the new page
+                        currentPageIs = currentPageIndex - index < 0
+                            ? -1
+                            : 1;//check the position of the old page relative to the new page
                     //check if resources are completed to go to the next page
                     if (currentPageIs === 1 || (currentPage == undefined || currentPage.getController().isCompleted())) {
                         if (this._currentRenderProcess && this._currentRenderProcess.state() === "pending") {
@@ -60,7 +67,9 @@ export class Navigator implements IEventHandler{
                         this._currentRenderProcess = $.Deferred();
                         this._currentPage = newPage;//set new page as current
                         this._currentPageIndex = index;
-                        let currentPageElement = currentPage ? currentPage.getController().getElement() : null, //get current element
+                        let currentPageElement = currentPage
+                                ? currentPage.getController().getElement()
+                                : null, //get current element
                             newPageController = newPage.getController(),//create a controller for new page
                             newPageElement = newPageController.getElement(),//get the rendered element
                             newPageName = newPage.getPageName();//get name of new controller
@@ -122,45 +131,49 @@ export class Navigator implements IEventHandler{
      * Devuelve el estado actual de deshabilitado
      * @returns {boolean}
      */
-    public isDisabled(){
+    public isDisabled() {
         return this._disabled;
     }
+
     /**
      * Establece el estado de deshabilitado
      * @param {boolean}     disabled        Estado a establecer
      */
-    public setDisabled(disabled:boolean){
+    public setDisabled(disabled: boolean) {
         if (this._disabled !== disabled) {
             this._disabled = disabled;
-            if(disabled){
+            if (disabled) {
                 this._eventEmitter.trigger(Navigator.ON_ENABLE);
-            }else{
+            } else {
                 this._eventEmitter.trigger(Navigator.ON_DISABLE);
             }
         }
     }
+
     /**
      * Habilita la navegación
      */
-    public enable(){
+    public enable() {
         this.setDisabled(false);
     }
+
     /**
      * Deshabilita la navegación
      */
-    public disable(){
+    public disable() {
         this.setDisabled(true);
     }
+
     /**
      * Retrocede a la página posterior si existe.
      * @returns {JQueryPromise|boolean} Devuelve una promsea si el proceso se inicia. False si está deshabilitado o no hay página posterior
      */
-    public next(){
+    public next() {
         let numPages = this.PageManager.count(),
             currentPageIndex = this.getCurrentPageIndex();
         if (currentPageIndex < numPages - 1) {
             return this.goTo(currentPageIndex + 1);
-        }else{
+        } else {
             return false;
         }
 
@@ -170,11 +183,11 @@ export class Navigator implements IEventHandler{
      * Retrocede a la página anterior si existe.
      * @returns {JQueryPromise|boolean} Devuelve una promsea si el proceso se inicia. False si está deshabilitado o no hay página anterior
      */
-    public prev(){
+    public prev() {
         let currentPageIndex = this.getCurrentPageIndex();
         if (currentPageIndex > 0) {
             return this.goTo(currentPageIndex - 1);
-        }else{
+        } else {
             return false;
         }
 
@@ -188,7 +201,7 @@ export class Navigator implements IEventHandler{
      * @private
      */
     protected _onPageShowEnd(newPage: PageImplementation, newPageData, oldPage: PageImplementation, oldPageData, defer) {
-        if(oldPage) {
+        if (oldPage) {
             let controller = oldPage.getController();
             oldPage.detach();
             controller.getElement().remove();
@@ -206,6 +219,7 @@ export class Navigator implements IEventHandler{
     public getCurrentPage() {
         return this._currentPage;
     }
+
     on(events: string, data: any, handler: (eventObject: JQueryEventObject, ...args: any[]) => any): Navigator {
         this._eventEmitter.on(events, data, handler);
         return this;

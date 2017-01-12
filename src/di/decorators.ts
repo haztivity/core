@@ -9,19 +9,25 @@ interface IBaseParams {
     dependencies: any[];
     factory?: Function;
 }
-export interface ICoreParams extends IBaseParams{
-    public?:boolean;
-    instantiable?:boolean;
+export interface ICoreParams extends IBaseParams {
+    public?: boolean;
+    instantiable?: boolean;
 }
-export interface IModuleParams extends IBaseParams{}
-export interface IServiceParams extends IBaseParams{}
-export interface IScoParams extends IBaseParams{}
-export interface IPageParams extends IBaseParams{}
-export interface IResourceParams extends IBaseParams{}
-export interface IComponentParams extends IBaseParams{}
+export interface IModuleParams extends IBaseParams {
+}
+export interface IServiceParams extends IBaseParams {
+}
+export interface IScoParams extends IBaseParams {
+}
+export interface IPageParams extends IBaseParams {
+}
+export interface IResourceParams extends IBaseParams {
+}
+export interface IComponentParams extends IBaseParams {
+}
 export interface IServiceInstanceParams {
-    name:string;
-    instance:any;
+    name: string;
+    instance: any;
 }
 /**
  * Decorador para registrar una clase como Core.
@@ -31,18 +37,18 @@ export interface IServiceInstanceParams {
  * @static
  * @function
  */
-export function Core (params:ICoreParams){
-    return (target)=> {
+export function Core(params: ICoreParams) {
+    return (target) => {
         if (params.public) {
-            if(params.instantiable){
-                injectorInstance.registerCorePublicTransient(params.name,target,params.dependencies,params.factory);
-            }else {
+            if (params.instantiable) {
+                injectorInstance.registerCorePublicTransient(params.name, target, params.dependencies, params.factory);
+            } else {
                 injectorInstance.registerCorePublic(params.name, target, params.dependencies, params.factory);
             }
         } else {
-            if(params.instantiable){
+            if (params.instantiable) {
                 injectorInstance.registerCoreTransient(params.name, target, params.dependencies, params.factory);
-            }else {
+            } else {
                 injectorInstance.registerCore(params.name, target, params.dependencies, params.factory);
             }
         }
@@ -54,9 +60,9 @@ export function Core (params:ICoreParams){
  * @static
  * @function
  */
-export function Module(params:IModuleParams){
-    return (target) =>{
-        injectorInstance.registerModule(params.name,target,params.dependencies,params.factory);
+export function Module(params: IModuleParams) {
+    return (target) => {
+        injectorInstance.registerModule(params.name, target, params.dependencies, params.factory);
     }
 }
 /**
@@ -65,9 +71,9 @@ export function Module(params:IModuleParams){
  * @static
  * @function
  */
-export function Service(params:IServiceParams){
-    return (target)=>{
-        injectorInstance.registerService(params.name,target,params.dependencies,params.factory);
+export function Service(params: IServiceParams) {
+    return (target) => {
+        injectorInstance.registerService(params.name, target, params.dependencies, params.factory);
     }
 }
 /**
@@ -76,9 +82,9 @@ export function Service(params:IServiceParams){
  * @static
  * @function
  */
-export function ServiceInstance(params:IServiceInstanceParams){
-    return (target) =>{
-        injectorInstance.registerServiceInstance(params.name,params.instance);
+export function ServiceInstance(params: IServiceInstanceParams) {
+    return (target) => {
+        injectorInstance.registerServiceInstance(params.name, params.instance);
     }
 }
 /**
@@ -87,9 +93,9 @@ export function ServiceInstance(params:IServiceInstanceParams){
  * @static
  * @function
  */
-export function Sco(params:IScoParams){
-    return (target) =>{
-        injectorInstance.registerSco(params.name,target,params.dependencies,params.factory);
+export function Sco(params: IScoParams) {
+    return (target) => {
+        injectorInstance.registerSco(params.name, target, params.dependencies, params.factory);
     }
 }
 /**
@@ -98,9 +104,9 @@ export function Sco(params:IScoParams){
  * @static
  * @function
  */
-export function Page(params:IPageParams){
-    return (target) =>{
-        injectorInstance.registerPage(params.name,target,params.dependencies,params.factory);
+export function Page(params: IPageParams) {
+    return (target) => {
+        injectorInstance.registerPage(params.name, target, params.dependencies, params.factory);
     }
 }
 /**
@@ -109,9 +115,9 @@ export function Page(params:IPageParams){
  * @static
  * @function
  */
-export function Resource(params:IResourceParams){
-    return (target) =>{
-        injectorInstance.registerResource(params.name,target,params.dependencies,params.factory);
+export function Resource(params: IResourceParams) {
+    return (target) => {
+        injectorInstance.registerResource(params.name, target, params.dependencies, params.factory);
     }
 }
 /**
@@ -120,9 +126,9 @@ export function Resource(params:IResourceParams){
  * @static
  * @function
  */
-export function Component(params:IComponentParams){
-    return (target) =>{
-        injectorInstance.registerComponent(params.name,target,params.dependencies,params.factory);
+export function Component(params: IComponentParams) {
+    return (target) => {
+        injectorInstance.registerComponent(params.name, target, params.dependencies, params.factory);
     }
 }
 /**
@@ -131,8 +137,8 @@ export function Component(params:IComponentParams){
  * @static
  * @function
  */
-export function Dependencies(params:{dependencies:any[]}){
-    return (target) =>{
-        injectorInstance.registerDependencies(target,params.dependencies);
+export function Dependencies(params: { dependencies: any[] }) {
+    return (target) => {
+        injectorInstance.registerDependencies(target, params.dependencies);
     }
 }

@@ -3,25 +3,27 @@
  * Copyright Davinchi. All Rights Reserved.
  */
 import {Core} from "../di";
-import {IEventHandler,EventEmitter,EventEmitterFactory} from "../utils";
+import {IEventHandler, EventEmitter, EventEmitterFactory} from "../utils";
 import {ResourceController} from "../resource";
-export interface IPageOptions{
-    name:string;
-    template:string;
-    controller?:string;
-    resources?:ResourceController[]
+export interface IPageOptions {
+    name: string;
+    template: string;
+    controller?: string;
+    resources?: ResourceController[]
 }
-@Core({
-    name:"Page",
-    instantiable:true,
-    dependencies:[
-        EventEmitterFactory
-    ]
-})
-export class Page implements IEventHandler{
+@Core(
+    {
+        name: "Page",
+        instantiable: true,
+        dependencies: [
+            EventEmitterFactory
+        ]
+    }
+)
+export class Page implements IEventHandler {
     public static readonly NAMESPACE = "page";
-    protected options:IPageOptions;
-    protected eventEmitter:EventEmitter;
+    protected options: IPageOptions;
+    protected eventEmitter: EventEmitter;
 
     /**
      * Almacena la información de una página.
@@ -29,29 +31,34 @@ export class Page implements IEventHandler{
      * @class
      * @param EventEmitterFactory
      */
-    constructor(protected EventEmitterFactory:EventEmitterFactory){
+    constructor(protected EventEmitterFactory: EventEmitterFactory) {
     }
-    public getResources():ResourceController[]{
+
+    public getResources(): ResourceController[] {
         return this.options.resources;
     }
+
     /**
      * Configura la clase nada más instanciarla
      * @param options
      */
-    public activate(options:IPageOptions){
-        this.options=options;
+    public activate(options: IPageOptions) {
+        this.options = options;
         this.eventEmitter = this.EventEmitterFactory.createEmitter();
     }
-    public on(events:string,data:any,handler: (eventObject: JQueryEventObject, ...args: any[]) => any):Page{
-        this.eventEmitter.on(events+"."+Page.NAMESPACE,data,handler);
+
+    public on(events: string, data: any, handler: (eventObject: JQueryEventObject, ...args: any[]) => any): Page {
+        this.eventEmitter.on(events + "." + Page.NAMESPACE, data, handler);
         return this;
     }
-    public one(events: string, data: any, handler: (eventObject: JQueryEventObject) => any):Page{
-        this.eventEmitter.one(events+"."+Page.NAMESPACE,data,handler);
+
+    public one(events: string, data: any, handler: (eventObject: JQueryEventObject) => any): Page {
+        this.eventEmitter.one(events + "." + Page.NAMESPACE, data, handler);
         return this;
     }
-    public off(events: string,handler?: (eventObject: JQueryEventObject) => any):Page{
-        this.eventEmitter.off(events+"."+Page.NAMESPACE,handler);
+
+    public off(events: string, handler?: (eventObject: JQueryEventObject) => any): Page {
+        this.eventEmitter.off(events + "." + Page.NAMESPACE, handler);
         return this;
     }
 
@@ -59,7 +66,7 @@ export class Page implements IEventHandler{
      * Obtiene el nombre de la página
      * @returns {string}
      */
-    public getName(){
+    public getName() {
         return this.options.name;
     }
 }

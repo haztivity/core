@@ -3,43 +3,46 @@
  * Copyright Davinchi. All Rights Reserved.
  */
 import {Core} from "../di";
-import {Page,IPageOptions} from "./Page";
-import {PageController,IPageState,IPageStore} from "./PageController";
+import {Page, IPageOptions} from "./Page";
+import {PageController, IPageState, IPageStore} from "./PageController";
 import {InjectorService} from "../di";
-import {ResourceManager,ResourceController} from "../resource";
+import {ResourceManager, ResourceController} from "../resource";
 
-@Core({
-    name:"PageImplementation",
-    dependencies:[
-        ResourceManager,
-        InjectorService
-    ],
-    instantiable:true
-})
-export class PageImplementation{
-    protected store:IPageStore={
-        public:{},
-        private:{}
+@Core(
+    {
+        name: "PageImplementation",
+        dependencies: [
+            ResourceManager,
+            InjectorService
+        ],
+        instantiable: true
+    }
+)
+export class PageImplementation {
+    protected store: IPageStore = {
+        public: {},
+        private: {}
     };
-    protected state:IPageState;
-    protected page:Page;
+    protected state: IPageState;
+    protected page: Page;
     protected _resourcesState;
-    protected controllerFactory:any;
-    protected currentController:PageController;
-    protected resources:ResourceController[];
+    protected controllerFactory: any;
+    protected currentController: PageController;
+    protected resources: ResourceController[];
+
     /**
      * Gestiona el ciclo de vida de una página una vez registrada en el PageManager. Almacena el estado y el store y gestiona el ciclo de vida del controlador.
      * @class
      * @param Injector
      */
-    constructor(protected ResourceManager, protected Injector:InjectorService){
+    constructor(protected ResourceManager, protected Injector: InjectorService) {
     }
 
     /**
      * Configura la clase nada más instanciarla
      * @param {Page}    page    Página registrada en el PageManager.
      */
-    activate(page:Page){
+    activate(page: Page) {
         this.state = {};
         this.resources = page.getResources();
         this.page = page;
@@ -49,7 +52,7 @@ export class PageImplementation{
      * Obtiene el Page asociado
      * @returns {Page}
      */
-    public getPage(){
+    public getPage() {
         return this.page;
     }
 
@@ -57,7 +60,7 @@ export class PageImplementation{
      * Obtiene el nombre de la página
      * @returns {string}
      */
-    public getPageName(){
+    public getPageName() {
         return this.page.getName();
     }
 
@@ -67,8 +70,8 @@ export class PageImplementation{
      * @returns {PageController}
      * @see PageController
      */
-    public getController(){
-        if(!this.currentController) {
+    public getController() {
+        if (!this.currentController) {
             let pageOptions = this.page.options;
             if (!this.controllerFactory) {
                 this.controllerFactory = this.Injector.get(pageOptions.controller);
@@ -85,14 +88,15 @@ export class PageImplementation{
     /**
      * Finaliza el ciclo de vida actual invocando al método "destroy" del controlador de la página y liberando la instancia del controlador
      */
-    public detach(){
+    public detach() {
         this.currentController._destroy();
         this.currentController = null;
     }
+
     /**
      * Desecha la instancia del controlador actual
      */
-    public stop(){
+    public stop() {
         this.currentController = null;
         return this;
     }
