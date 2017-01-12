@@ -12,10 +12,12 @@ export interface IPageControllerOptions extends IPageOptions {
     template: string;
 }
 export interface IPageStore {
-
+    public?:any;
+    private?:any;
 }
-export interface IPageState {
-
+export interface  IPageState {
+    completed:boolean;
+    visited:boolean;
 }
 @Dependencies(
     {
@@ -32,7 +34,7 @@ export abstract class PageController {
     public static readonly ON_RENDERED = `${PageController.NAMESPACE}:rendered`;
     public static readonly ON_SHOW = `${PageController.NAMESPACE}:show`;
     public static readonly ON_SHOWN = `${PageController.NAMESPACE}:shown`;
-    public static readonly ON_COMPLETE = `${PageController.NAMESPACE}:completed`;
+    public static readonly ON_COMPLETE_CHANGE = `${PageController.NAMESPACE}:completechange`;
     public static readonly ON_DESTROY = `${PageController.NAMESPACE}:destroy`;
     public static readonly CLASS_PAGE = "hz-page";
     public $element;
@@ -65,17 +67,30 @@ export abstract class PageController {
         this.options = options;
         this.state = state;
         this.store = store;
+        this.state.visited = true;
         this.eventEmitter = eventEmitter;
     }
-
-    public isCompleted() {
+    protected _getNumCompletedResources(){
         let completed = 0;
         for (let resource of this.resources) {
             completed += resource.isCompleted()
                 ? 1
                 : 0;
         }
-        return completed === this.resources.length;
+        return completed
+    }
+    public isCompleted(forceCheck?:boolean) {
+        let result = this.state.completed,
+            current = this.state.completed;
+        if(forceCheck || this.state.completed != true){
+            result = this._getNumCompletedResources() === this.resources.length;
+            //if the state changes, trigger event
+            this.state.completed = result;
+            if(current !== result){
+                this.eventEmitter.trigger(PageController.ON_COMPLETE_CHANGE,[result,this.$element,this]);
+            }
+        }
+        return result;
     }
 
     public render() {
@@ -101,9 +116,15 @@ export abstract class PageController {
 
     public initializeResources() {
         this.resources = this.ResourceInitializerService.initialize(this.$element);
+        for (let resource of this.resources) {
+            resource.on(ResourceController.ON_COMPLETED,{instance:this},this._onResourceCompleted);
+        }
         return this.resources;
     }
-
+    protected _onResourceCompleted(e){
+        let instance:PageController = e.data.instance;
+        instance.isCompleted(true);
+    }
     /**
      * Gestiona la transición entre la página anterior y la nueva
      * @param {JQuery}          $oldPage                    Página anterior

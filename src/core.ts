@@ -33,14 +33,15 @@ export {
     PageController,
     Page,
     IPageOptions,
-    PageFactory
+    PageFactory,
+    PageManager
 } from "./page";
 export {
     ResourceInitializerService,
     ResourceController,
     ResourceManager
 } from "./resource";
-export {Navigator} from "./navigator";
+export {Navigator,INavigatorPageData} from "./navigator";
 export {
     ComponentController,
     ComponentManager,

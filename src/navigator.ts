@@ -2,4 +2,4 @@
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-export {Navigator} from "./navigator/Navigator";
+export {Navigator,INavigatorPageData} from "./navigator/Navigator";

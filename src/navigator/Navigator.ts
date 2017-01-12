@@ -6,6 +6,10 @@ import {$ as jquery} from "../jquery";
 import {Core} from "../di";
 import {PageManager, PageImplementation, PageController} from "../page";
 import {EventEmitter, EventEmitterFactory, IEventHandler} from "../utils";
+export interface INavigatorPageData{
+    index:number;
+    name:string;
+}
 @Core(
     {
         name: "Navigator",
@@ -23,7 +27,8 @@ export class Navigator implements IEventHandler {
     public static readonly ON_DRAW_PAGE = `${Navigator.NAMESPACE}:draw`;
     public static readonly ON_DISABLE = `${Navigator.NAMESPACE}:disable`;
     public static readonly ON_ENABLE = `${Navigator.NAMESPACE}:enable`;
-    public static readonly ON_CHANGE_PAGE_END = `${Navigator.NAMESPACE}:changend`;
+    public static readonly ON_CHANGE_PAGE_END = `${Navigator.NAMESPACE}:changeend`;
+    public static readonly ON_CHANGE_PAGE_START = `${Navigator.NAMESPACE}:changestart`;
     protected _$context: JQuery;
     protected _currentPage: PageImplementation;
     protected _currentPageIndex: number;
@@ -53,7 +58,6 @@ export class Navigator implements IEventHandler {
             //the page must be provided and different of the current page
             if (newPage) {
                 if (newPage !== this._currentPage) {
-                    //todo check if page is complete
                     let currentPage = this.getCurrentPage(),//get current page and index
                         currentPageIndex = this.getCurrentPageIndex(),
                         currentPageIs = currentPageIndex - index < 0
@@ -67,12 +71,28 @@ export class Navigator implements IEventHandler {
                         this._currentRenderProcess = $.Deferred();
                         this._currentPage = newPage;//set new page as current
                         this._currentPageIndex = index;
+                        let newPageName = newPage.getPageName(),//get name of new controller
+                            newPageData:INavigatorPageData = {
+                                index: index,
+                                name: newPageName
+                            },
+                            currentPageData:INavigatorPageData;
+                        if (currentPage) {
+                            currentPageData = {
+                                index: currentPageIndex,
+                                name: currentPage.getPageName()
+                            }
+                        }
+                        //trigger event in navigator
+                        this._eventEmitter.trigger(Navigator.ON_CHANGE_PAGE_START, newPageData,currentPageData);
+                        //trigger a global event that could be listened by anyone
+                        this._eventEmitter.globalEmitter.trigger(Navigator.ON_CHANGE_PAGE_START, newPageData,currentPageData);
                         let currentPageElement = currentPage
                                 ? currentPage.getController().getElement()
                                 : null, //get current element
                             newPageController = newPage.getController(),//create a controller for new page
-                            newPageElement = newPageController.getElement(),//get the rendered element
-                            newPageName = newPage.getPageName();//get name of new controller
+                            newPageElement = newPageController.getElement();//get the rendered element
+
 
                         //if the new page is before to the current page
                         if (currentPageIndex === -1) {
@@ -85,18 +105,8 @@ export class Navigator implements IEventHandler {
                         //trigger a global event that could be listened by anyone
                         this._eventEmitter.globalEmitter.trigger(Navigator.ON_DRAW_PAGE, newPageName);
                         //request animations
-                        let showPromise = newPageController.show(currentPageElement, currentPageIs),
-                            newPageData = {
-                                index: index,
-                                name: newPageName
-                            },
-                            currentPageData;
-                        if (currentPage) {
-                            currentPageData = {
-                                index: currentPageIndex,
-                                name: currentPage.getPageName()
-                            }
-                        }
+                        let showPromise = newPageController.show(currentPageElement, currentPageIs);
+
                         //if the function returns a promise
                         if (typeof showPromise.then === "function") {
                             showPromise.then(
@@ -196,11 +206,13 @@ export class Navigator implements IEventHandler {
     /**
      * Invocado al finalizarse la animación del cambio de página
      * @param newPage
+     * @param newPageData
      * @param oldPage
+     * @param oldPageData
      * @param defer
      * @private
      */
-    protected _onPageShowEnd(newPage: PageImplementation, newPageData, oldPage: PageImplementation, oldPageData, defer) {
+    protected _onPageShowEnd(newPage: PageImplementation, newPageData:INavigatorPageData, oldPage: PageImplementation, oldPageData:INavigatorPageData, defer) {
         if (oldPage) {
             let controller = oldPage.getController();
             oldPage.detach();

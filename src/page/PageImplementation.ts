@@ -23,9 +23,8 @@ export class PageImplementation {
         public: {},
         private: {}
     };
-    protected state: IPageState;
+    protected state: IPageState = {completed: false, visited: false};
     protected page: Page;
-    protected _resourcesState;
     protected controllerFactory: any;
     protected currentController: PageController;
     protected resources: ResourceController[];
@@ -43,7 +42,6 @@ export class PageImplementation {
      * @param {Page}    page    Página registrada en el PageManager.
      */
     activate(page: Page) {
-        this.state = {};
         this.resources = page.getResources();
         this.page = page;
     }
@@ -70,7 +68,7 @@ export class PageImplementation {
      * @returns {PageController}
      * @see PageController
      */
-    public getController() {
+    public getController(): PageController {
         if (!this.currentController) {
             let pageOptions = this.page.options;
             if (!this.controllerFactory) {

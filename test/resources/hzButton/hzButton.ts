@@ -18,8 +18,11 @@ export class HzButton extends ResourceController{
     }
     protected _onClick(e){
         let instance = e.data.instance;
-        instance._$element.attr("disabled","disabled");
+        instance.disable();
         instance._markAsCompleted();
+    }
+    public disable(){
+        this._$element.attr("disabled","disabled");
     }
     getInstance() {
         return this;

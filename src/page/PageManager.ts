@@ -11,6 +11,7 @@ import {ResourceManager} from "../resource";
 @Core(
     {
         name: "PageManager",
+        public:true,//todo TEMPORAL
         dependencies: [
             ResourceManager,
             EventEmitterFactory,
