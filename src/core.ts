@@ -41,7 +41,11 @@ export {
     ResourceController,
     ResourceManager
 } from "./resource";
-export {Navigator,INavigatorPageData} from "./navigator";
+export {
+    Navigator,
+    INavigatorPageData,
+    NavigatorService
+} from "./navigator";
 export {
     ComponentController,
     ComponentManager,

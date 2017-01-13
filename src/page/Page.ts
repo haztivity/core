@@ -21,6 +21,7 @@ export interface IPageOptions {
     }
 )
 export class Page implements IEventHandler {
+
     public static readonly NAMESPACE = "page";
     protected options: IPageOptions;
     protected eventEmitter: EventEmitter;

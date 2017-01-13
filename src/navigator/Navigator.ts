@@ -10,6 +10,19 @@ export interface INavigatorPageData{
     index:number;
     name:string;
 }
+export interface INavigatorService{
+    goTo(index: number):JQueryPromise|boolean;
+    isDisabled():boolean;
+    setDisabled(disabled: boolean):void;
+    enable():void;
+    disable():void;
+    next():JQueryPromise|boolean;
+    prev():JQueryPromise|boolean;
+    getCurrentPageData():INavigatorPageData;
+    on(events: string, data: any, handler: (eventObject: JQueryEventObject, ...args: any[]) => any): Navigator;
+    one(events: string, data: any, handler: (eventObject: JQueryEventObject) => any): Navigator;
+    off(events: string, handler?: (eventObject: JQueryEventObject) => any): Navigator;
+}
 @Core(
     {
         name: "Navigator",
@@ -21,7 +34,7 @@ export interface INavigatorPageData{
         ]
     }
 )
-export class Navigator implements IEventHandler {
+export class Navigator implements IEventHandler, INavigatorService {
 
     public static readonly NAMESPACE = "navigator";
     public static readonly ON_DRAW_PAGE = `${Navigator.NAMESPACE}:draw`;
@@ -36,25 +49,32 @@ export class Navigator implements IEventHandler {
     protected _eventEmitter: EventEmitter;
     protected _disabled: boolean;
 
-    constructor(protected $: JQueryStatic, protected PageManager: PageManager, protected EventEmitterFactory: EventEmitterFactory) {
+    /**
+     * Gestiona la transición entre páginas y el renderizado de las mismas en un contexto específico
+     * @param {JQueryStatic}                _$
+     * @param {PageManager}                 _PageManager
+     * @param {EventEmitterFactory}         _EventEmitterFactory
+     */
+    constructor(protected _$: JQueryStatic, protected _PageManager: PageManager, protected _EventEmitterFactory: EventEmitterFactory) {
 
     }
 
     public activate($context: JQuery) {
         this._$context = $context;
-        this._eventEmitter = this.EventEmitterFactory.createEmitter();
+        this._eventEmitter = this._EventEmitterFactory.createEmitter();
     }
 
     /**
      * Navega a la página solicitada.
      * Debe estar registrada en PageManager
      * @param {Number} index    Índice de la página a navegar
-     * @returns {JQueryDeferred} Promesa que es resuelta al finalizarse el proceso completo de cambio de página
+     * @returns {JQueryPromise|boolean} Promesa que es resuelta al finalizarse el proceso completo de cambio de
+     * página. False si no se realiza el cambio
      */
-    public goTo(index: number) {
+    public goTo(index: number):JQueryPromise|boolean {
         if (this.isDisabled() !== true) {
             //get the page requested
-            let newPage: PageImplementation = this.PageManager.getPage(index);
+            let newPage: PageImplementation = this._PageManager.getPage(index);
             //the page must be provided and different of the current page
             if (newPage) {
                 if (newPage !== this._currentPage) {
@@ -176,10 +196,11 @@ export class Navigator implements IEventHandler {
 
     /**
      * Retrocede a la página posterior si existe.
-     * @returns {JQueryPromise|boolean} Devuelve una promsea si el proceso se inicia. False si está deshabilitado o no hay página posterior
+     * @returns {JQueryPromise|boolean} Promesa que es resuelta al finalizarse el proceso completo de cambio de
+     * página. False si no se realiza el cambio
      */
     public next() {
-        let numPages = this.PageManager.count(),
+        let numPages = this._PageManager.count(),
             currentPageIndex = this.getCurrentPageIndex();
         if (currentPageIndex < numPages - 1) {
             return this.goTo(currentPageIndex + 1);
@@ -191,7 +212,8 @@ export class Navigator implements IEventHandler {
 
     /**
      * Retrocede a la página anterior si existe.
-     * @returns {JQueryPromise|boolean} Devuelve una promsea si el proceso se inicia. False si está deshabilitado o no hay página anterior
+     * @returns {JQueryPromise|boolean} Promesa que es resuelta al finalizarse el proceso completo de cambio de
+     * página. False si no se realiza el cambio
      */
     public prev() {
         let currentPageIndex = this.getCurrentPageIndex();
@@ -205,11 +227,11 @@ export class Navigator implements IEventHandler {
 
     /**
      * Invocado al finalizarse la animación del cambio de página
-     * @param newPage
-     * @param newPageData
-     * @param oldPage
-     * @param oldPageData
-     * @param defer
+     * @param {PageImplementation}      newPage     Página activada
+     * @param {INavigatorPageData}      newPageData Datos de la página activada
+     * @param {PageImplementation}      oldPage     Página desactivada
+     * @param {INavigatorPageData}      oldPageData Datos de la página desactivada
+     * @param {JQueryDeferred}          defer       Deferred a resolver para indicar que el proceso ha finalizado
      * @private
      */
     protected _onPageShowEnd(newPage: PageImplementation, newPageData:INavigatorPageData, oldPage: PageImplementation, oldPageData:INavigatorPageData, defer) {
@@ -224,24 +246,53 @@ export class Navigator implements IEventHandler {
         this._eventEmitter.globalEmitter.trigger(Navigator.ON_CHANGE_PAGE_END, [newPageData, oldPageData]);
     }
 
+    /**
+     * Obtiene el índice de la página actual
+     * @returns {number}
+     */
     public getCurrentPageIndex() {
         return this._currentPageIndex;
     }
 
+    /**
+     * Obtiene la implementación de página actual
+     * @returns {PageImplementation}
+     */
     public getCurrentPage() {
         return this._currentPage;
     }
 
+    /**
+     * Devuelve los datos de la página actual
+     * @returns {INavigatorPageData}
+     */
+    public getCurrentPageData():INavigatorPageData{
+        return {
+            index:this._currentPageIndex,
+            name:this._currentPage.getPageName()
+        };
+    }
+
+    /**
+     * @see EventEmitter#on
+     * @returns {Navigator}
+     */
     on(events: string, data: any, handler: (eventObject: JQueryEventObject, ...args: any[]) => any): Navigator {
         this._eventEmitter.on(events, data, handler);
         return this;
     }
-
+    /**
+     * @see EventEmitter#one
+     * @returns {Navigator}
+     */
     one(events: string, data: any, handler: (eventObject: JQueryEventObject) => any): Navigator {
         this._eventEmitter.one(events, data, handler);
         return this;
     }
-
+    /**
+     * @see EventEmitter#off
+     * @returns {Navigator}
+     */
     off(events: string, handler?: (eventObject: JQueryEventObject) => any): Navigator {
         this._eventEmitter.off(events, handler);
         return this;

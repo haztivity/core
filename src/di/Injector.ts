@@ -91,13 +91,12 @@ export const TYPES: ITypes = <ITypes>(function () {
     );
     registerType(
         types, "Component", [
-            "Service",
-            "CorePublic"
+            "CorePublic",
+            "Service"
         ]
     );
     registerType(
         types, "Page", [
-            "CorePublic",
             "Service"
         ]
     );

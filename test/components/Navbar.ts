@@ -5,7 +5,7 @@
 import {$, Navigator,INavigatorPageData, Component, ComponentController,EventEmitterFactory,PageManager,PageController} from "../../src/core";
 @Component(
     {
-        name: "hzNavbar",
+        name: "HzNavbar",
         dependencies: [
             $,
             EventEmitterFactory,
@@ -48,7 +48,6 @@ export class HzNavbarComponent extends ComponentController {
     }
     protected _onPageChangeStart(e, newPage:INavigatorPageData, oldPage:INavigatorPageData) {
         let instance = e.data.instance;
-        debugger;
         if(oldPage){
             let pageImplementation = instance._PageManager.getPage(oldPage.index),
                 page = pageImplementation.getPage();
@@ -59,7 +58,6 @@ export class HzNavbarComponent extends ComponentController {
     }
     protected _onPageChangeEnd(e, newPage:INavigatorPageData, oldPage:INavigatorPageData) {
         let instance = e.data.instance;
-        debugger;
         if(newPage.index === 0){
             instance._$prevBtn.attr("disabled","disabled");
             instance._$nextBtn.removeAttr("disabled");
@@ -83,7 +81,6 @@ export class HzNavbarComponent extends ComponentController {
     }
     protected _onPageCompleteChange(e,completed){
         if(completed) {
-            debugger;
             let instance = e.data.instance;
             let pageImplementation = instance._Navigator.getCurrentPage(),
                 page = pageImplementation.getPage();

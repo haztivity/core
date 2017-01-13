@@ -8,6 +8,9 @@ import {PageImplementation} from "./PageImplementation";
 import {EventEmitter, EventEmitterFactory,} from "../utils";
 import {HaztivityPageAlreadyRegistered, HaztivityPageNameInvalid} from "./Errors";
 import {ResourceManager} from "../resource";
+export interface IPageManagerService{
+
+}
 @Core(
     {
         name: "PageManager",
@@ -32,7 +35,7 @@ export class PageManager {
      * Indica el número de páginas registradas
      * @returns {number}
      */
-    public count() {
+    public count():number {
         return this.pages.length;
     }
 
@@ -88,7 +91,7 @@ export class PageManager {
      * @param {string}      name    Nombre de la página
      * @returns {number}
      */
-    public getPageIndex(name: string) {
+    public getPageIndex(name: string):number {
         let result = this.pagesMap.get(name);
         result = result != undefined
             ? result
@@ -104,7 +107,6 @@ export class PageManager {
     public getPage(index: number) {
         return this.pages[index];
     }
-
     /**
      * Obtiene una página por el nombre registrado. Si no se encuentra se devuelve undefined
      * @param {string}  name    Nombre de la página a obtener

@@ -50,7 +50,7 @@ export class PageImplementation {
      * Obtiene el Page asociado
      * @returns {Page}
      */
-    public getPage() {
+    public getPage():Page {
         return this.page;
     }
 
