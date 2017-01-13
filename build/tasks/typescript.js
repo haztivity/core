@@ -25,17 +25,3 @@ let config = require("./../config");
         gulp.watch(tsFiles, ['typescript:build']);
     });
 })();
-//server
-(function() {
-    const tsProject = ts.createProject(path.resolve("./server", "tsconfig.json"));
-    const tsFiles = path.resolve("./server", "**/*.ts");
-    gulp.task("typescriptserver:build", function () {
-        let tsresult = gulp.src(tsFiles)
-            .pipe(tsProject());
-        return merge([
-            tsresult.pipe(gulpif(config.sourcemap == true, sourcemaps.init())),
-            tsresult.pipe(gulpif(config.sourcemap == true, sourcemaps.write())),
-            tsresult.js.pipe(gulp.dest("./server"))
-        ]);
-    });
-})();
