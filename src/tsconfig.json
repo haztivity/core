@@ -1,15 +1,11 @@
 {
     "compilerOptions": {
         "declaration": true,
-        "stripInternal": true,
         "experimentalDecorators": true,
         "module": "umd",
         "moduleResolution": "node",
-        "rootDir": ".",
         "sourceMap": true,
-        "inlineSources": true,
         "target": "es5",
-        "skipLibCheck": true,
         "typeRoots": [
             "../node_modules/@types",
             "../jspm_packages/npm/bottlejs@1.5.0/dist"
