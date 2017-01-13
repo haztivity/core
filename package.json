@@ -2,10 +2,12 @@
   "name": "@haztivity/core",
   "version": "0.0.1",
   "description": "Framework haztivity",
-  "main": "dist/core.js",
+  "main": "index.js",
+  "module": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "registry": "npm",
   "repository": {
     "type": "git",
     "url": "git+https://jperezr-davinchi@bitbucket.org/davinchi_finsi/core.git"
@@ -42,6 +44,7 @@
     "gulp-usemin": "^0.3.24",
     "gulp-util": "^3.0.7",
     "jspm": "^0.16.48",
+    "lite-server": "^2.2.2",
     "merge2": "^1.0.2",
     "postcss": "^5.2.4",
     "pug": "^2.0.0-beta6",
@@ -50,21 +53,21 @@
     "typescript": "^2.1.1"
   },
   "jspm": {
+    "directories": {
+      "lib": "src"
+    },
     "dependencies": {
-      "bottlejs": "npm:bottlejs@^1.5.0",
+      "bottlejs": "^1.5.0",
       "css": "github:systemjs/plugin-css@^0.1.32",
-      "es6-shim": "npm:es6-shim@^0.35.2",
-      "jquery": "npm:jquery@^3.1.1",
+      "es6-shim": "^0.35.2",
+      "jquery": "^3.1.1",
       "json": "github:systemjs/plugin-json@^0.2.3",
-      "loglevel": "npm:loglevel@^1.4.1",
-      "string": "npm:string@^3.3.3",
+      "loglevel": "^1.4.1",
+      "string": "^3.3.3",
       "text": "github:systemjs/plugin-text@^0.0.9"
     },
     "devDependencies": {
-      "typescript": "npm:typescript@^2.0.7"
+      "typescript": "^2.0.7"
     }
-  },
-  "dependencies": {
-    "@types/eventemitter2": "^2.2.1"
   }
 }
