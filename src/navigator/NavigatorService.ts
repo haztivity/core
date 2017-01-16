@@ -36,7 +36,7 @@ export class NavigatorService implements INavigatorService{
             this[method] = _Navigator[method].bind(_Navigator);
         }
     }
-    public goTo(index: number): JQueryPromise|boolean {
+    public goTo(index: number): JQueryPromise<INavigatorPageData,INavigatorPageData>|boolean {
         return undefined;
     }
 
@@ -53,11 +53,11 @@ export class NavigatorService implements INavigatorService{
     public disable(): void {
     }
 
-    public next(): JQueryPromise|boolean {
+    public next(): JQueryPromise<INavigatorPageData,INavigatorPageData>|boolean {
         return undefined;
     }
 
-    public prev(): JQueryPromise|boolean {
+    public prev(): JQueryPromise<INavigatorPageData,INavigatorPageData>|boolean {
         return undefined;
     }
 

@@ -66,7 +66,7 @@ export class ResourceManager {
         return this.S(name).camelize().s === name;
     }
 
-    public exists(name: string): ResourceController {
+    public exists(name: string): boolean {
         return this._resources.get(name) != undefined;
     }
 

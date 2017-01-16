@@ -4,7 +4,7 @@
  */
 import {Injector} from "./Injector";
 const injectorInstance = Injector.getInstance();
-interface IBaseParams {
+export interface IBaseParams {
     name: string;
     dependencies: any[];
     factory?: Function;

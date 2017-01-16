@@ -28,13 +28,13 @@ export class DataOptions {
     public getDataOptions(element: JQuery, prefix: string, optPrefix = "opt", mode?: string) {
         //extract data-_attributes with jquery data
         let $element = this.$(element),
-            params = $element.data(), parsedParams = {},
-            optPrefix = S(optPrefix + "-" + prefix).camelize().s,
-            mode = mode || $element.data("paramsMode");
+            params = $element.data(), parsedParams = {};
+        optPrefix = S(optPrefix + "-" + prefix).camelize().s;
+        mode = mode || $element.data("paramsMode");
         //each param: data-prefix-my-param is prefixMyParam
         for (let key in params) {
             //find prefix
-            if (key.search(optPrefix) != -1) {
+            if (key.search(optPrefix) !== -1) {
                 //remove prefix: prefixMyParam to myParam
                 let parsedKey: string = key.replace(optPrefix, "");
                 //some components require different nomenclatures

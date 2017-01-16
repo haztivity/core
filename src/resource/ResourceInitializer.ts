@@ -17,8 +17,7 @@ export interface IResourceInitializer {
     initialize($context: JQuery): ResourceController[];
     getResources($context: JQuery, initState?: number): JQuery;
     getResourcesControllers($context): ResourceController[]
-    initializeOne($element, config: any = {}): ResourceController;
-
+    initializeOne($element, config): ResourceController;
 }
 @Core(
     {
@@ -48,8 +47,8 @@ export class ResourceInitializer {
     public initialize($context: JQuery): ResourceController[] {
         let $elements = this._findElementsInContext($context),
             results = [];
-        for (let $element of $elements) {
-            let result = this.initializeOne($($element));
+        for (let element of <any>$elements) {
+            let result = this.initializeOne($(element));
             if (result != undefined) {
                 results.push(result);
             }

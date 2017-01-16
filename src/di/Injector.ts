@@ -38,12 +38,12 @@ export interface ITypes {
 //Create readonly types
 export const TYPES: ITypes = <ITypes>(function () {
     function sealProperty(val) {
+        Object.freeze(val);
         return {
             writable: false,
             configurable: false,
             value: val
         };
-        Object.freeze(val);
     }
 
     function registerType(types, name, allowAccess) {
@@ -404,7 +404,7 @@ export class Injector {
                     return new service(...resolvedDependencies);
                 }
             };
-            this._root.instanceFactory(name, GenericFactory);
+            this._root.instanceFactory(name, <any>GenericFactory);
         }
     }
 

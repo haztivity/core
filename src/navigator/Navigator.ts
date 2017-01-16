@@ -11,13 +11,13 @@ export interface INavigatorPageData{
     name:string;
 }
 export interface INavigatorService{
-    goTo(index: number):JQueryPromise|boolean;
+    goTo(index: number):JQueryPromise<INavigatorPageData,INavigatorPageData>|boolean;
     isDisabled():boolean;
     setDisabled(disabled: boolean):void;
     enable():void;
     disable():void;
-    next():JQueryPromise|boolean;
-    prev():JQueryPromise|boolean;
+    next():JQueryPromise<INavigatorPageData,INavigatorPageData>|boolean;
+    prev():JQueryPromise<INavigatorPageData,INavigatorPageData>|boolean;
     getCurrentPageData():INavigatorPageData;
     on(events: string, data: any, handler: (eventObject: JQueryEventObject, ...args: any[]) => any): Navigator;
     one(events: string, data: any, handler: (eventObject: JQueryEventObject) => any): Navigator;
@@ -45,7 +45,7 @@ export class Navigator implements IEventHandler, INavigatorService {
     protected _$context: JQuery;
     protected _currentPage: PageImplementation;
     protected _currentPageIndex: number;
-    protected _currentRenderProcess: JQueryDeferred;
+    protected _currentRenderProcess: JQueryDeferred<INavigatorPageData,INavigatorPageData>;
     protected _eventEmitter: EventEmitter;
     protected _disabled: boolean;
 
@@ -71,7 +71,7 @@ export class Navigator implements IEventHandler, INavigatorService {
      * @returns {JQueryPromise|boolean} Promesa que es resuelta al finalizarse el proceso completo de cambio de
      * página. False si no se realiza el cambio
      */
-    public goTo(index: number):JQueryPromise|boolean {
+    public goTo(index: number):JQueryPromise<INavigatorPageData,INavigatorPageData>|boolean {
         if (this.isDisabled() !== true) {
             //get the page requested
             let newPage: PageImplementation = this._PageManager.getPage(index);
@@ -149,6 +149,7 @@ export class Navigator implements IEventHandler, INavigatorService {
                             );
                         }
                     }
+                    return this._currentRenderProcess;
                 }
             } else {
                 //todo throw
@@ -244,6 +245,7 @@ export class Navigator implements IEventHandler, INavigatorService {
         this._eventEmitter.trigger(Navigator.ON_CHANGE_PAGE_END, [newPageData, oldPageData]);
         //trigger a global event that could be listened by anyone
         this._eventEmitter.globalEmitter.trigger(Navigator.ON_CHANGE_PAGE_END, [newPageData, oldPageData]);
+        defer.resolve(newPageData,oldPageData);
     }
 
     /**

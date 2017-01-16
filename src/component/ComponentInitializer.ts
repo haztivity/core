@@ -73,7 +73,7 @@ export class ComponentInitializer {
             //check if exists
             if (!!this.ComponentManager.exists(name)) {
                 //get from DI
-                let controllerInstance: ComponentController = $element.data(this._instanceDataName);
+                let controllerInstance: ComponentController = <ComponentController>$element.data(this._instanceDataName);
                 if (controllerInstance == undefined || controllerInstance.isDestroyed()) {
                     controllerInstance = this.InjectorService.get(name);
                     if (controllerInstance) {

@@ -131,7 +131,7 @@ export abstract class PageController {
      * @param {number}          oldPageRelativePosition     Posición de la página desactivada en relación con la actual. -1 si la pagina anterior es inferior a la actual, 1 si la pagina anterior es posterior a la actual
      * @return {JQueryPromise}  Promesa resulta al finalizarse la animación
      */
-    public show($oldPage, oldPageRelativePosition): JQueryPromise {
+    public show($oldPage, oldPageRelativePosition): JQueryPromise<null> {
         let deferred = $.Deferred(),
             promise = deferred.promise(),
             event = this.eventEmitter.createEvent(PageController.ON_SHOW),
@@ -176,7 +176,7 @@ export abstract class PageController {
      * @returns {JQueryPromise<T>}  Promesa que se resuelve al finalizar la animación
      * @protected
      */
-    protected _show($oldPage, oldPageRelativePosition): JQueryPromise {
+    protected _show($oldPage, oldPageRelativePosition): JQueryPromise<null> {
         let defer = $.Deferred();
         defer.resolve();
         return defer.promise();
