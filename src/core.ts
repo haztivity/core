@@ -51,3 +51,4 @@ export {
     ComponentManager,
     ComponentInitializer
 } from "./component";
+export {ScormService} from "./scorm";
