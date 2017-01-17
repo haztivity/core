@@ -2,8 +2,8 @@
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-import {PageFactory,Page,PageController} from "../../../../../src/core";
-import {HzButton} from "../../../../resources/hzButton/hzButton";
+import {PageFactory,Page,PageController,ScormService} from "../../../../../src/core";
+import {HzButton} from "../../../../resources/hzButton/hzButton";}
 import template from "./6611.html!text";
 let page:Page = PageFactory.createPage({
     name:"6611",
@@ -20,12 +20,14 @@ page.on(PageController.ON_RENDERED,null,(eventObject,$page:JQuery,pageController
     if(pageController.isCompleted()) {
         $page.find("#myResource").data("hzResourceInstance").disable();
     }
+    );
 });
 page.on(PageController.ON_SHOW,null,(eventObject,$page,$oldPage,oldPageRelativePosition,pageController)=>{
     console.log(`${pageController.options.name} show start`);
 });
 page.on(PageController.ON_SHOWN,null,(eventObject,$page,$oldPage,oldPageRelativePosition,pageController)=>{
     console.log(`${pageController.options.name} show end`);
+    let scormService = pageController.InjectorService.get("ScormService");
 });
 page.on(PageController.ON_COMPLETE_CHANGE,null,(eventObject,isCompleted,$page,pageController)=>{
     console.log(`${pageController.options.name} complete change`);

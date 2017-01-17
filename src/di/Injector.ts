@@ -268,7 +268,7 @@ export class Injector {
                         throw new HaztivityDependencyAccessDenied(serviceName, dependencyToResolveName);
                     }
                 } else {
-                    throw new HaztivityDependencyNotRegisteredError(dependencyToResolve);
+                    throw new HaztivityDependencyNotRegisteredError(dependencyToResolve,serviceName);
                 }
             } else {//If the dependency requested is null
                 throw new HaztivityDependencyNotValid(serviceName, dependencies);
@@ -638,7 +638,7 @@ export class InjectorService {
     constructor(injector, target) {
         this.get = function (service) {
             let result;
-            if (Array.isArray(name)) {
+            if (Array.isArray(service)) {
                 result = injector._getFor(target, service);
             } else {
                 result = injector._getFor(target, [service]);
@@ -653,18 +653,18 @@ export class InjectorService {
 
     /**
      * @description Comprueba si una clase se ha registrado en el contenedor root. Equivale a injector.getContainer("root").exists("Dependencia");
-     * @param {String}  name    Nombre registrado de la clase a comprobar
+     * @param {String|Object|Function}  dependency    Clase a comprobar
      * @returns {boolean}
      */
-    public exists(name: string): boolean {
+    public exists(dependency: string): boolean {
         return undefined;
     }
 
     /**
      * @description Obtiene una clase mediante el nombre registrado del contenedor root. Equivale a injector.getContainer("root").get("Dependencia");
-     * @param {String}  name    Nombre registrado de la clase a obtener
+     * @param {String|Object|Function}  dependency      Dependencia a obtener
      */
-    public get(name: string): any {
+    public get(dependency: string|Object|Function): any {
     }
 }
 export interface IInjectorRegisterService {
