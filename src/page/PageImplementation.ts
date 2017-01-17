@@ -55,6 +55,21 @@ export class PageImplementation {
     }
 
     /**
+     * Obtiene el estado actual
+     * @returns {IPageState}
+     */
+    public getState():IPageState{
+        return this.state;
+    }
+
+    /**
+     * Actualiza el estado
+     * @param {IPageState}  state       Estado a establecer
+     */
+    public setState(state:IPageState){
+        this.state = state;
+    }
+    /**
      * Obtiene el nombre de la página
      * @returns {string}
      */

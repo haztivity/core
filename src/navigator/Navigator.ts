@@ -4,7 +4,7 @@
  */
 import {$ as jquery} from "../jquery";
 import {Core} from "../di";
-import {PageManager, PageImplementation, PageController} from "../page";
+import {PageManager, PageImplementation, PageController,IPageState} from "../page";
 import {EventEmitter, EventEmitterFactory, IEventHandler} from "../utils";
 export interface INavigatorPageData{
     index:number;
@@ -158,6 +158,22 @@ export class Navigator implements IEventHandler, INavigatorService {
         return false;
     }
 
+    /**
+     * Devuelve un array con los índices de las páginas que hayan sido visitadas
+     * @returns {Number[]}
+     */
+    public getVisitedPages():Number[]{
+        let pagesLength = this._PageManager.count(),
+            pages:Number[] = [];
+        for (let pageIndex = 0; pageIndex < pagesLength; pageIndex++) {
+            let currentPage:PageImplementation = this._PageManager.getPage(pageIndex),
+                state:IPageState = currentPage.getState();
+            if(state.visited){
+                pages.push(pageIndex);
+            }
+        }
+        return pages;
+    }
     /**
      * Devuelve el estado actual de deshabilitado
      * @returns {boolean}
