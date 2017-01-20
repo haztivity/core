@@ -19,3 +19,11 @@ export class HaztivityPageNameInvalid extends BaseError {
         super("HaztivityPageNameInvalid", `The name '${pageName}' is invalid. Only allowed [a-zA-Z0-9_-]`);
     }
 }
+/**
+ * Error al no generarse elemento en la página
+ */
+export class HaztivityPageElementError extends BaseError {
+    constructor(pageName: string) {
+        super("HaztivityPageElementError", `The page '${pageName}' $element is invalid. The template could be undefined`);
+    }
+}

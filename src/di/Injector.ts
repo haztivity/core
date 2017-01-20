@@ -38,7 +38,7 @@ export interface ITypes {
 //Create readonly types
 export const TYPES: ITypes = <ITypes>(function () {
     function sealProperty(val) {
-        Object.freeze(val);
+        //Object.freeze(val);
         return {
             writable: false,
             configurable: false,
@@ -72,6 +72,7 @@ export const TYPES: ITypes = <ITypes>(function () {
         types, "Service", [
             "CorePublic",
             "Service",
+            "Component",
             "Module"
         ]
     );
@@ -100,7 +101,7 @@ export const TYPES: ITypes = <ITypes>(function () {
             "Service"
         ]
     );
-    Object.freeze(types);
+    //Object.freeze(types);
     return types;
 })();
 export interface IInjectorRegister {

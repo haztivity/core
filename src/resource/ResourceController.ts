@@ -27,7 +27,7 @@ export abstract class ResourceController implements IEventHandler {
      * @param {JQueryStatic}            $
      * @param {EventEmitterFactory}     EventEmitterFactory
      */
-    constructor(protected $: JQueryStatic, protected EventEmitterFactory: EventEmitterFactory) {
+    constructor(protected _$: JQueryStatic, protected _EventEmitterFactory: EventEmitterFactory) {
     }
 
     /**
@@ -36,7 +36,7 @@ export abstract class ResourceController implements IEventHandler {
      */
     public activate($element) {
         this._$element = $element;
-        this._eventEmitter = this.EventEmitterFactory.createEmitter(this._$element);
+        this._eventEmitter = this._EventEmitterFactory.createEmitter(this._$element);
     }
 
     /**

@@ -5,6 +5,7 @@
 export * from "./jquery";
 export {Logger} from "./debug";
 export {
+    InjectorService,
     IInjectorService,
     IInjectorRegisterService,
     Service,
@@ -35,7 +36,7 @@ export {
 } from "./sco";
 export {
     PageController,
-    Page,
+    PageRegister,
     IPageOptions,
     PageFactory,
     PageManager

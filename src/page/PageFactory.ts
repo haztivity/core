@@ -3,7 +3,7 @@
  * Copyright Davinchi. All Rights Reserved.
  */
 import {Core, Injector} from "../di";
-import {Page, IPageOptions} from "./Page";
+import {PageRegister, IPageOptions} from "./PageRegister";
 import {GenericPageController} from "./GenericPageController";
 /**
  * Factory para crear páginas genéricas
@@ -25,7 +25,7 @@ export class PageFactory {
      * @returns {Page}
      */
     public static createPage(options: IPageOptions) {
-        let PageDIFactory = Injector.getInstance(PageFactory).get(Page);
+        let PageDIFactory = Injector.getInstance(PageFactory).get(PageRegister);
         let page = PageDIFactory.instance();
         //Set PageController as default
         if (!options.controller) {

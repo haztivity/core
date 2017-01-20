@@ -34,10 +34,10 @@ export interface IResourceInitializer {
 )
 export class ResourceInitializer {
     protected _prefix: string = "hz-resource";
-    protected _camelPrefix: string = this.S(this._prefix).camelize().s;
+    protected _camelPrefix: string = this._S(this._prefix).camelize().s;
     protected _instanceDataName: string = `${this._camelPrefix}Instance`;
 
-    constructor(protected $: JQueryStatic, protected ResourceManager: ResourceManager, protected InjectorService: InjectorService, protected S, protected DataOptions: DataOptions) {
+    constructor(protected _$: JQueryStatic, protected _ResourceManager: ResourceManager, protected _InjectorService: InjectorService, protected _S, protected _DataOptions: DataOptions) {
     }
 
     /**
@@ -69,15 +69,15 @@ export class ResourceInitializer {
             result;
         if (!!name) {
             //check if exists
-            if (!!this.ResourceManager.exists(name)) {
+            if (!!this._ResourceManager.exists(name)) {
                 //get from DI
-                let factory = this.InjectorService.get(name);
+                let factory = this._InjectorService.get(name);
                 if (factory) {
                     //check if is already instanciated
                     let controllerInstance: ResourceController = $element.data(this._instanceDataName);
                     if (controllerInstance == undefined || controllerInstance.isDestroyed()) {
                         //extract options
-                        let options = this.DataOptions.getDataOptions($element, name);
+                        let options = this._DataOptions.getDataOptions($element, name);
                         options = $.extend({}, options, config.options);
                         //get controller instance
                         controllerInstance = factory.instance();
@@ -116,7 +116,7 @@ export class ResourceInitializer {
         switch (initState) {
             case 0://only without init
                 for (let elementIndex = 0, $elementsLength = $elements.length; elementIndex < $elementsLength; elementIndex++) {
-                    let $element = this.$($elements[elementIndex]);
+                    let $element = this._$($elements[elementIndex]);
                     if ($element.data(this._instanceDataName) == undefined) {
                         result.push($element);
                     }
@@ -124,7 +124,7 @@ export class ResourceInitializer {
                 break;
             case 1://only initialized
                 for (let elementIndex = 0, $elementsLength = $elements.length; elementIndex < $elementsLength; elementIndex++) {
-                    let $element = this.$($elements[elementIndex]);
+                    let $element = this._$($elements[elementIndex]);
                     if ($element.data(this._instanceDataName) != undefined) {
                         result.push($element);
                     }
@@ -133,7 +133,7 @@ export class ResourceInitializer {
 
             default:
                 for (let elementIndex = 0, $elementsLength = $elements.length; elementIndex < $elementsLength; elementIndex++) {
-                    let $element = this.$($elements[elementIndex]);
+                    let $element = this._$($elements[elementIndex]);
                     result.push($element);
                 }
                 break;
@@ -153,7 +153,7 @@ export class ResourceInitializer {
                 ? this._findElementsInContext($context)
                 : $context;
         for (let elementIndex = 0, $elementsLength = $elements.length; elementIndex < $elementsLength; elementIndex++) {
-            let $element = this.$($elements[elementIndex]),
+            let $element = this._$($elements[elementIndex]),
                 controller = $element.data(this._instanceDataName);
             if (controller != undefined) {
                 result.push(controller);

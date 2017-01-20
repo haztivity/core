@@ -2,11 +2,11 @@
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-import {Page as PageDecorator, InjectorService} from "../di";
+import {Page, InjectorService} from "../di";
 import {$} from "../jquery";
 import {PageController} from "./PageController";
 import {ResourceInitializerService} from "../resource";
-@PageDecorator(
+@Page(
     {
         name: "GenericPageController",
         dependencies: [

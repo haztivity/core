@@ -24,7 +24,7 @@ export class ComponentManager {
     //store available components
     protected _components: Map<string,ComponentController> = new Map<string,ComponentController>();
 
-    constructor(protected Injector: InjectorService, protected S) {
+    constructor(protected _Injector: InjectorService, protected _S) {
 
     }
 
@@ -64,7 +64,7 @@ export class ComponentManager {
     }
 
     public nameIsValid(name: string): boolean {
-        return this.S(name).camelize().s === name;
+        return this._S(name).camelize().s === name;
     }
 
     public exists(name: string): ComponentController {

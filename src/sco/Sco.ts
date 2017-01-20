@@ -4,7 +4,7 @@
  */
 import {EventEmitter, EventEmitterFactory} from "../utils";
 import {Sco} from "../di";
-import {Page, PageManager} from "../page";
+import {PageRegister, PageManager} from "../page";
 import {Navigator} from "../navigator";
 import {HaztivityAppContextNotFound, HaztivityPagesContextNotFound} from "./Errors";
 import {ResourceManager} from "../resource";
@@ -16,7 +16,7 @@ export interface ISco {
 }
 export interface IScoOptions {
     name: string;
-    pages: Page[];
+    pages: PageRegister[];
     components?: ComponentController[];
 }
 @Sco(
@@ -35,24 +35,24 @@ export interface IScoOptions {
 export class ScoController implements ISco {
     public static readonly CLASS_CONTEXT = "hz-container";
     public static readonly CLASS_PAGES = "hz-pages-container";
-    protected eventEmitter: EventEmitter;
-    protected options: IScoOptions;
-    protected $context: JQuery;
-    protected $pagesContainer: JQuery;
+    protected _eventEmitter: EventEmitter;
+    protected _options: IScoOptions;
+    protected _$context: JQuery;
+    protected _$pagesContainer: JQuery;
 
-    constructor(protected Navigator: Navigator,
-                protected PageManager: PageManager,
-                protected ResourceManager: ResourceManager,
-                protected EventEmitterFactory: EventEmitterFactory,
-                protected ComponentManager: ComponentManager,
-                protected ComponentInitializer: ComponentInitializer) {
-        this.eventEmitter = EventEmitterFactory.createEmitter();
+    constructor(protected _Navigator: Navigator,
+                protected _PageManager: PageManager,
+                protected _ResourceManager: ResourceManager,
+                protected _EventEmitterFactory: EventEmitterFactory,
+                protected _ComponentManager: ComponentManager,
+                protected _ComponentInitializer: ComponentInitializer) {
+        this._eventEmitter = this._EventEmitterFactory.createEmitter();
     }
 
     public activate(options: IScoOptions): ScoController {
-        this.options = options;
-        this.ComponentManager.addAll(this.options.components || []);
-        this.PageManager.addPages(this.options.pages);
+        this._options = options;
+        this._ComponentManager.addAll(this._options.components || []);
+        this._PageManager.addPages(this._options.pages);
         return this;
     }
 
@@ -61,13 +61,13 @@ export class ScoController implements ISco {
     }
 
     protected _init() {
-        this.$context = $("[data-hz-app]");
+        this._$context = $("[data-hz-app]");
         //context must exists
-        if (this.$context.length > 0) {
-            this.$context.addClass(ScoController.CLASS_CONTEXT);
-            this.$pagesContainer = this.$context.find("[data-hz-pages]");
+        if (this._$context.length > 0) {
+            this._$context.addClass(ScoController.CLASS_CONTEXT);
+            this._$pagesContainer = this._$context.find("[data-hz-pages]");
             //page contexts must exists
-            if (this.$pagesContainer.length > 0) {
+            if (this._$pagesContainer.length > 0) {
                 return true;
             } else {
                 throw new HaztivityPagesContextNotFound();
@@ -79,11 +79,11 @@ export class ScoController implements ISco {
 
     public run(): ScoController {
         this._init();
-        this.Navigator.activate(this.$pagesContainer);
-        this.$pagesContainer.addClass(ScoController.CLASS_PAGES);
-        this.ComponentInitializer.initialize(this.$context);
+        this._Navigator.activate(this._$pagesContainer);
+        this._$pagesContainer.addClass(ScoController.CLASS_PAGES);
+        this._ComponentInitializer.initialize(this._$context);
         //init components
-        this.Navigator.goTo(0);
+        this._Navigator.goTo(0);
         return this;
     }
 }

@@ -24,7 +24,7 @@ export class ResourceManager {
     //store available resources
     protected _resources: Map<string,ResourceController> = new Map<string,ResourceController>();
 
-    constructor(protected Injector: InjectorService, protected S) {
+    constructor(protected _Injector: InjectorService, protected _S) {
 
     }
 
@@ -63,7 +63,7 @@ export class ResourceManager {
     }
 
     public nameIsValid(name: string): boolean {
-        return this.S(name).camelize().s === name;
+        return this._S(name).camelize().s === name;
     }
 
     public exists(name: string): boolean {

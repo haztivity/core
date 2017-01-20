@@ -42,6 +42,8 @@ export class Navigator implements IEventHandler, INavigatorService {
     public static readonly ON_ENABLE = `${Navigator.NAMESPACE}:enable`;
     public static readonly ON_CHANGE_PAGE_END = `${Navigator.NAMESPACE}:changeend`;
     public static readonly ON_CHANGE_PAGE_START = `${Navigator.NAMESPACE}:changestart`;
+    protected static readonly ATTR_TRANSITION_TO = "data-hz-navigator-transition-to";
+    protected static readonly ATTR_CURRENT = "data-hz-navigator-page";
     protected _$context: JQuery;
     protected _currentPage: PageImplementation;
     protected _currentPageIndex: number;
@@ -120,6 +122,8 @@ export class Navigator implements IEventHandler, INavigatorService {
                         } else {//if the new page is after the current page
                             this._$context.append(newPageElement);
                         }
+                        this._$context.removeAttr(Navigator.ATTR_CURRENT);
+                        this._$context.attr(Navigator.ATTR_TRANSITION_TO,newPageName);
                         //trigger event in navigator
                         this._eventEmitter.trigger(Navigator.ON_DRAW_PAGE, newPageName);
                         //trigger a global event that could be listened by anyone
@@ -257,6 +261,8 @@ export class Navigator implements IEventHandler, INavigatorService {
             oldPage.detach();
             controller.getElement().remove();
         }
+        this._$context.removeAttr(Navigator.ATTR_TRANSITION_TO);
+        this._$context.attr(Navigator.ATTR_CURRENT,newPageData.name);
         //trigger event in navigator
         this._eventEmitter.trigger(Navigator.ON_CHANGE_PAGE_END, [newPageData, oldPageData]);
         //trigger a global event that could be listened by anyone

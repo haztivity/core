@@ -13,18 +13,18 @@ export interface IPageOptions {
 }
 @Core(
     {
-        name: "Page",
+        name: "PageRegister",
         instantiable: true,
         dependencies: [
             EventEmitterFactory
         ]
     }
 )
-export class Page implements IEventHandler {
+export class PageRegister implements IEventHandler {
 
     public static readonly NAMESPACE = "page";
-    protected options: IPageOptions;
-    protected eventEmitter: EventEmitter;
+    protected _options: IPageOptions;
+    protected _eventEmitter: EventEmitter;
 
     /**
      * Almacena la información de una página.
@@ -32,11 +32,11 @@ export class Page implements IEventHandler {
      * @class
      * @param EventEmitterFactory
      */
-    constructor(protected EventEmitterFactory: EventEmitterFactory) {
+    constructor(protected _EventEmitterFactory: EventEmitterFactory) {
     }
 
     public getResources(): ResourceController[] {
-        return this.options.resources;
+        return this._options.resources;
     }
 
     /**
@@ -44,22 +44,22 @@ export class Page implements IEventHandler {
      * @param options
      */
     public activate(options: IPageOptions) {
-        this.options = options;
-        this.eventEmitter = this.EventEmitterFactory.createEmitter();
+        this._options = options;
+        this._eventEmitter = this._EventEmitterFactory.createEmitter();
     }
 
-    public on(events: string, data: any, handler: (eventObject: JQueryEventObject, ...args: any[]) => any): Page {
-        this.eventEmitter.on(events + "." + Page.NAMESPACE, data, handler);
+    public on(events: string, data: any, handler: (eventObject: JQueryEventObject, ...args: any[]) => any): PageRegister {
+        this._eventEmitter.on(events + "." + PageRegister.NAMESPACE, data, handler);
         return this;
     }
 
-    public one(events: string, data: any, handler: (eventObject: JQueryEventObject) => any): Page {
-        this.eventEmitter.one(events + "." + Page.NAMESPACE, data, handler);
+    public one(events: string, data: any, handler: (eventObject: JQueryEventObject) => any): PageRegister {
+        this._eventEmitter.one(events + "." + PageRegister.NAMESPACE, data, handler);
         return this;
     }
 
-    public off(events: string, handler?: (eventObject: JQueryEventObject) => any): Page {
-        this.eventEmitter.off(events + "." + Page.NAMESPACE, handler);
+    public off(events: string, handler?: (eventObject: JQueryEventObject) => any): PageRegister {
+        this._eventEmitter.off(events + "." + PageRegister.NAMESPACE, handler);
         return this;
     }
 
@@ -68,6 +68,6 @@ export class Page implements IEventHandler {
      * @returns {string}
      */
     public getName() {
-        return this.options.name;
+        return this._options.name;
     }
 }

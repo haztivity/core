@@ -4,9 +4,10 @@
  */
 import {Dependencies, InjectorService} from "../di";
 import {$} from "../jquery";
-import {IPageOptions} from "./Page";
+import {IPageOptions} from "./PageRegister";
 import {EventEmitter} from "../utils";
 import {ResourceController, ResourceInitializerService} from "../resource";
+import {HaztivityPageElementError} from "./Errors";
 export interface IPageControllerOptions extends IPageOptions {
     name: string;
     template: string;
@@ -42,17 +43,17 @@ export abstract class PageController {
     public eventEmitter: EventEmitter;
     public state: IPageState;
     public store: IPageStore;
-    protected resources: ResourceController[] = [];
+    protected _resources: ResourceController[] = [];
 
     /**
      * Controller base para todas las páginas.
      * Tipo Page
      * @class
-     * @param {JQueryStatic}    $                   Objeto JQuery
+     * @param {JQueryStatic}    _$                   Objeto JQuery
      * @param {InjectorService} InjectorService     Servicio del inyector
      * @see Injector.TYPES
      */
-    constructor(public $, public InjectorService: InjectorService, protected ResourceInitializerService: ResourceInitializerService) {
+    constructor(public _$, public InjectorService: InjectorService, protected _ResourceInitializerService: ResourceInitializerService) {
 
     }
 
@@ -72,7 +73,7 @@ export abstract class PageController {
     }
     protected _getNumCompletedResources(){
         let completed = 0;
-        for (let resource of this.resources) {
+        for (let resource of this._resources) {
             completed += resource.isCompleted()
                 ? 1
                 : 0;
@@ -83,7 +84,7 @@ export abstract class PageController {
         let result = this.state.completed,
             current = this.state.completed;
         if(forceCheck || this.state.completed != true){
-            result = this._getNumCompletedResources() === this.resources.length;
+            result = this._getNumCompletedResources() === this._resources.length;
             //if the state changes, trigger event
             this.state.completed = result;
             if(current !== result){
@@ -99,10 +100,13 @@ export abstract class PageController {
             //allow to user to custom render the template
             result = this.eventEmitter.trigger(event, [this.options.template, this]);
         //if a result is provided, ignore the default render function
-        if (result instanceof this.$) {
+        if (result instanceof this._$) {
             $element = result;
         } else {
             $element = this._render(this.options.template);
+        }
+        if($element == undefined || $element.length === 0){
+            throw new HaztivityPageElementError(this.options.name);
         }
         $element.addClass(`${PageController.CLASS_PAGE} ${PageController.CLASS_PAGE}-${this.options.name}`);
         this.$element = $element;
@@ -115,11 +119,11 @@ export abstract class PageController {
     }
 
     public initializeResources() {
-        this.resources = this.ResourceInitializerService.initialize(this.$element);
-        for (let resource of this.resources) {
+        this._resources = this._ResourceInitializerService.initialize(this.$element);
+        for (let resource of this._resources) {
             resource.on(ResourceController.ON_COMPLETED,{instance:this},this._onResourceCompleted);
         }
-        return this.resources;
+        return this._resources;
     }
     protected _onResourceCompleted(e){
         let instance:PageController = e.data.instance;

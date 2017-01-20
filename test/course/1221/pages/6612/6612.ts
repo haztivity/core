@@ -2,10 +2,10 @@
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-import {PageFactory, Page, PageController} from "../../../../../src/core";
+import {PageFactory, PageRegister, PageController} from "../../../../../src/core";
 import {HzButton} from "../../../../resources/hzButton/hzButton";
 import template from "./6612.html!text";
-let page: Page = PageFactory.createPage(
+let page: PageRegister = PageFactory.createPage(
     {
         name: "6612",
         resources: [

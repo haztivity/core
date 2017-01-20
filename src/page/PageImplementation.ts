@@ -3,7 +3,7 @@
  * Copyright Davinchi. All Rights Reserved.
  */
 import {Core} from "../di";
-import {Page, IPageOptions} from "./Page";
+import {PageRegister, IPageOptions} from "./PageRegister";
 import {PageController, IPageState, IPageStore} from "./PageController";
 import {InjectorService} from "../di";
 import {ResourceManager, ResourceController} from "../resource";
@@ -23,35 +23,35 @@ export class PageImplementation {
         public: {},
         private: {}
     };
-    protected state: IPageState = {completed: false, visited: false};
-    protected page: Page;
-    protected controllerFactory: any;
-    protected currentController: PageController;
-    protected resources: ResourceController[];
+    protected _state: IPageState = {completed: false, visited: false};
+    protected _page: PageRegister;
+    protected _controllerFactory: any;
+    protected _currentController: PageController;
+    protected _resources: ResourceController[];
 
     /**
      * Gestiona el ciclo de vida de una página una vez registrada en el PageManager. Almacena el estado y el store y gestiona el ciclo de vida del controlador.
      * @class
      * @param Injector
      */
-    constructor(protected ResourceManager, protected Injector: InjectorService) {
+    constructor(protected _ResourceManager, protected _Injector: InjectorService) {
     }
 
     /**
      * Configura la clase nada más instanciarla
-     * @param {Page}    page    Página registrada en el PageManager.
+     * @param {PageRegister}    page    Página registrada en el PageManager.
      */
-    activate(page: Page) {
-        this.resources = page.getResources();
-        this.page = page;
+    activate(page: PageRegister) {
+        this._resources = page.getResources();
+        this._page = page;
     }
 
     /**
-     * Obtiene el Page asociado
-     * @returns {Page}
+     * Obtiene el PageRegister asociado
+     * @returns {PageRegister}
      */
-    public getPage():Page {
-        return this.page;
+    public getPage():PageRegister {
+        return this._page;
     }
 
     /**
@@ -59,7 +59,7 @@ export class PageImplementation {
      * @returns {IPageState}
      */
     public getState():IPageState{
-        return this.state;
+        return this._state;
     }
 
     /**
@@ -67,14 +67,14 @@ export class PageImplementation {
      * @param {IPageState}  state       Estado a establecer
      */
     public setState(state:IPageState){
-        this.state = state;
+        this._state = state;
     }
     /**
      * Obtiene el nombre de la página
      * @returns {string}
      */
     public getPageName() {
-        return this.page.getName();
+        return this._page.getName();
     }
 
     /**
@@ -84,33 +84,33 @@ export class PageImplementation {
      * @see PageController
      */
     public getController(): PageController {
-        if (!this.currentController) {
-            let pageOptions = this.page.options;
-            if (!this.controllerFactory) {
-                this.controllerFactory = this.Injector.get(pageOptions.controller);
+        if (!this._currentController) {
+            let pageOptions = this._page._options;
+            if (!this._controllerFactory) {
+                this._controllerFactory = this._Injector.get(pageOptions.controller);
             }
-            let controller: PageController = this.controllerFactory.instance();
-            controller.activate(pageOptions, this.page.eventEmitter, this.state, this.store);
+            let controller: PageController = this._controllerFactory.instance();
+            controller.activate(pageOptions, this._page._eventEmitter, this._state, this.store);
             controller.render();
             controller.initializeResources();
-            this.currentController = controller;
+            this._currentController = controller;
         }
-        return this.currentController;
+        return this._currentController;
     }
 
     /**
      * Finaliza el ciclo de vida actual invocando al método "destroy" del controlador de la página y liberando la instancia del controlador
      */
     public detach() {
-        this.currentController._destroy();
-        this.currentController = null;
+        this._currentController._destroy();
+        this._currentController = null;
     }
 
     /**
      * Desecha la instancia del controlador actual
      */
     public stop() {
-        this.currentController = null;
+        this._currentController = null;
         return this;
     }
 }

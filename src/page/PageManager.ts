@@ -3,7 +3,7 @@
  * Copyright Davinchi. All Rights Reserved.
  */
 import {Core} from "../di";
-import {Page} from "./Page";
+import {PageRegister} from "./PageRegister";
 import {PageImplementation} from "./PageImplementation";
 import {EventEmitter, EventEmitterFactory,} from "../utils";
 import {HaztivityPageAlreadyRegistered, HaztivityPageNameInvalid} from "./Errors";
@@ -23,12 +23,12 @@ export interface IPageManagerService{
     }
 )
 export class PageManager {
-    protected pages: PageImplementation[] = [];
-    protected pagesMap: Map<string,number> = new Map<string,number>();
-    protected eventEmitter: EventEmitter;
+    protected _pages: PageImplementation[] = [];
+    protected _pagesMap: Map<string,number> = new Map<string,number>();
+    protected _eventEmitter: EventEmitter;
 
-    constructor(protected ResourceManager, protected EventEmitterFactory: EventEmitterFactory, protected PageImplementationFactory) {
-        this.eventEmitter = EventEmitterFactory.createEmitter();
+    constructor(protected _ResourceManager, protected _EventEmitterFactory: EventEmitterFactory, protected _PageImplementationFactory) {
+        this._eventEmitter = this._EventEmitterFactory.createEmitter();
     }
 
     /**
@@ -36,14 +36,14 @@ export class PageManager {
      * @returns {number}
      */
     public count():number {
-        return this.pages.length;
+        return this._pages.length;
     }
 
     /**
      * Añade un conjunto de páginas.
-     * @param {Page[]}          pages       Conjunto de páginas a añadir
+     * @param {PageRegister[]}          pages       Conjunto de páginas a añadir
      */
-    public addPages(pages: Page[]) {
+    public addPages(pages: PageRegister[]) {
         for (let page of pages) {
             this.addPage(page);
         }
@@ -53,15 +53,15 @@ export class PageManager {
      * Añade una página
      * @param {Page}    page        Página a añadir
      */
-    public addPage(page: Page) {
+    public addPage(page: PageRegister) {
         let pageName = page.getName();
         if (this.getPageIndex(pageName) === -1) {
             if (this._validatePageName(pageName)) {
-                this.ResourceManager.addAll(page.getResources());
-                let pageImplementation: PageImplementation = this.PageImplementationFactory.instance();
+                this._ResourceManager.addAll(page.getResources());
+                let pageImplementation: PageImplementation = this._PageImplementationFactory.instance();
                 pageImplementation.activate(page);
-                this.pages.push(pageImplementation);
-                this.pagesMap.set(pageName, this.pages.length - 1);
+                this._pages.push(pageImplementation);
+                this._pagesMap.set(pageName, this._pages.length - 1);
             } else {
                 throw new HaztivityPageNameInvalid(pageName);
             }
@@ -78,11 +78,11 @@ export class PageManager {
      * Actualiza el mapa de nombre-índice de las páginas
      */
     public remapPages() {
-        this.pagesMap.clear();
-        let pages = this.pages;
+        this._pagesMap.clear();
+        let pages = this._pages;
         for (let pageIndex = 0, pagesLength = pages.length; pageIndex < pagesLength; pageIndex++) {
             let currentPage = pages[pageIndex];
-            this.pagesMap.set(currentPage.getPageName(), pageIndex);
+            this._pagesMap.set(currentPage.getPageName(), pageIndex);
         }
     }
 
@@ -92,7 +92,7 @@ export class PageManager {
      * @returns {number}
      */
     public getPageIndex(name: string):number {
-        let result = this.pagesMap.get(name);
+        let result = this._pagesMap.get(name);
         result = result != undefined
             ? result
             : -1;
@@ -105,7 +105,7 @@ export class PageManager {
      * @returns {PageImplementation}
      */
     public getPage(index: number) {
-        return this.pages[index];
+        return this._pages[index];
     }
     /**
      * Obtiene una página por el nombre registrado. Si no se encuentra se devuelve undefined

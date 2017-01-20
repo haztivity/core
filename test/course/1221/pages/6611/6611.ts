@@ -2,10 +2,10 @@
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-import {PageFactory,Page,PageController,ScormService} from "../../../../../src/core";
-import {HzButton} from "../../../../resources/hzButton/hzButton";}
+import {PageFactory,PageRegister,PageController,ScormService} from "../../../../../src/core";
+import {HzButton} from "../../../../resources/hzButton/hzButton";
 import template from "./6611.html!text";
-let page:Page = PageFactory.createPage({
+let page:PageRegister = PageFactory.createPage({
     name:"6611",
     resources:[
         HzButton
@@ -20,7 +20,6 @@ page.on(PageController.ON_RENDERED,null,(eventObject,$page:JQuery,pageController
     if(pageController.isCompleted()) {
         $page.find("#myResource").data("hzResourceInstance").disable();
     }
-    );
 });
 page.on(PageController.ON_SHOW,null,(eventObject,$page,$oldPage,oldPageRelativePosition,pageController)=>{
     console.log(`${pageController.options.name} show start`);

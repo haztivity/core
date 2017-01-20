@@ -27,19 +27,19 @@ import {
 )
 export class ComponentInitializer {
     protected _prefix: string = "hz-component";
-    protected _camelPrefix: string = this.S(this._prefix).camelize().s;
+    protected _camelPrefix: string = this._S(this._prefix).camelize().s;
     protected _instanceDataName: string = `${this._camelPrefix}Instance`;
 
     /**
      * Inicializador de componentes.
      * @class
-     * @param {JQueryStatic}                    $
-     * @param {ComponentManager}                ComponentManager
-     * @param {InjectorService}                 InjectorService
-     * @param {String.JS}                       S
-     * @param {DataOptions}                     DataOptions
+     * @param {JQueryStatic}                    _$
+     * @param {ComponentManager}                _ComponentManager
+     * @param {InjectorService}                 _InjectorService
+     * @param {String.JS}                       _S
+     * @param {DataOptions}                     _DataOptions
      */
-    constructor(protected $: JQueryStatic, protected ComponentManager: ComponentManager, protected InjectorService: InjectorService, protected S, protected DataOptions: DataOptions) {
+    constructor(protected _$: JQueryStatic, protected _ComponentManager: ComponentManager, protected _InjectorService: InjectorService, protected _S, protected _DataOptions: DataOptions) {
     }
 
     /**
@@ -71,15 +71,15 @@ export class ComponentInitializer {
             result;
         if (!!name) {
             //check if exists
-            if (!!this.ComponentManager.exists(name)) {
+            if (!!this._ComponentManager.exists(name)) {
                 //get from DI
                 let controllerInstance: ComponentController = <ComponentController>$element.data(this._instanceDataName);
                 if (controllerInstance == undefined || controllerInstance.isDestroyed()) {
-                    controllerInstance = this.InjectorService.get(name);
+                    controllerInstance = this._InjectorService.get(name);
                     if (controllerInstance) {
                         //check if is already instanciated
                         //extract options
-                        let options = this.DataOptions.getDataOptions($element, name);
+                        let options = this._DataOptions.getDataOptions($element, name);
                         options = $.extend({}, options, config.options);
                         //get controller instance
                         controllerInstance.activate($element);
@@ -117,7 +117,7 @@ export class ComponentInitializer {
         switch (initState) {
             case 0://only without init
                 for (let elementIndex = 0, $elementsLength = $elements.length; elementIndex < $elementsLength; elementIndex++) {
-                    let $element = this.$($elements[elementIndex]);
+                    let $element = this._$($elements[elementIndex]);
                     if ($element.data(this._instanceDataName) == undefined) {
                         result.push($element);
                     }
@@ -125,7 +125,7 @@ export class ComponentInitializer {
                 break;
             case 1://only initialized
                 for (let elementIndex = 0, $elementsLength = $elements.length; elementIndex < $elementsLength; elementIndex++) {
-                    let $element = this.$($elements[elementIndex]);
+                    let $element = this._$($elements[elementIndex]);
                     if ($element.data(this._instanceDataName) != undefined) {
                         result.push($element);
                     }
@@ -134,7 +134,7 @@ export class ComponentInitializer {
 
             default:
                 for (let elementIndex = 0, $elementsLength = $elements.length; elementIndex < $elementsLength; elementIndex++) {
-                    let $element = this.$($elements[elementIndex]);
+                    let $element = this._$($elements[elementIndex]);
                     result.push($element);
                 }
                 break;
@@ -154,7 +154,7 @@ export class ComponentInitializer {
                 ? this._findElementsInContext($context)
                 : $context;
         for (let elementIndex = 0, $elementsLength = $elements.length; elementIndex < $elementsLength; elementIndex++) {
-            let $element = this.$($elements[elementIndex]),
+            let $element = this._$($elements[elementIndex]),
                 controller = $element.data(this._instanceDataName);
             if (controller != undefined) {
                 result.push(controller);
@@ -174,7 +174,7 @@ export class ComponentInitializer {
         } else {
             $context.each(
                 (index, element) => {
-                    let $element = $(element);
+                    let $element = this._$(element);
                     if ($element.is(`[${this._prefix}],[data-${this._prefix}]`)) {
                         parents.push($element);
                     }

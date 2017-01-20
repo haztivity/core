@@ -15,7 +15,7 @@ import {S} from "./String";
     }
 )
 export class DataOptions {
-    constructor(protected $, protected S: S) {
+    constructor(protected _$, protected _S: S) {
 
     }
 
@@ -27,7 +27,7 @@ export class DataOptions {
 
     public getDataOptions(element: JQuery, prefix: string, optPrefix = "opt", mode?: string) {
         //extract data-_attributes with jquery data
-        let $element = this.$(element),
+        let $element = this._$(element),
             params = $element.data(), parsedParams = {};
         optPrefix = S(optPrefix + "-" + prefix).camelize().s;
         mode = mode || $element.data("paramsMode");
