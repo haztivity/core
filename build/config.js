@@ -19,6 +19,7 @@ let config = {
         },
         open:!program.disableLiveReload
     },
-    sourcemap:!(!!program.production || program.noSourcemap)
+    tsSourcemap:!(!!program.production || program.noTsSourcemap),
+    tsDeclaration:!!program.tsDeclaration
 };
 module.exports = config;

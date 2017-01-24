@@ -18,7 +18,8 @@ program
     .option('-l, --disable-live-reload', 'Disable live reload. Default enabled')
     .option('-d, --base-dir <val>', 'Base dir for the server. Default ./')
     .option('-P, --production', 'Dist for poroduction')
-    .option('-n, --no-sourcemap', 'Don not generate sourcemaps').parse(process.argv);
+    .option('-s, --no-ts-sourcemap', 'Don not generate sourcemaps').parse(process.argv)
+    .option('-D, --ts-declaration', 'Generate .d.ts').parse(process.argv);
 var requireDir = require('require-dir');
 
 requireDir('./build', { recurse: true });

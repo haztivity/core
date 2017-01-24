@@ -15,8 +15,9 @@ let config = require("./../config");
             .pipe(tsProject());
 
         return merge([
-            tsresult.pipe(gulpif(config.sourcemap == true, sourcemaps.init())),
-            tsresult.pipe(gulpif(config.sourcemap == true, sourcemaps.write())),
+            tsresult.pipe(gulpif(config.tsSourcemap === true, sourcemaps.init())),
+            tsresult.pipe(gulpif(config.tsSourcemap === true, sourcemaps.write())),
+            tsresult.dts.pipe(gulpif(config.tsDeclaration === true,gulp.dest(tsProject.declarationDir || config.src))),
             tsresult.js.pipe(gulp.dest(config.src))
         ])
     });
