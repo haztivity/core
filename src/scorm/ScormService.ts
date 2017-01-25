@@ -128,9 +128,9 @@ export class ScormService {
         if (!this._API) {
             this.getAPIHandle();
             if (!this._API) {
-                return (function () {
+                return (()=>{
                     Logger.error("ScormService",
-                                 `No API found, unable to execute ${this._version === ScormService.VERSIONS.v2004
+                                 `No API found, unable to execute ${this.getAPIVersion() === ScormService.VERSIONS.v2004
                                      ? funcname2004
                                      : funcname12}`
                     );
@@ -140,11 +140,11 @@ export class ScormService {
 
         switch (this._version) {
             case ScormService.VERSIONS.v2004:
-                return function () {
+                return ()=> {
                     return this._API[funcname2004].apply(this._API, arguments);
                 };
             default:
-                return function () {
+                return ()=> {
                     return this._API[funcname12].apply(this._API, arguments);
                 };
         }

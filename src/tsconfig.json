@@ -3,7 +3,7 @@
         "declaration": true,
         "declarationDir": "./types",
         "experimentalDecorators": true,
-        "module": "umd",
+        "module": "system",
         "moduleResolution": "node",
         "sourceMap": true,
         "target": "es5",
