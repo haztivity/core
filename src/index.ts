@@ -27,7 +27,7 @@ export {
 import {Injector} from "./di/Injector";
 import {Logger} from "./debug";
 Injector.getInstance().registerServiceInstance("Logger",Logger);
-export {EventEmitter, EventEmitterFactory} from "./utils";
+export {EventEmitter, EventEmitterFactory,DataOptions} from "./utils";
 export {
     ScoFactory,
     ISco,

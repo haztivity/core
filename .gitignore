@@ -12,6 +12,6 @@ jspm_packages/
 #test/**/*.css
 #test/**/*.css.map
 #test/**/*.js
-#test/**/*.js.map
-#test/**/*.html
+test/**/*.js.map
+test/**/*.html
 typings
