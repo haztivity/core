@@ -16,6 +16,8 @@ import {EventEmitter, EventEmitterFactory, IEventHandler} from "../utils";
 export abstract class ResourceController implements IEventHandler {
     public static readonly NAMESPACE = "resourceController";
     public static readonly ON_COMPLETED = `${ResourceController.NAMESPACE}:completed`;
+    protected static readonly CLASS_UNCOMPLETED = "hz-resource--uncompleted";
+    public static readonly CLASS_COMPLETED = "hz-resource--completed";
     protected _destroyed: boolean = false;
     protected _completed: boolean = false;
     protected _$element: JQuery;
@@ -24,8 +26,8 @@ export abstract class ResourceController implements IEventHandler {
 
     /**
      * Controlador base para los recursos
-     * @param {JQueryStatic}            $
-     * @param {EventEmitterFactory}     EventEmitterFactory
+     * @param {JQueryStatic}            _$
+     * @param {EventEmitterFactory}     _EventEmitterFactory
      */
     constructor(protected _$: JQueryStatic, protected _EventEmitterFactory: EventEmitterFactory) {
     }
@@ -36,6 +38,7 @@ export abstract class ResourceController implements IEventHandler {
      */
     public activate($element) {
         this._$element = $element;
+        this._$element.addClass(ResourceController.CLASS_UNCOMPLETED);
         this._eventEmitter = this._EventEmitterFactory.createEmitter(this._$element);
     }
 
@@ -69,6 +72,7 @@ export abstract class ResourceController implements IEventHandler {
 
     protected _markAsCompleted() {
         this._completed = true;
+        this._$element.addClass(ResourceController.CLASS_COMPLETED);
         this._eventEmitter.trigger(ResourceController.ON_COMPLETED)
     }
 
