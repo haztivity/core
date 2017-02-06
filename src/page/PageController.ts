@@ -33,6 +33,7 @@ export abstract class PageController {
     public static readonly NAMESPACE = "pageController";
     public static readonly ON_RENDERING = `${PageController.NAMESPACE}:rendering`;
     public static readonly ON_RENDERED = `${PageController.NAMESPACE}:rendered`;
+    public static readonly ON_APPENDED = `${PageController.NAMESPACE}:appended`;
     public static readonly ON_SHOW = `${PageController.NAMESPACE}:show`;
     public static readonly ON_SHOWN = `${PageController.NAMESPACE}:shown`;
     public static readonly ON_COMPLETE_CHANGE = `${PageController.NAMESPACE}:completechange`;
@@ -199,5 +200,10 @@ export abstract class PageController {
      */
     protected _destroy() {
         this.eventEmitter.trigger(PageController.ON_DESTROY, [this.$element, this]);
+    }
+    protected _prepareTemplate(){
+        let event = $.Event(PageController.ON_RENDERED);
+        this.eventEmitter.trigger(event, [this.$element, this]);
+        return event.isDefaultPrevented();
     }
 }

@@ -91,8 +91,10 @@ export class PageImplementation {
             }
             let controller: PageController = this._controllerFactory.instance();
             controller.activate(pageOptions, this._page._eventEmitter, this._state, this.store);
-            controller.render();
+            let $documentFragment = $(document.createDocumentFragment());
+            $documentFragment.append(controller.render());
             controller.initializeResources();
+            controller._prepareTemplate();
             this._currentController = controller;
         }
         return this._currentController;
