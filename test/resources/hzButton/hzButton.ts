@@ -2,7 +2,7 @@
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-import {$,EventEmitterFactory,ResourceController,Resource,IResourceParams} from "../../../src/core";
+import {$,EventEmitterFactory,ResourceController,Resource,IResourceParams} from "../../../src/index";
 @Resource(<IResourceParams>{
     name:"hzButton",
     dependencies:[

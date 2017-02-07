@@ -2,4 +2,4 @@
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-export * from "./src/core";
+export * from "./src/index";

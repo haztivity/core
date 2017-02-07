@@ -18,11 +18,10 @@ import {ResourceInitializerService} from "../resource";
 )
 export class GenericPageController extends PageController {
 
-    protected _prepareTemplate() {
-        let prevented = super._prepareTemplate();
-        if(!prevented) {
-            this.$element.hide();
-        }
+    protected _render(template){
+        let render = super._render(template);
+        render.hide();
+        return render;
     }
 
     protected _show($oldPage, oldPageRelativePosition): JQueryPromise<null> {

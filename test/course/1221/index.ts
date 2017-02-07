@@ -3,7 +3,7 @@
  * Copyright Davinchi. All Rights Reserved.
  */
 
-import {ScoFactory,Sco,ISco} from "../../../src/core";
+import {ScoFactory,Sco,ISco} from "../../../src/index";
 import {HzNavbarComponent} from "../../components/Navbar";
 import {page6611} from "./pages/6611/6611";
 import {page6612} from "./pages/6612/6612";

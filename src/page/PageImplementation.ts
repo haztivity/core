@@ -6,12 +6,14 @@ import {Core} from "../di";
 import {PageRegister, IPageOptions} from "./PageRegister";
 import {PageController, IPageState, IPageStore} from "./PageController";
 import {InjectorService} from "../di";
+import {$} from "../jquery";
 import {ResourceManager, ResourceController} from "../resource";
 
 @Core(
     {
         name: "PageImplementation",
         dependencies: [
+            $,
             ResourceManager,
             InjectorService
         ],
@@ -34,7 +36,7 @@ export class PageImplementation {
      * @class
      * @param Injector
      */
-    constructor(protected _ResourceManager, protected _Injector: InjectorService) {
+    constructor(protected _$,protected _ResourceManager, protected _Injector: InjectorService) {
     }
 
     /**
@@ -91,15 +93,25 @@ export class PageImplementation {
             }
             let controller: PageController = this._controllerFactory.instance();
             controller.activate(pageOptions, this._page._eventEmitter, this._state, this.store);
-            let $documentFragment = $(document.createDocumentFragment());
-            $documentFragment.append(controller.render());
-            controller.initializeResources();
-            controller._prepareTemplate();
             this._currentController = controller;
         }
         return this._currentController;
     }
-
+    public render(){
+        if(this._currentController && !this._currentController.getElement()){
+            return this._currentController.render();
+        }
+    }
+    public postRender(){
+        if(this._currentController) {
+            this._currentController._postRender();
+        }
+    }
+    public getElement(){
+        if(this._currentController) {
+            return this._currentController.getElement();
+        }
+    }
     /**
      * Finaliza el ciclo de vida actual invocando al método "destroy" del controlador de la página y liberando la instancia del controlador
      */

@@ -119,7 +119,7 @@ export abstract class PageController {
         return $element;
     }
 
-    public initializeResources() {
+    protected _initializeResources() {
         this._resources = this._ResourceInitializerService.initialize(this.$element);
         for (let resource of this._resources) {
             resource.on(ResourceController.ON_COMPLETED,{instance:this},this._onResourceCompleted);
@@ -196,14 +196,17 @@ export abstract class PageController {
     }
 
     /**
+     * Invocado al finalizar la renderización. Inicializa los recursos.
+     * @private
+     */
+    protected _postRender(){
+        this._initializeResources();
+        this.eventEmitter.trigger(PageController.ON_RENDERED,[this.$element,this]);
+    }
+    /**
      * Invocado al solicitarse la destruccion de la página
      */
     protected _destroy() {
         this.eventEmitter.trigger(PageController.ON_DESTROY, [this.$element, this]);
-    }
-    protected _prepareTemplate(){
-        let event = $.Event(PageController.ON_RENDERED);
-        this.eventEmitter.trigger(event, [this.$element, this]);
-        return event.isDefaultPrevented();
     }
 }

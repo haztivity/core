@@ -1,15 +1,12 @@
 {
     "compilerOptions": {
-        "declaration": true,
-        "declarationDir": "./types",
-        "experimentalDecorators": true,
         "module": "system",
-        "moduleResolution": "node",
-        "sourceMap": true,
         "target": "es5",
+        "sourceMap": true,
+        "moduleResolution": "node",
+        "experimentalDecorators": true,
         "typeRoots": [
-            "../node_modules/@types",
-            "../jspm_packages/npm/bottlejs@1.5.0/dist"
+            "../node_modules/@types"
         ]
     },
     "exclude": [

@@ -113,15 +113,15 @@ export class Navigator implements IEventHandler, INavigatorService {
                                 ? currentPage.getController().getElement()
                                 : null, //get current element
                             newPageController = newPage.getController(),//create a controller for new page
-                            newPageElement = newPageController.getElement();//get the rendered element
-
-
+                            newPageElement = newPage.render();//get the rendered element
                         //if the new page is before to the current page
                         if (currentPageIndex === -1) {
                             this._$context.prepend(newPageElement);
                         } else {//if the new page is after the current page
                             this._$context.append(newPageElement);
                         }
+                        //initialize resources and trigger rendered event
+                        newPage.postRender();
                         this._$context.removeAttr(Navigator.ATTR_CURRENT);
                         this._$context.attr(Navigator.ATTR_TRANSITION_TO,newPageName);
                         //trigger event in navigator

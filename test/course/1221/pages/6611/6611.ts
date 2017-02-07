@@ -2,7 +2,7 @@
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-import {PageFactory,PageRegister,PageController,ScormService} from "../../../../../src/core";
+import {PageFactory,PageRegister,PageController,ScormService} from "../../../../../src/index";
 import {HzButton} from "../../../../resources/hzButton/hzButton";
 import template from "./6611.html!text";
 let page:PageRegister = PageFactory.createPage({

@@ -2,7 +2,7 @@
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-import {$, Navigator,INavigatorPageData, Component, ComponentController,EventEmitterFactory,PageManager,PageController} from "../../src/core";
+import {$, Navigator,INavigatorPageData, Component, ComponentController,EventEmitterFactory,PageManager,PageController} from "../../src/index";
 @Component(
     {
         name: "HzNavbar",
