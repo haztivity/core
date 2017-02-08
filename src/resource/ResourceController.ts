@@ -72,8 +72,9 @@ export abstract class ResourceController implements IEventHandler {
 
     protected _markAsCompleted() {
         this._completed = true;
+        this._$element.removeClass(ResourceController.CLASS_UNCOMPLETED);
         this._$element.addClass(ResourceController.CLASS_COMPLETED);
-        this._eventEmitter.trigger(ResourceController.ON_COMPLETED)
+        this._eventEmitter.trigger(ResourceController.ON_COMPLETED);
     }
 
     public setOption(name, value) {

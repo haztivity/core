@@ -37,6 +37,7 @@ export abstract class PageController {
     public static readonly ON_SHOW = `${PageController.NAMESPACE}:show`;
     public static readonly ON_SHOWN = `${PageController.NAMESPACE}:shown`;
     public static readonly ON_COMPLETE_CHANGE = `${PageController.NAMESPACE}:completechange`;
+    public static readonly ON_RESOURCE_COMPLETED = `${PageController.NAMESPACE}:resourcecomplete`;
     public static readonly ON_DESTROY = `${PageController.NAMESPACE}:destroy`;
     public static readonly CLASS_PAGE = "hz-page";
     public $element;
@@ -122,12 +123,13 @@ export abstract class PageController {
     protected _initializeResources() {
         this._resources = this._ResourceInitializerService.initialize(this.$element);
         for (let resource of this._resources) {
-            resource.on(ResourceController.ON_COMPLETED,{instance:this},this._onResourceCompleted);
+            resource.on(ResourceController.ON_COMPLETED,{instance:this,resource:resource},this._onResourceCompleted);
         }
         return this._resources;
     }
     protected _onResourceCompleted(e){
         let instance:PageController = e.data.instance;
+        instance.eventEmitter.trigger(PageController.ON_RESOURCE_COMPLETED,[instance.$element,instance,e.data.resource]);
         instance.isCompleted(true);
     }
     /**
