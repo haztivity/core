@@ -16,8 +16,9 @@ import {EventEmitter, EventEmitterFactory, IEventHandler} from "../utils";
 export abstract class ResourceController implements IEventHandler {
     public static readonly NAMESPACE = "resourceController";
     public static readonly ON_COMPLETED = `${ResourceController.NAMESPACE}:completed`;
-    protected static readonly CLASS_UNCOMPLETED = "hz-resource--uncompleted";
+    public static readonly CLASS_UNCOMPLETED = "hz-resource--uncompleted";
     public static readonly CLASS_COMPLETED = "hz-resource--completed";
+    public static readonly CLASS_DISABLED = "hz-resource--disabled";
     protected _destroyed: boolean = false;
     protected _completed: boolean = false;
     protected _$element: JQuery;
@@ -95,6 +96,7 @@ export abstract class ResourceController implements IEventHandler {
     public disable(){
         if(!this.isLocked()) {
             this._disabled = true;
+            this._$element.addClass(ResourceController.CLASS_DISABLED);
             return true;
         }
         return false;
@@ -107,6 +109,7 @@ export abstract class ResourceController implements IEventHandler {
     public enable(){
         if(!this.isLocked()) {
             this._disabled = false;
+            this._$element.removeClass(ResourceController.CLASS_DISABLED);
             return true;
         }
         return false;

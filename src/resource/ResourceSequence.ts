@@ -21,6 +21,7 @@ import {ResourceInitializer} from "./ResourceInitializer";
 export class ResourceSequence implements IEventHandler {
     public static readonly NAMESPACE = "resourceSequence";
     public static readonly ON_COMPLETED = `${ResourceSequence.NAMESPACE}:completed`;
+    public static readonly ON_RESOURCE_STATE_CHANGE = `${ResourceSequence.NAMESPACE}:resourcestatechange`;
     public static readonly STATES = {
         waiting: 0,
         running: 1,
@@ -104,6 +105,8 @@ export class ResourceSequence implements IEventHandler {
                     $element.addClass(ResourceSequence.CLASS_WAITING);
                     break;
             }
+            (<any>item)._eventEmitter.trigger(ResourceSequence.ON_RESOURCE_STATE_CHANGE,[item,state]);
+            this._eventEmitter.trigger(ResourceSequence.ON_RESOURCE_STATE_CHANGE,[item,state]);
         }
     }
 

@@ -33,3 +33,4 @@ page.on(PageController.ON_DESTROY,null,(eventObject,$page,pageController)=>{
     console.log(`${pageController.options.name} destroy`);
 });
 export {page as page6611};
+
