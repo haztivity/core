@@ -39,12 +39,15 @@ export {
     PageRegister,
     IPageOptions,
     PageFactory,
-    PageManager
+    PageManager,
+    GenericPageController
 } from "./page";
 export {
     ResourceInitializerService,
     ResourceController,
-    ResourceManager
+    ResourceManager,
+    ResourceSequenceFactory,
+    ResourceSequence
 } from "./resource";
 export {
     Navigator,
