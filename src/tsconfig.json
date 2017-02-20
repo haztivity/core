@@ -1,6 +1,8 @@
 {
     "compilerOptions": {
-        "module": "system",
+        "allowJs": true,
+        "declaration": true,
+        "module": "umd",
         "target": "es5",
         "sourceMap": true,
         "moduleResolution": "node",
