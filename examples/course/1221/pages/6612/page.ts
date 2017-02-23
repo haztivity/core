@@ -4,32 +4,29 @@
  */
 import {PageFactory, PageRegister, GenericPageController} from "../../../../../src/index";
 import {HzButton} from "../../../../resources/hzButton/hzButton";
-import * as template from "./6612.html!text";
-let page: PageRegister = PageFactory.createPage(
+import * as template from "./page.html!text";
+export let page: PageRegister = PageFactory.createPage(
     {
         name: "6612",
         resources: [
             HzButton
         ],
         template: template,
-        autoSequence:false
-    }
-);
-page.on(
-    GenericPageController.ON_RENDERING, null, (eventObject, template, pageController:GenericPageController) => {
-        console.log(`${pageController.options.name} rendering`);
+        autoSequence:false//disable the auto creation of sequences
     }
 );
 page.on(
     GenericPageController.ON_RENDERED, null, (eventObject, $page, pageController) => {
-        console.log(`${pageController.options.name} rendered`);
         let groups = $page.find(".group");
         groups.hide();
         groups.first().show();
         let sequences = [];
+        //look for groups, each group will be a sequence
         for (let groupIndex = 0, groupsLength = groups.length; groupIndex < groupsLength; groupIndex++) {
             let $item = $(groups[groupIndex]);
+            //create a sequence
             let sequence = pageController.createResourceSequence($item.find("[data-hz-resource]"));
+            //when the senquence is completed, show the next group
             sequence.getCompletePromise().then(()=>{
                 let index = groups.index($item);
                 if(index < groups.length -1){
@@ -38,21 +35,9 @@ page.on(
             });
             sequences.push(sequence);
         }
+        //Create a sequence of sequences
         pageController.createResourceSequence(sequences).run().then(()=>{
             console.log("All sequences completed");
         });
     }
 );
-page.on(
-    GenericPageController.ON_SHOW, null, (eventObject, $page, $oldPage, oldPageRelativePosition, pageController) => {
-        console.log(`${pageController.options.name} show start`);
-    }
-);
-page.on(
-    GenericPageController.ON_SHOWN, null, (eventObject, $page, $oldPage, oldPageRelativePosition, pageController) => {
-        console.log(`${pageController.options.name} show end`);
-    }
-);
-
-export {page as page6612};
-

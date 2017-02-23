@@ -4,8 +4,9 @@
  */
 import {PageFactory,PageRegister,PageController,ScormService} from "../../../../../src/index";
 import {HzButton} from "../../../../resources/hzButton/hzButton";
-import * as template from "./6611.html!text";
-let page:PageRegister = PageFactory.createPage({
+import * as template from "./page.html!text";
+import "./page.css!";
+export let page:PageRegister = PageFactory.createPage({
     name:"6611",
     resources:[
         HzButton
@@ -17,8 +18,6 @@ page.on(PageController.ON_RENDERING,null,(eventObject,template,pageController)=>
 });
 page.on(PageController.ON_RENDERED,null,(eventObject,$page:JQuery,pageController:PageController)=>{
     console.log(`${pageController.options.name} rendered`);
-    if(pageController.isCompleted()) {
-    }
 });
 page.on(PageController.ON_SHOW,null,(eventObject,$page,$oldPage,oldPageRelativePosition,pageController)=>{
     console.log(`${pageController.options.name} show start`);
@@ -26,11 +25,13 @@ page.on(PageController.ON_SHOW,null,(eventObject,$page,$oldPage,oldPageRelativeP
 page.on(PageController.ON_SHOWN,null,(eventObject,$page,$oldPage,oldPageRelativePosition,pageController)=>{
     console.log(`${pageController.options.name} show end`);
 });
+page.on(PageController.ON_RESOURCE_COMPLETED,null,(eventObject,$page,pageController,resource)=>{
+    console.log(`${pageController.options.name} resource completed`);
+});
 page.on(PageController.ON_COMPLETE_CHANGE,null,(eventObject,isCompleted,$page,pageController)=>{
     console.log(`${pageController.options.name} complete change`);
 });
 page.on(PageController.ON_DESTROY,null,(eventObject,$page,pageController)=>{
     console.log(`${pageController.options.name} destroy`);
 });
-export {page as page6611};
 

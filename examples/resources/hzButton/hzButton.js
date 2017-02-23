@@ -48,11 +48,19 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
         HzButton.prototype.disable = function () {
             if (_super.prototype.disable.call(this)) {
                 this._$element.attr("disabled", "disabled");
+                return true;
+            }
+            else {
+                return false;
             }
         };
         HzButton.prototype.enable = function () {
             if (_super.prototype.enable.call(this)) {
                 this._$element.removeAttr("disabled");
+                return true;
+            }
+            else {
+                return false;
             }
         };
         HzButton.prototype.getInstance = function () {

@@ -21,14 +21,20 @@ export class HzButton extends ResourceController{
         instance.disable();
         instance._markAsCompleted();
     }
-    public disable(){
+    public disable():boolean{
         if(super.disable()) {
             this._$element.attr("disabled", "disabled");
+            return true;
+        }else{
+            return false;
         }
     }
     public enable(){
         if(super.enable()) {
             this._$element.removeAttr("disabled");
+            return true;
+        }else{
+            return false;
         }
     }
     getInstance() {

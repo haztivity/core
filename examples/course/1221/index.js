@@ -8,21 +8,21 @@
         if (v !== undefined) module.exports = v;
     }
     else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", "../../../src/index", "../../components/Navbar", "./pages/6611/6611", "./pages/6612/6612"], factory);
+        define(["require", "exports", "../../../src/index", "../../components/Navbar", "./pages/6611/page", "./pages/6612/page"], factory);
     }
 })(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var index_1 = require("../../../src/index");
     var Navbar_1 = require("../../components/Navbar");
-    var _6611_1 = require("./pages/6611/6611");
-    var _6612_1 = require("./pages/6612/6612");
+    var page_1 = require("./pages/6611/page");
+    var page_2 = require("./pages/6612/page");
     debugger;
     var sco = index_1.ScoFactory.createSco({
         name: "1221",
         pages: [
-            _6611_1.page6611,
-            _6612_1.page6612
+            page_1.page,
+            page_2.page
         ],
         components: [
             Navbar_1.HzNavbarComponent

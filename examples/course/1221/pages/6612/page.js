@@ -4,7 +4,7 @@
         if (v !== undefined) module.exports = v;
     }
     else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", "../../../../../src/index", "../../../../resources/hzButton/hzButton", "./6612.html!text"], factory);
+        define(["require", "exports", "../../../../../src/index", "../../../../resources/hzButton/hzButton", "./page.html!text"], factory);
     }
 })(function (require, exports) {
     "use strict";
@@ -15,20 +15,16 @@
      */
     var index_1 = require("../../../../../src/index");
     var hzButton_1 = require("../../../../resources/hzButton/hzButton");
-    var template = require("./6612.html!text");
-    var page = index_1.PageFactory.createPage({
+    var template = require("./page.html!text");
+    exports.page = index_1.PageFactory.createPage({
         name: "6612",
         resources: [
             hzButton_1.HzButton
         ],
         template: template,
-        autoSequence: false
+        autoSequence: false //disable the auto creation of sequences
     });
-    exports.page6612 = page;
-    page.on(index_1.GenericPageController.ON_RENDERING, null, function (eventObject, template, pageController) {
-        console.log(pageController.options.name + " rendering");
-    });
-    page.on(index_1.GenericPageController.ON_RENDERED, null, function (eventObject, $page, pageController) {
+    exports.page.on(index_1.GenericPageController.ON_RENDERED, null, function (eventObject, $page, pageController) {
         console.log(pageController.options.name + " rendered");
         var groups = $page.find(".group");
         groups.hide();
@@ -36,7 +32,9 @@
         var sequences = [];
         var _loop_1 = function (groupIndex, groupsLength) {
             var $item = $(groups[groupIndex]);
+            //create a sequence
             var sequence = pageController.createResourceSequence($item.find("[data-hz-resource]"));
+            //when the senquence is completed, show the next group
             sequence.getCompletePromise().then(function () {
                 var index = groups.index($item);
                 if (index < groups.length - 1) {
@@ -45,18 +43,14 @@
             });
             sequences.push(sequence);
         };
+        //look for groups, each group will be a sequence
         for (var groupIndex = 0, groupsLength = groups.length; groupIndex < groupsLength; groupIndex++) {
             _loop_1(groupIndex, groupsLength);
         }
+        //Create a sequence of sequences
         pageController.createResourceSequence(sequences).run().then(function () {
             console.log("All sequences completed");
         });
     });
-    page.on(index_1.GenericPageController.ON_SHOW, null, function (eventObject, $page, $oldPage, oldPageRelativePosition, pageController) {
-        console.log(pageController.options.name + " show start");
-    });
-    page.on(index_1.GenericPageController.ON_SHOWN, null, function (eventObject, $page, $oldPage, oldPageRelativePosition, pageController) {
-        console.log(pageController.options.name + " show end");
-    });
 });
-//# sourceMappingURL=6612.js.map
+//# sourceMappingURL=page.js.map
