@@ -4,7 +4,7 @@
  */
 import {PageFactory, PageRegister, GenericPageController} from "../../../../../src/index";
 import {HzButton} from "../../../../resources/hzButton/hzButton";
-import template from "./6612.html!text";
+import * as template from "./6612.html!text";
 let page: PageRegister = PageFactory.createPage(
     {
         name: "6612",
