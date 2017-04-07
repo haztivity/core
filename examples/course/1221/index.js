@@ -3,6 +3,7 @@
  * Copyright Davinchi. All Rights Reserved.
  */
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var index_1 = require("../../../src/index");
 var Navbar_1 = require("../../components/Navbar");
 var page_1 = require("./pages/6611/page");

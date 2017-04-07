@@ -1,11 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-import { Bottle } from "bottlejs";
-import { HaztivityDependencyHasItsOwnAsDependency, HaztivityDependencyAlreadyRegistered, HaztivityDependencyNotRegisteredError, HaztivityDependencyOptionRequired, HaztivityDependencyAccessDenied, HaztivityDependencyNotValid } from "./Errors";
+var bottlejs_1 = require("bottlejs");
+var Errors_1 = require("./Errors");
 //Create readonly types
-export var TYPES = (function () {
+exports.TYPES = (function () {
     function sealProperty(val) {
         //Object.freeze(val);
         return {
@@ -69,7 +71,7 @@ var Injector = (function () {
     function Injector() {
         this._registers = new Map();
         this._registersName = new Map();
-        this._root = new Bottle();
+        this._root = new bottlejs_1.Bottle();
     }
     /**
      * @description Comprueba si una clase se ha registrado en el contenedor root. Equivale a injector.getContainer("root").exists("Dependencia");
@@ -185,15 +187,15 @@ var Injector = (function () {
                         resolvedDependencies.push(dependency);
                     }
                     else {
-                        throw new HaztivityDependencyAccessDenied(serviceName, dependencyToResolveName);
+                        throw new Errors_1.HaztivityDependencyAccessDenied(serviceName, dependencyToResolveName);
                     }
                 }
                 else {
-                    throw new HaztivityDependencyNotRegisteredError(dependencyToResolve, serviceName);
+                    throw new Errors_1.HaztivityDependencyNotRegisteredError(dependencyToResolve, serviceName);
                 }
             }
             else {
-                throw new HaztivityDependencyNotValid(serviceName, dependencies);
+                throw new Errors_1.HaztivityDependencyNotValid(serviceName, dependencies);
             }
         }
         return resolvedDependencies;
@@ -338,15 +340,15 @@ var Injector = (function () {
                     return true;
                 }
                 else {
-                    throw new HaztivityDependencyHasItsOwnAsDependency(name);
+                    throw new Errors_1.HaztivityDependencyHasItsOwnAsDependency(name);
                 }
             }
             else {
-                throw new HaztivityDependencyAlreadyRegistered(name);
+                throw new Errors_1.HaztivityDependencyAlreadyRegistered(name);
             }
         }
         else {
-            throw new HaztivityDependencyOptionRequired("name");
+            throw new Errors_1.HaztivityDependencyOptionRequired("name");
         }
     };
     /**
@@ -359,7 +361,7 @@ var Injector = (function () {
      * @see TYPES
      */
     Injector.prototype.registerService = function (name, service, dependencies, factory) {
-        this._registerService(TYPES.Service, name, service, dependencies, factory);
+        this._registerService(exports.TYPES.Service, name, service, dependencies, factory);
     };
     /**
      * Registra un servicio de tipo Service de haztivity instanciable.
@@ -371,7 +373,7 @@ var Injector = (function () {
      * @see TYPES
      */
     Injector.prototype.registerServiceTransient = function (name, service, dependencies, factory) {
-        this._registerTransient(TYPES.Service, name, service, dependencies, factory);
+        this._registerTransient(exports.TYPES.Service, name, service, dependencies, factory);
     };
     /**
      * Registra una instancia. No resuelve dependencias.
@@ -385,7 +387,7 @@ var Injector = (function () {
         if (this._validateName(name, dependencies)) {
             var injectorRegister = {
                 name: name,
-                type: TYPES.Service,
+                type: exports.TYPES.Service,
                 dependencies: dependencies,
                 service: instance
             };
@@ -393,7 +395,7 @@ var Injector = (function () {
             this._root.constant(name, instance);
         }
         else {
-            throw new HaztivityDependencyAlreadyRegistered(name);
+            throw new Errors_1.HaztivityDependencyAlreadyRegistered(name);
         }
     };
     /**
@@ -406,7 +408,7 @@ var Injector = (function () {
      * @see TYPES
      */
     Injector.prototype.registerCore = function (name, service, dependencies, factory) {
-        this._registerService(TYPES.Core, name, service, dependencies, factory);
+        this._registerService(exports.TYPES.Core, name, service, dependencies, factory);
     };
     /**
      * Registra una clase de tipo Core de haztivity instanciable
@@ -417,7 +419,7 @@ var Injector = (function () {
      * @see _registerTransient
      */
     Injector.prototype.registerCoreTransient = function (name, Class, dependencies, factory) {
-        this._registerTransient(TYPES.Core, name, Class, dependencies, factory);
+        this._registerTransient(exports.TYPES.Core, name, Class, dependencies, factory);
     };
     /**
      * Registra un servicio de tipo CorePublic de haztivity
@@ -429,7 +431,7 @@ var Injector = (function () {
      * @see TYPES
      */
     Injector.prototype.registerCorePublic = function (name, service, dependencies, factory) {
-        this._registerService(TYPES.CorePublic, name, service, dependencies, factory);
+        this._registerService(exports.TYPES.CorePublic, name, service, dependencies, factory);
     };
     /**
      * Registra una clase de tipo CorePublic de haztivity instanciable
@@ -440,7 +442,7 @@ var Injector = (function () {
      * @see _registerTransient
      */
     Injector.prototype.registerCorePublicTransient = function (name, Class, dependencies, factory) {
-        this._registerTransient(TYPES.CorePublic, name, Class, dependencies, factory);
+        this._registerTransient(exports.TYPES.CorePublic, name, Class, dependencies, factory);
     };
     /**
      * Registra un servicio de tipo Sco de haztivity
@@ -452,7 +454,7 @@ var Injector = (function () {
      * @see TYPES
      */
     Injector.prototype.registerSco = function (name, service, dependencies, factory) {
-        this._registerTransient(TYPES.Sco, name, service, dependencies, factory);
+        this._registerTransient(exports.TYPES.Sco, name, service, dependencies, factory);
     };
     /**
      * Registra un servicio de tipo Module de haztivity
@@ -464,7 +466,7 @@ var Injector = (function () {
      * @see TYPES
      */
     Injector.prototype.registerModule = function (name, service, dependencies, factory) {
-        this._registerService(TYPES.Module, name, service, dependencies, factory);
+        this._registerService(exports.TYPES.Module, name, service, dependencies, factory);
     };
     /**
      * Registra un servicio de tipo Component de haztivity
@@ -479,7 +481,7 @@ var Injector = (function () {
         if (service._componentName == undefined) {
             service._componentName = name;
         }
-        this._registerService(TYPES.Component, name, service, dependencies, factory);
+        this._registerService(exports.TYPES.Component, name, service, dependencies, factory);
     };
     /**
      * Registra una clase de tipo Page de haztivity
@@ -491,7 +493,7 @@ var Injector = (function () {
      * @see TYPES
      */
     Injector.prototype.registerPage = function (name, service, dependencies, factory) {
-        this._registerTransient(TYPES.Page, name, service, dependencies, factory);
+        this._registerTransient(exports.TYPES.Page, name, service, dependencies, factory);
     };
     /**
      * Registra una clase de tipo Resource de haztivity
@@ -506,7 +508,7 @@ var Injector = (function () {
         if (service._resourceName == undefined) {
             service._resourceName = name;
         }
-        this._registerTransient(TYPES.Resource, name, service, dependencies, factory);
+        this._registerTransient(exports.TYPES.Resource, name, service, dependencies, factory);
     };
     /**
      * Obtiene una instancia del inyector. Si se indica el parámetro target se obtiene una instancia del servicio InjectorService para ese target indicado.
@@ -534,7 +536,7 @@ var Injector = (function () {
     };
     return Injector;
 }());
-export { Injector };
+exports.Injector = Injector;
 var InjectorService = (function () {
     function InjectorService(injector, target) {
         this.get = function (service) {
@@ -568,7 +570,7 @@ var InjectorService = (function () {
     };
     return InjectorService;
 }());
-export { InjectorService };
+exports.InjectorService = InjectorService;
 //Map dynamically the methods
 var InjectorRegisterService = (function () {
     function InjectorRegisterService(injector) {
@@ -594,7 +596,7 @@ var InjectorRegisterService = (function () {
     }
     return InjectorRegisterService;
 }());
-export { InjectorRegisterService };
+exports.InjectorRegisterService = InjectorRegisterService;
 //Register Injector as a instantiable service.
 Injector.getInstance().registerServiceTransient("InjectorService", InjectorService, [], function (service, dependencies, resolvedDependencies, requester) {
     return Injector.getInstance(requester);

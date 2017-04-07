@@ -1,3 +1,4 @@
+"use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -8,11 +9,12 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-import { BaseError } from "../base/BaseError";
+var BaseError_1 = require("../base/BaseError");
 /**
  * Error al intentar obtener una dependencia no registrada
  */
@@ -24,8 +26,8 @@ var HaztivityDependencyNotRegisteredError = (function (_super) {
             : dependency + " is not registered in the Injector.") || this;
     }
     return HaztivityDependencyNotRegisteredError;
-}(BaseError));
-export { HaztivityDependencyNotRegisteredError };
+}(BaseError_1.BaseError));
+exports.HaztivityDependencyNotRegisteredError = HaztivityDependencyNotRegisteredError;
 /**
  * Error al intentar registrar una dependencia ya registrada
  */
@@ -35,8 +37,8 @@ var HaztivityDependencyAlreadyRegistered = (function (_super) {
         return _super.call(this, "HaztivityDependencyAlreadyRegistered", dependency + " is already registered") || this;
     }
     return HaztivityDependencyAlreadyRegistered;
-}(BaseError));
-export { HaztivityDependencyAlreadyRegistered };
+}(BaseError_1.BaseError));
+exports.HaztivityDependencyAlreadyRegistered = HaztivityDependencyAlreadyRegistered;
 /**
  * Error al no indicarse un parámetro obligatorio
  */
@@ -46,8 +48,8 @@ var HaztivityDependencyOptionRequired = (function (_super) {
         return _super.call(this, "HaztivityDependencyOptionRequired", "The parameter '" + parameterName + "' is required") || this;
     }
     return HaztivityDependencyOptionRequired;
-}(BaseError));
-export { HaztivityDependencyOptionRequired };
+}(BaseError_1.BaseError));
+exports.HaztivityDependencyOptionRequired = HaztivityDependencyOptionRequired;
 /**
  * Error al definir una clase como dependencia de ella misma
  */
@@ -57,8 +59,8 @@ var HaztivityDependencyHasItsOwnAsDependency = (function (_super) {
         return _super.call(this, "HaztivityDependencyHasItsOwnAsDependency", dependency + " has its own as dependency") || this;
     }
     return HaztivityDependencyHasItsOwnAsDependency;
-}(BaseError));
-export { HaztivityDependencyHasItsOwnAsDependency };
+}(BaseError_1.BaseError));
+exports.HaztivityDependencyHasItsOwnAsDependency = HaztivityDependencyHasItsOwnAsDependency;
 /**
  * Error al intentar inyectar una dependencia a la que no se tiene acceso
  */
@@ -68,8 +70,8 @@ var HaztivityDependencyAccessDenied = (function (_super) {
         return _super.call(this, "HaztivityDependencyAccessDenied", target + " has not access to " + dependency) || this;
     }
     return HaztivityDependencyAccessDenied;
-}(BaseError));
-export { HaztivityDependencyAccessDenied };
+}(BaseError_1.BaseError));
+exports.HaztivityDependencyAccessDenied = HaztivityDependencyAccessDenied;
 /**
  * Error al intentar inyectar una dependencia a la que no se tiene acceso
  */
@@ -79,6 +81,6 @@ var HaztivityDependencyNotValid = (function (_super) {
         return _super.call(this, "HaztivityDependencyNotValid", "Some dependency for " + target + " is undefined.") || this;
     }
     return HaztivityDependencyNotValid;
-}(BaseError));
-export { HaztivityDependencyNotValid };
+}(BaseError_1.BaseError));
+exports.HaztivityDependencyNotValid = HaztivityDependencyNotValid;
 //# sourceMappingURL=Errors.js.map
