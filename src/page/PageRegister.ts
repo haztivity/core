@@ -9,7 +9,8 @@ export interface IPageOptions {
     name: string;
     template: string;
     controller?: string;
-    resources?: ResourceController[]
+    resources?: any[];
+    autoSequence?:boolean;
 }
 @Core(
     {

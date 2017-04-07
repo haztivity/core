@@ -11,7 +11,7 @@ import {
     HaztivityDependencyAccessDenied,
     HaztivityDependencyNotValid
 } from "./Errors";
-import * as IBottle from "../../jspm_packages/npm/bottlejs@1.5.0/dist/bottle";
+import * as IBottle from "bottlejs/dist/bottle";
 export interface InjectorRegister {
 
 }

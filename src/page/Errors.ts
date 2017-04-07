@@ -24,6 +24,6 @@ export class HaztivityPageNameInvalid extends BaseError {
  */
 export class HaztivityPageElementError extends BaseError {
     constructor(pageName: string) {
-        super("HaztivityPageElementError", `The page '${pageName}' $element is invalid. The template could be undefined`);
+        super("HaztivityPageElementError", `The page '${pageName}' $element is invalid. The template could not be undefined`);
     }
 }

@@ -1,3 +1,4 @@
+"use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -8,43 +9,31 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-(function (factory) {
-    if (typeof module === "object" && typeof module.exports === "object") {
-        var v = factory(require, exports);
-        if (v !== undefined) module.exports = v;
+/**
+ * @license
+ * Copyright Davinchi. All Rights Reserved.
+ */
+var BaseError_1 = require("../base/BaseError");
+/**
+ * Error al no indicarse contexto para la aplicación
+ */
+var HaztivityAppContextNotFound = (function (_super) {
+    __extends(HaztivityAppContextNotFound, _super);
+    function HaztivityAppContextNotFound() {
+        return _super.call(this, "HaztivityAppContextNotFound", "not context found for the application. Please visit LINK TO HELP") || this;
     }
-    else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", "../base/BaseError"], factory);
+    return HaztivityAppContextNotFound;
+}(BaseError_1.BaseError));
+exports.HaztivityAppContextNotFound = HaztivityAppContextNotFound;
+/**
+ * Error al no indicarse contexto para las páginas
+ */
+var HaztivityPagesContextNotFound = (function (_super) {
+    __extends(HaztivityPagesContextNotFound, _super);
+    function HaztivityPagesContextNotFound() {
+        return _super.call(this, "HaztivityPagesContextNotFound", "not context found for pages. Please visit LINK TO HELP") || this;
     }
-})(function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    /**
-     * @license
-     * Copyright Davinchi. All Rights Reserved.
-     */
-    var BaseError_1 = require("../base/BaseError");
-    /**
-     * Error al no indicarse contexto para la aplicación
-     */
-    var HaztivityAppContextNotFound = (function (_super) {
-        __extends(HaztivityAppContextNotFound, _super);
-        function HaztivityAppContextNotFound() {
-            return _super.call(this, "HaztivityAppContextNotFound", "not context found for the application. Please visit LINK TO HELP") || this;
-        }
-        return HaztivityAppContextNotFound;
-    }(BaseError_1.BaseError));
-    exports.HaztivityAppContextNotFound = HaztivityAppContextNotFound;
-    /**
-     * Error al no indicarse contexto para las páginas
-     */
-    var HaztivityPagesContextNotFound = (function (_super) {
-        __extends(HaztivityPagesContextNotFound, _super);
-        function HaztivityPagesContextNotFound() {
-            return _super.call(this, "HaztivityPagesContextNotFound", "not context found for pages. Please visit LINK TO HELP") || this;
-        }
-        return HaztivityPagesContextNotFound;
-    }(BaseError_1.BaseError));
-    exports.HaztivityPagesContextNotFound = HaztivityPagesContextNotFound;
-});
+    return HaztivityPagesContextNotFound;
+}(BaseError_1.BaseError));
+exports.HaztivityPagesContextNotFound = HaztivityPagesContextNotFound;
 //# sourceMappingURL=Errors.js.map

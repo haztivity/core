@@ -1,3 +1,4 @@
+"use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -14,69 +15,57 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-(function (factory) {
-    if (typeof module === "object" && typeof module.exports === "object") {
-        var v = factory(require, exports);
-        if (v !== undefined) module.exports = v;
+/**
+ * @license
+ * Copyright Davinchi. All Rights Reserved.
+ */
+var index_1 = require("../../../src/index");
+var HzButton = (function (_super) {
+    __extends(HzButton, _super);
+    function HzButton() {
+        return _super !== null && _super.apply(this, arguments) || this;
     }
-    else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", "../../../src/index"], factory);
-    }
-})(function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    /**
-     * @license
-     * Copyright Davinchi. All Rights Reserved.
-     */
-    var index_1 = require("../../../src/index");
-    var HzButton = (function (_super) {
-        __extends(HzButton, _super);
-        function HzButton() {
-            return _super !== null && _super.apply(this, arguments) || this;
+    HzButton.prototype.init = function (options, config) {
+        this._options = options;
+        this._$element.text(this._options.content);
+        this._$element.one("click", { instance: this }, this._onClick);
+    };
+    HzButton.prototype._onClick = function (e) {
+        var instance = e.data.instance;
+        instance.disable();
+        instance._markAsCompleted();
+    };
+    HzButton.prototype.disable = function () {
+        if (_super.prototype.disable.call(this)) {
+            this._$element.attr("disabled", "disabled");
+            return true;
         }
-        HzButton.prototype.init = function (options, config) {
-            this._options = options;
-            this._$element.text(this._options.content);
-            this._$element.one("click", { instance: this }, this._onClick);
-        };
-        HzButton.prototype._onClick = function (e) {
-            var instance = e.data.instance;
-            instance.disable();
-            instance._markAsCompleted();
-        };
-        HzButton.prototype.disable = function () {
-            if (_super.prototype.disable.call(this)) {
-                this._$element.attr("disabled", "disabled");
-                return true;
-            }
-            else {
-                return false;
-            }
-        };
-        HzButton.prototype.enable = function () {
-            if (_super.prototype.enable.call(this)) {
-                this._$element.removeAttr("disabled");
-                return true;
-            }
-            else {
-                return false;
-            }
-        };
-        HzButton.prototype.getInstance = function () {
-            return this;
-        };
-        return HzButton;
-    }(index_1.ResourceController));
-    HzButton = __decorate([
-        index_1.Resource({
-            name: "hzButton",
-            dependencies: [
-                index_1.$,
-                index_1.EventEmitterFactory
-            ]
-        })
-    ], HzButton);
-    exports.HzButton = HzButton;
-});
+        else {
+            return false;
+        }
+    };
+    HzButton.prototype.enable = function () {
+        if (_super.prototype.enable.call(this)) {
+            this._$element.removeAttr("disabled");
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
+    HzButton.prototype.getInstance = function () {
+        return this;
+    };
+    return HzButton;
+}(index_1.ResourceController));
+HzButton = __decorate([
+    index_1.Resource({
+        name: "hzButton",
+        dependencies: [
+            index_1.$,
+            index_1.EventEmitterFactory
+        ]
+    })
+], HzButton);
+exports.HzButton = HzButton;
 //# sourceMappingURL=hzButton.js.map
