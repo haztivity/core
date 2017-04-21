@@ -53,7 +53,7 @@ export class GenericPageController extends PageController {
         return this._resources;
     }
     protected _show($oldPage, oldPageRelativePosition): JQueryPromise<null> {
-        let defer = $.Deferred();
+        let defer = this._$.Deferred();
         if ($oldPage) {
             $oldPage.fadeOut(
                 400, () => {

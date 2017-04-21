@@ -10,12 +10,14 @@ import {HaztivityAppContextNotFound, HaztivityPagesContextNotFound} from "./Erro
 import {ResourceManager} from "../resource";
 import {ComponentManager, ComponentInitializer} from "../component";
 import {ComponentController} from "../component/ComponentController";
+import {$} from "../jquery";
 export interface ISco {
     on(): void;
     run(): void;
 }
 export interface IScoOptions {
     name: string;
+    template:string;
     pages: PageRegister[];
     components?: ComponentController[];
 }
@@ -28,7 +30,8 @@ export interface IScoOptions {
             ResourceManager,
             EventEmitterFactory,
             ComponentManager,
-            ComponentInitializer
+            ComponentInitializer,
+            $
         ]
     }
 )
@@ -39,13 +42,13 @@ export class ScoController implements ISco {
     protected _options: IScoOptions;
     protected _$context: JQuery;
     protected _$pagesContainer: JQuery;
-
     constructor(protected _Navigator: Navigator,
                 protected _PageManager: PageManager,
                 protected _ResourceManager: ResourceManager,
                 protected _EventEmitterFactory: EventEmitterFactory,
                 protected _ComponentManager: ComponentManager,
-                protected _ComponentInitializer: ComponentInitializer) {
+                protected _ComponentInitializer: ComponentInitializer,
+                protected _$: JQueryStatic) {
         this._eventEmitter = this._EventEmitterFactory.createEmitter();
     }
 
@@ -61,9 +64,10 @@ export class ScoController implements ISco {
     }
 
     protected _init() {
-        this._$context = $("[data-hz-app]");
+        this._$context = this._$("[data-hz-app]");
         //context must exists
         if (this._$context.length > 0) {
+            this._$context.prepend(this._options.template);
             this._$context.addClass(ScoController.CLASS_CONTEXT);
             this._$pagesContainer = this._$context.find("[data-hz-pages]");
             //page contexts must exists

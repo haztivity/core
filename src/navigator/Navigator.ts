@@ -11,13 +11,13 @@ export interface INavigatorPageData{
     name:string;
 }
 export interface INavigatorService{
-    goTo(index: number):JQueryPromise<INavigatorPageData,INavigatorPageData>|boolean;
+    goTo(index: number):JQueryPromise<INavigatorPageData>|boolean;
     isDisabled():boolean;
     setDisabled(disabled: boolean):void;
     enable():void;
     disable():void;
-    next():JQueryPromise<INavigatorPageData,INavigatorPageData>|boolean;
-    prev():JQueryPromise<INavigatorPageData,INavigatorPageData>|boolean;
+    next():JQueryPromise<INavigatorPageData>|boolean;
+    prev():JQueryPromise<INavigatorPageData>|boolean;
     getCurrentPageData():INavigatorPageData;
     on(events: string, data: any, handler: (eventObject: JQueryEventObject, ...args: any[]) => any): Navigator;
     one(events: string, data: any, handler: (eventObject: JQueryEventObject) => any): Navigator;
@@ -73,7 +73,7 @@ export class Navigator implements IEventHandler, INavigatorService {
      * @returns {JQueryPromise|boolean} Promesa que es resuelta al finalizarse el proceso completo de cambio de
      * página. False si no se realiza el cambio
      */
-    public goTo(index: number):JQueryPromise<INavigatorPageData,INavigatorPageData>|boolean {
+    public goTo(index: number):JQueryPromise<INavigatorPageData>|boolean {
         if (this.isDisabled() !== true) {
             //get the page requested
             let newPage: PageImplementation = this._PageManager.getPage(index);
@@ -90,7 +90,7 @@ export class Navigator implements IEventHandler, INavigatorService {
                         if (this._currentRenderProcess && this._currentRenderProcess.state() === "pending") {
                             this._currentRenderProcess.reject();
                         }
-                        this._currentRenderProcess = $.Deferred();
+                        this._currentRenderProcess = this._$.Deferred();
                         this._currentPage = newPage;//set new page as current
                         this._currentPageIndex = index;
                         let newPageName = newPage.getPageName(),//get name of new controller

@@ -3,7 +3,6 @@
  * Copyright Davinchi. All Rights Reserved.
  */
 import {$} from "../jquery";
-import EventEmitter from "eventemitter2";
 //Register EventEmitter in DI
 import {Core} from "../di";
 export interface IEventHandler {
@@ -24,13 +23,13 @@ export interface IEventHandler {
 export class EventEmitter {
     protected _$context: JQuery;
     public globalEmitter: EventEmitter;
-    protected _namespace: String = ".eventEmitter" + new Date().getTime();
+    protected _namespace: string = ".eventEmitter" + new Date().getTime();
 
     constructor(protected _$: JQueryStatic) {
     }
 
     public activate(global: EventEmitter, bind: Object = {}) {
-        this._$context = $(bind);
+        this._$context = this._$(bind);
         this.globalEmitter = global;
     }
 

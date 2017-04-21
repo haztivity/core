@@ -3,7 +3,6 @@
  * Copyright Davinchi. All Rights Reserved.
  */
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * @module
  * @description

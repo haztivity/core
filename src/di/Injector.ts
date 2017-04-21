@@ -2,7 +2,8 @@
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-import {Bottle} from "bottlejs";
+import * as Bottle from "bottlejs";
+import {$} from "../jquery";
 import {
     HaztivityDependencyHasItsOwnAsDependency,
     HaztivityDependencyAlreadyRegistered,

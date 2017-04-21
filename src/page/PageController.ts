@@ -116,7 +116,7 @@ export abstract class PageController {
     }
 
     protected _render(template) {
-        let $element = $(template);
+        let $element = this._$(template);
         return $element;
     }
 
@@ -139,7 +139,7 @@ export abstract class PageController {
      * @return {JQueryPromise}  Promesa resulta al finalizarse la animación
      */
     public show($oldPage, oldPageRelativePosition): JQueryPromise<null> {
-        let deferred = $.Deferred(),
+        let deferred = this._$.Deferred(),
             promise = deferred.promise(),
             event = this.eventEmitter.createEvent(PageController.ON_SHOW),
             result = this.eventEmitter.trigger(event, [this.$element, $oldPage, oldPageRelativePosition, this]);
@@ -184,7 +184,7 @@ export abstract class PageController {
      * @protected
      */
     protected _show($oldPage, oldPageRelativePosition): JQueryPromise<null> {
-        let defer = $.Deferred();
+        let defer = this._$.Deferred();
         defer.resolve();
         return defer.promise();
     }

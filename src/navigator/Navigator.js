@@ -5,7 +5,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * @license
  * Copyright Davinchi. All Rights Reserved.
@@ -53,7 +52,7 @@ var Navigator = Navigator_1 = (function () {
                         if (this._currentRenderProcess && this._currentRenderProcess.state() === "pending") {
                             this._currentRenderProcess.reject();
                         }
-                        this._currentRenderProcess = $.Deferred();
+                        this._currentRenderProcess = this._$.Deferred();
                         this._currentPage = newPage; //set new page as current
                         this._currentPageIndex = index;
                         var newPageName = newPage.getPageName(), //get name of new controller
@@ -105,7 +104,6 @@ var Navigator = Navigator_1 = (function () {
                 }
             }
             else {
-                //todo throw
             }
         }
         return false;

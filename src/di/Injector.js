@@ -1,10 +1,10 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-var bottlejs_1 = require("bottlejs");
+var Bottle = require("bottlejs");
+var jquery_1 = require("../jquery");
 var Errors_1 = require("./Errors");
 //Create readonly types
 exports.TYPES = (function () {
@@ -71,7 +71,7 @@ var Injector = (function () {
     function Injector() {
         this._registers = new Map();
         this._registersName = new Map();
-        this._root = new bottlejs_1.Bottle();
+        this._root = new Bottle();
     }
     /**
      * @description Comprueba si una clase se ha registrado en el contenedor root. Equivale a injector.getContainer("root").exists("Dependencia");
@@ -261,7 +261,7 @@ var Injector = (function () {
     Injector.prototype.registerDependencies = function (service, dependencies) {
         var registeredDependencies = this._getRegisteredDependencies(service);
         //if the element already has dependencies, concat
-        dependencies = $.unique(dependencies.concat(registeredDependencies));
+        dependencies = jquery_1.$.unique(dependencies.concat(registeredDependencies));
         service.prototype.$inject = dependencies;
         return dependencies;
     };

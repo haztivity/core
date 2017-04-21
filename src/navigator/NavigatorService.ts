@@ -53,11 +53,11 @@ export class NavigatorService implements INavigatorService{
     public disable(): void {
     }
 
-    public next(): JQueryPromise<INavigatorPageData,INavigatorPageData>|boolean {
+    public next(): JQueryPromise<INavigatorPageData>|boolean {
         return undefined;
     }
 
-    public prev(): JQueryPromise<INavigatorPageData,INavigatorPageData>|boolean {
+    public prev(): JQueryPromise<INavigatorPageData>|boolean {
         return undefined;
     }
 

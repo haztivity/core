@@ -5,7 +5,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * @license
  * Copyright Davinchi. All Rights Reserved.
@@ -17,14 +16,16 @@ var navigator_1 = require("../navigator");
 var Errors_1 = require("./Errors");
 var resource_1 = require("../resource");
 var component_1 = require("../component");
+var jquery_1 = require("../jquery");
 var ScoController = ScoController_1 = (function () {
-    function ScoController(_Navigator, _PageManager, _ResourceManager, _EventEmitterFactory, _ComponentManager, _ComponentInitializer) {
+    function ScoController(_Navigator, _PageManager, _ResourceManager, _EventEmitterFactory, _ComponentManager, _ComponentInitializer, _$) {
         this._Navigator = _Navigator;
         this._PageManager = _PageManager;
         this._ResourceManager = _ResourceManager;
         this._EventEmitterFactory = _EventEmitterFactory;
         this._ComponentManager = _ComponentManager;
         this._ComponentInitializer = _ComponentInitializer;
+        this._$ = _$;
         this._eventEmitter = this._EventEmitterFactory.createEmitter();
     }
     ScoController.prototype.activate = function (options) {
@@ -37,9 +38,10 @@ var ScoController = ScoController_1 = (function () {
         return this;
     };
     ScoController.prototype._init = function () {
-        this._$context = $("[data-hz-app]");
+        this._$context = this._$("[data-hz-app]");
         //context must exists
         if (this._$context.length > 0) {
+            this._$context.prepend(this._options.template);
             this._$context.addClass(ScoController_1.CLASS_CONTEXT);
             this._$pagesContainer = this._$context.find("[data-hz-pages]");
             //page contexts must exists
@@ -76,7 +78,8 @@ ScoController = ScoController_1 = __decorate([
             resource_1.ResourceManager,
             utils_1.EventEmitterFactory,
             component_1.ComponentManager,
-            component_1.ComponentInitializer
+            component_1.ComponentInitializer,
+            jquery_1.$
         ]
     })
 ], ScoController);

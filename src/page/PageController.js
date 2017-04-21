@@ -5,7 +5,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * @license
  * Copyright Davinchi. All Rights Reserved.
@@ -84,7 +83,7 @@ var PageController = PageController_1 = (function () {
         return $element;
     };
     PageController.prototype._render = function (template) {
-        var $element = jquery_1.$(template);
+        var $element = this._$(template);
         return $element;
     };
     PageController.prototype._initializeResources = function () {
@@ -107,7 +106,7 @@ var PageController = PageController_1 = (function () {
      * @return {JQueryPromise}  Promesa resulta al finalizarse la animación
      */
     PageController.prototype.show = function ($oldPage, oldPageRelativePosition) {
-        var deferred = jquery_1.$.Deferred(), promise = deferred.promise(), event = this.eventEmitter.createEvent(PageController_1.ON_SHOW), result = this.eventEmitter.trigger(event, [this.$element, $oldPage, oldPageRelativePosition, this]);
+        var deferred = this._$.Deferred(), promise = deferred.promise(), event = this.eventEmitter.createEvent(PageController_1.ON_SHOW), result = this.eventEmitter.trigger(event, [this.$element, $oldPage, oldPageRelativePosition, this]);
         if (!event.isDefaultPrevented()) {
             //if the user doesn't prevent default
             this._show($oldPage, oldPageRelativePosition).then(function () {
@@ -148,7 +147,7 @@ var PageController = PageController_1 = (function () {
      * @protected
      */
     PageController.prototype._show = function ($oldPage, oldPageRelativePosition) {
-        var defer = jquery_1.$.Deferred();
+        var defer = this._$.Deferred();
         defer.resolve();
         return defer.promise();
     };

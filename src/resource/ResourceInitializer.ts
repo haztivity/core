@@ -77,7 +77,7 @@ export class ResourceInitializer {
                     if (controllerInstance == undefined || controllerInstance.isDestroyed()) {
                         //extract options
                         let options = this._DataOptions.getDataOptions($element, name);
-                        options = $.extend({}, options, config.options);
+                        options = this._$.extend({}, options, config.options);
                         //get controller instance
                         controllerInstance = factory.instance();
                         controllerInstance.activate($element);
@@ -137,7 +137,7 @@ export class ResourceInitializer {
                 }
                 break;
         }
-        return $(result);
+        return this._$(result);
     }
 
     /**
@@ -172,7 +172,7 @@ export class ResourceInitializer {
         } else {
             $context.each(
                 (index, element) => {
-                    let $element = $(element);
+                    let $element = this._$(element);
                     if ($element.is(`[${ResourceInitializer.PREFIX}],[data-${ResourceInitializer.PREFIX}]`)) {
                         parents.push($element);
                     }
@@ -180,6 +180,6 @@ export class ResourceInitializer {
             );
         }
         $elements = parents.concat($context.find(`[${ResourceInitializer.PREFIX}],[data-${ResourceInitializer.PREFIX}]`).toArray());//get elements with the prefix
-        return $($elements);
+        return this._$($elements);
     }
 }

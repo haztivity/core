@@ -5,7 +5,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * @license
  * Copyright Davinchi. All Rights Reserved.
@@ -59,7 +58,7 @@ var ResourceInitializer = ResourceInitializer_1 = (function () {
                     if (controllerInstance == undefined || controllerInstance.isDestroyed()) {
                         //extract options
                         var options = this._DataOptions.getDataOptions($element, name);
-                        options = jquery_1.$.extend({}, options, config.options);
+                        options = this._$.extend({}, options, config.options);
                         //get controller instance
                         controllerInstance = factory.instance();
                         controllerInstance.activate($element);
@@ -68,7 +67,6 @@ var ResourceInitializer = ResourceInitializer_1 = (function () {
                         controllerInstance.init(options, config.data);
                     }
                     else {
-                        //warn
                     }
                     result = controllerInstance;
                 }
@@ -121,7 +119,7 @@ var ResourceInitializer = ResourceInitializer_1 = (function () {
                 }
                 break;
         }
-        return jquery_1.$(result);
+        return this._$(result);
     };
     /**
      * Obtiene los controladores de recursos
@@ -143,6 +141,7 @@ var ResourceInitializer = ResourceInitializer_1 = (function () {
         return result;
     };
     ResourceInitializer.prototype._findElementsInContext = function ($context) {
+        var _this = this;
         var $elements, parents = [];
         //check if context is also a resource
         if ($context.length === 1) {
@@ -152,14 +151,14 @@ var ResourceInitializer = ResourceInitializer_1 = (function () {
         }
         else {
             $context.each(function (index, element) {
-                var $element = jquery_1.$(element);
+                var $element = _this._$(element);
                 if ($element.is("[" + ResourceInitializer_1.PREFIX + "],[data-" + ResourceInitializer_1.PREFIX + "]")) {
                     parents.push($element);
                 }
             });
         }
         $elements = parents.concat($context.find("[" + ResourceInitializer_1.PREFIX + "],[data-" + ResourceInitializer_1.PREFIX + "]").toArray()); //get elements with the prefix
-        return jquery_1.$($elements);
+        return this._$($elements);
     };
     return ResourceInitializer;
 }());

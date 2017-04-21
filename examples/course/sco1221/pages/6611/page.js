@@ -1,19 +1,18 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
 var index_1 = require("../../../../../src/index");
-var hzButton_1 = require("../../../../resources/hzButton/hzButton");
-var template = require("./page.html!text");
+var hzButton_1 = require("../../../resources/hzButton/hzButton");
+var page_pug_1 = require("./page.pug");
 require("./page.css!");
 exports.page = index_1.PageFactory.createPage({
     name: "6611",
     resources: [
         hzButton_1.HzButton
     ],
-    template: template
+    template: page_pug_1.default
 });
 exports.page.on(index_1.PageController.ON_RENDERING, null, function (eventObject, template, pageController) {
     console.log(pageController.options.name + " rendering");

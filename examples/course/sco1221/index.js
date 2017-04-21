@@ -3,14 +3,14 @@
  * Copyright Davinchi. All Rights Reserved.
  */
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var index_1 = require("../../../src/index");
-var Navbar_1 = require("../../components/Navbar");
+var core_1 = require("@haztivity/core");
+var Navbar_1 = require("../components/Navbar");
 var page_1 = require("./pages/6611/page");
 var page_2 = require("./pages/6612/page");
-debugger;
-var sco = index_1.ScoFactory.createSco({
-    name: "1221",
+var sco_html_1 = require("./sco.html");
+var sco = core_1.ScoFactory.createSco({
+    name: "sco1221",
+    template: sco_html_1.default,
     pages: [
         page_1.page,
         page_2.page

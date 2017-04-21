@@ -3,7 +3,7 @@
  * Copyright Davinchi. All Rights Reserved.
  */
 import {Dependencies} from "../di";
-import $ from "../jquery";
+import {$} from "../jquery";
 import {EventEmitter, EventEmitterFactory, IEventHandler} from "../utils";
 @Dependencies(
     {

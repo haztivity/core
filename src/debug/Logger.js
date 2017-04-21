@@ -1,5 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var loglevel = require("loglevel");
 //Create log
 var log = loglevel.getLogger("haztivity-core");

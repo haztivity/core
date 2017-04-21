@@ -5,7 +5,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * @license
  * Copyright Davinchi. All Rights Reserved.
@@ -73,7 +72,7 @@ var ComponentInitializer = (function () {
                         //check if is already instanciated
                         //extract options
                         var options = this._DataOptions.getDataOptions($element, name);
-                        options = jquery_1.$.extend({}, options, config.options);
+                        options = this._$.extend({}, options, config.options);
                         //get controller instance
                         controllerInstance.activate($element);
                         $element.data(this._instanceDataName, controllerInstance);
@@ -81,7 +80,6 @@ var ComponentInitializer = (function () {
                         controllerInstance.init(options, config.data);
                     }
                     else {
-                        //warn
                     }
                     result = controllerInstance;
                 }
@@ -134,7 +132,7 @@ var ComponentInitializer = (function () {
                 }
                 break;
         }
-        return jquery_1.$(result);
+        return this._$(result);
     };
     /**
      * Obtiene los controladores de componentes
@@ -173,7 +171,7 @@ var ComponentInitializer = (function () {
             });
         }
         $elements = parents.concat($context.find("[" + this._prefix + "],[data-" + this._prefix + "]").toArray()); //get elements with the prefix
-        return jquery_1.$($elements);
+        return this._$($elements);
     };
     return ComponentInitializer;
 }());

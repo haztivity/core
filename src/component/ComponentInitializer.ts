@@ -80,7 +80,7 @@ export class ComponentInitializer {
                         //check if is already instanciated
                         //extract options
                         let options = this._DataOptions.getDataOptions($element, name);
-                        options = $.extend({}, options, config.options);
+                        options = this._$.extend({}, options, config.options);
                         //get controller instance
                         controllerInstance.activate($element);
                         $element.data(this._instanceDataName, controllerInstance);
@@ -139,7 +139,7 @@ export class ComponentInitializer {
                 }
                 break;
         }
-        return $(result);
+        return this._$(result);
     }
 
     /**
@@ -182,6 +182,6 @@ export class ComponentInitializer {
             );
         }
         $elements = parents.concat($context.find(`[${this._prefix}],[data-${this._prefix}]`).toArray());//get elements with the prefix
-        return $($elements);
+        return this._$($elements);
     }
 }
