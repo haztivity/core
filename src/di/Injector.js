@@ -4,7 +4,8 @@
  * Copyright Davinchi. All Rights Reserved.
  */
 var Bottle = require("bottlejs");
-var jquery_1 = require("../jquery");
+debugger;
+var arrUnique = require("array-unique");
 var Errors_1 = require("./Errors");
 //Create readonly types
 exports.TYPES = (function () {
@@ -71,6 +72,7 @@ var Injector = (function () {
     function Injector() {
         this._registers = new Map();
         this._registersName = new Map();
+        this._arrUnique = arrUnique;
         this._root = new Bottle();
     }
     /**
@@ -261,7 +263,8 @@ var Injector = (function () {
     Injector.prototype.registerDependencies = function (service, dependencies) {
         var registeredDependencies = this._getRegisteredDependencies(service);
         //if the element already has dependencies, concat
-        dependencies = jquery_1.$.unique(dependencies.concat(registeredDependencies));
+        debugger;
+        dependencies = this._arrUnique(dependencies.concat(registeredDependencies));
         service.prototype.$inject = dependencies;
         return dependencies;
     };
@@ -601,3 +604,4 @@ exports.InjectorRegisterService = InjectorRegisterService;
 Injector.getInstance().registerServiceTransient("InjectorService", InjectorService, [], function (service, dependencies, resolvedDependencies, requester) {
     return Injector.getInstance(requester);
 });
+//# sourceMappingURL=Injector.js.map

@@ -3,7 +3,8 @@
  * Copyright Davinchi. All Rights Reserved.
  */
 import * as Bottle from "bottlejs";
-import {$} from "../jquery";
+debugger;
+import * as arrUnique from "array-unique";
 import {
     HaztivityDependencyHasItsOwnAsDependency,
     HaztivityDependencyAlreadyRegistered,
@@ -120,6 +121,7 @@ export class Injector {
     protected static _registerInstance: InjectorRegisterService;
     protected _registers: Map<Object|Function,IInjectorRegister> = new Map<Object|Function,IInjectorRegister>();
     protected _registersName: Map<string,IInjectorRegister> = new Map<string,IInjectorRegister>();
+    protected _arrUnique= arrUnique;
     /**
      * Contenedor principal
      * @member {InjectorContainer} _root
@@ -343,7 +345,8 @@ export class Injector {
     protected registerDependencies(service, dependencies) {
         let registeredDependencies = this._getRegisteredDependencies(service);
         //if the element already has dependencies, concat
-        dependencies = $.unique(dependencies.concat(registeredDependencies));
+        debugger;
+        dependencies = this._arrUnique(dependencies.concat(registeredDependencies));
         service.prototype.$inject = dependencies;
         return dependencies;
     }

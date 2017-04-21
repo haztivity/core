@@ -1,9 +1,9 @@
 {
   "name": "@haztivity/core",
-  "version": "0.6.0",
+  "version": "0.6.2",
   "description": "Framework haztivity",
-  "main": "src/index.js",
-  "module": "src/index.js",
+  "main": "index.js",
+  "module": "index.js",
   "scripts": {
     "examples": "npm run require-self"
   },
@@ -55,6 +55,7 @@
     "typescript": "^2.1.1"
   },
   "dependencies": {
+    "array-unique": "^0.3.2",
     "bottlejs": "^1.6.0",
     "jquery": "^3.2.1",
     "loglevel": "^1.4.1",

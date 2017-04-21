@@ -2,10 +2,11 @@
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-import {ConfigService,IHaztivityCliConfig} from "./libs/ConfigService";
+import {ConfigService,IHaztivityCliConfig} from "@haztivity/cli";
 export const config:IHaztivityCliConfig = {
-    homeDir:"examples/course",
+    homeDir:".",
     scoTest:/sco*/,
+    scoDir:"examples/course",
     dev:{
         server:{
             root:".",
