@@ -3,7 +3,6 @@
  * Copyright Davinchi. All Rights Reserved.
  */
 import * as Bottle from "bottlejs";
-debugger;
 import * as arrUnique from "array-unique";
 import {
     HaztivityDependencyHasItsOwnAsDependency,
@@ -345,7 +344,6 @@ export class Injector {
     protected registerDependencies(service, dependencies) {
         let registeredDependencies = this._getRegisteredDependencies(service);
         //if the element already has dependencies, concat
-        debugger;
         dependencies = this._arrUnique(dependencies.concat(registeredDependencies));
         service.prototype.$inject = dependencies;
         return dependencies;

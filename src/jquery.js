@@ -5,7 +5,8 @@
  */
 var di_1 = require("./di");
 var $ = require("jquery");
-module.exports.default = $;
-module.exports.$ = $;
+exports.$ = $;
 di_1.Injector.getInstance().registerServiceInstance("$", $);
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = $;
 //using global jquery

@@ -4,7 +4,6 @@
  * Copyright Davinchi. All Rights Reserved.
  */
 var Bottle = require("bottlejs");
-debugger;
 var arrUnique = require("array-unique");
 var Errors_1 = require("./Errors");
 //Create readonly types
@@ -263,7 +262,6 @@ var Injector = (function () {
     Injector.prototype.registerDependencies = function (service, dependencies) {
         var registeredDependencies = this._getRegisteredDependencies(service);
         //if the element already has dependencies, concat
-        debugger;
         dependencies = this._arrUnique(dependencies.concat(registeredDependencies));
         service.prototype.$inject = dependencies;
         return dependencies;

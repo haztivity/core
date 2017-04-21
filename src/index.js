@@ -1,4 +1,10 @@
 "use strict";
+/**
+ * @license
+ * Copyright Davinchi. All Rights Reserved.
+ */
+var jquery_1 = require("./jquery");
+exports.$ = jquery_1.$;
 var debug_1 = require("./debug");
 exports.Logger = debug_1.Logger;
 var di_1 = require("./di");

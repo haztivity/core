@@ -2,7 +2,7 @@
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-export * from "./jquery";
+export {$} from "./jquery";
 export {Logger} from "./debug";
 export {
     InjectorService,

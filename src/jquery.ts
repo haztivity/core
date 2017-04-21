@@ -4,7 +4,7 @@
  */
 import {Injector} from "./di";
 import * as $ from "jquery";
-module.exports.default = $;
-module.exports.$ = $;
 Injector.getInstance().registerServiceInstance("$",$);
+export default $;
+export {$ as $};
 //using global jquery
