@@ -85,4 +85,3 @@ GenericPageController = __decorate([
     })
 ], GenericPageController);
 exports.GenericPageController = GenericPageController;
-//# sourceMappingURL=GenericPageController.js.map

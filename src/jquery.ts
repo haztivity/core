@@ -3,6 +3,8 @@
  * Copyright Davinchi. All Rights Reserved.
  */
 import {Injector} from "./di";
-import * as $ from "jquery";
+import "jquery";
 Injector.getInstance().registerServiceInstance("$",$);
-export {$ as $};
+//using global jquery
+module.exports.default = $;
+module.exports.$ = $;

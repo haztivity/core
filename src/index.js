@@ -1,12 +1,4 @@
 "use strict";
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
-/**
- * @license
- * Copyright Davinchi. All Rights Reserved.
- */
-__export(require("./jquery"));
 var debug_1 = require("./debug");
 exports.Logger = debug_1.Logger;
 var di_1 = require("./di");
@@ -51,4 +43,3 @@ exports.ComponentManager = component_1.ComponentManager;
 exports.ComponentInitializer = component_1.ComponentInitializer;
 var scorm_1 = require("./scorm");
 exports.ScormService = scorm_1.ScormService;
-//# sourceMappingURL=index.js.map

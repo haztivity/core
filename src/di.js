@@ -12,4 +12,3 @@ exports.TYPES = Injector_1.TYPES;
 exports.InjectorRegisterService = Injector_1.InjectorRegisterService;
 exports.InjectorService = Injector_1.InjectorService;
 __export(require("./di/decorators"));
-//# sourceMappingURL=di.js.map

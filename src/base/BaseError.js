@@ -27,4 +27,3 @@ var BaseError = (function (_super) {
     return BaseError;
 }(Error));
 exports.BaseError = BaseError;
-//# sourceMappingURL=BaseError.js.map

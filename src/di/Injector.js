@@ -601,4 +601,3 @@ exports.InjectorRegisterService = InjectorRegisterService;
 Injector.getInstance().registerServiceTransient("InjectorService", InjectorService, [], function (service, dependencies, resolvedDependencies, requester) {
     return Injector.getInstance(requester);
 });
-//# sourceMappingURL=Injector.js.map

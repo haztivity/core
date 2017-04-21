@@ -12,4 +12,3 @@ var String_1 = require("../libs/String");
 exports.S = String_1.S;
 var di_1 = require("../di");
 di_1.Injector.getInstance().registerServiceInstance("S", String_1.S);
-//# sourceMappingURL=String.js.map

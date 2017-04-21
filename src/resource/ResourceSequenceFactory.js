@@ -37,4 +37,3 @@ ResourceSequenceFactory = __decorate([
     })
 ], ResourceSequenceFactory);
 exports.ResourceSequenceFactory = ResourceSequenceFactory;
-//# sourceMappingURL=ResourceSequenceFactory.js.map

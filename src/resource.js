@@ -13,4 +13,3 @@ var ResourceSequenceFactory_1 = require("./resource/ResourceSequenceFactory");
 exports.ResourceSequenceFactory = ResourceSequenceFactory_1.ResourceSequenceFactory;
 var ResourceSequence_1 = require("./resource/ResourceSequence");
 exports.ResourceSequence = ResourceSequence_1.ResourceSequence;
-//# sourceMappingURL=resource.js.map

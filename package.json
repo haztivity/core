@@ -59,5 +59,10 @@
     "jquery": "^3.2.1",
     "loglevel": "^1.4.1",
     "string": "^3.3.3"
+  },
+  "types": "index.ts",
+  "typings": "index.ts",
+  "directories": {
+    "typings": "src"
   }
 }

@@ -81,4 +81,3 @@ var HaztivityInvalidComponentControllerError = (function (_super) {
     return HaztivityInvalidComponentControllerError;
 }(BaseError_1.BaseError));
 exports.HaztivityInvalidComponentControllerError = HaztivityInvalidComponentControllerError;
-//# sourceMappingURL=Errors.js.map

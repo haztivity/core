@@ -230,4 +230,3 @@ ResourceSequence = ResourceSequence_1 = __decorate([
 ], ResourceSequence);
 exports.ResourceSequence = ResourceSequence;
 var ResourceSequence_1;
-//# sourceMappingURL=ResourceSequence.js.map

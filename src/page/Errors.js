@@ -47,4 +47,3 @@ var HaztivityPageElementError = (function (_super) {
     return HaztivityPageElementError;
 }(BaseError_1.BaseError));
 exports.HaztivityPageElementError = HaztivityPageElementError;
-//# sourceMappingURL=Errors.js.map

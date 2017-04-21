@@ -71,4 +71,3 @@ ComponentController = __decorate([
     })
 ], ComponentController);
 exports.ComponentController = ComponentController;
-//# sourceMappingURL=ComponentController.js.map

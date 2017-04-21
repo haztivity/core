@@ -65,4 +65,3 @@ PageRegister = PageRegister_1 = __decorate([
 ], PageRegister);
 exports.PageRegister = PageRegister;
 var PageRegister_1;
-//# sourceMappingURL=PageRegister.js.map

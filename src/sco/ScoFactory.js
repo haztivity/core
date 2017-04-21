@@ -36,4 +36,3 @@ ScoFactory = ScoFactory_1 = __decorate([
 ], ScoFactory);
 exports.ScoFactory = ScoFactory;
 var ScoFactory_1;
-//# sourceMappingURL=ScoFactory.js.map

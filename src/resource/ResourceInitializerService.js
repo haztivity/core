@@ -60,4 +60,3 @@ ResourceInitializerService = __decorate([
     })
 ], ResourceInitializerService);
 exports.ResourceInitializerService = ResourceInitializerService;
-//# sourceMappingURL=ResourceInitializerService.js.map

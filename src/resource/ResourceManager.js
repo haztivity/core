@@ -86,4 +86,3 @@ ResourceManager = __decorate([
     })
 ], ResourceManager);
 exports.ResourceManager = ResourceManager;
-//# sourceMappingURL=ResourceManager.js.map

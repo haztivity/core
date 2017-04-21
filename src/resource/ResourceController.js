@@ -176,4 +176,3 @@ ResourceController = ResourceController_1 = __decorate([
 ], ResourceController);
 exports.ResourceController = ResourceController;
 var ResourceController_1;
-//# sourceMappingURL=ResourceController.js.map

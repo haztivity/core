@@ -129,4 +129,3 @@ EventEmitter = __decorate([
     })
 ], EventEmitter);
 exports.EventEmitter = EventEmitter;
-//# sourceMappingURL=EventEmitter.js.map

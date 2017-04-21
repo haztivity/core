@@ -85,4 +85,3 @@ ScoController = ScoController_1 = __decorate([
 ], ScoController);
 exports.ScoController = ScoController;
 var ScoController_1;
-//# sourceMappingURL=Sco.js.map

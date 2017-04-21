@@ -179,4 +179,3 @@ ResourceInitializer = ResourceInitializer_1 = __decorate([
 ], ResourceInitializer);
 exports.ResourceInitializer = ResourceInitializer;
 var ResourceInitializer_1;
-//# sourceMappingURL=ResourceInitializer.js.map

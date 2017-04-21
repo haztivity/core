@@ -41,4 +41,3 @@ EventEmitterFactory = __decorate([
     })
 ], EventEmitterFactory);
 exports.EventEmitterFactory = EventEmitterFactory;
-//# sourceMappingURL=EventEmitterFactory.js.map

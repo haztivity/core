@@ -80,4 +80,3 @@ NavigatorService = __decorate([
     })
 ], NavigatorService);
 exports.NavigatorService = NavigatorService;
-//# sourceMappingURL=NavigatorService.js.map

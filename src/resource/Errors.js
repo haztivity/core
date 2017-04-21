@@ -81,4 +81,3 @@ var HaztivityInvalidResourceControllerError = (function (_super) {
     return HaztivityInvalidResourceControllerError;
 }(BaseError_1.BaseError));
 exports.HaztivityInvalidResourceControllerError = HaztivityInvalidResourceControllerError;
-//# sourceMappingURL=Errors.js.map
