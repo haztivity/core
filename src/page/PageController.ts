@@ -209,6 +209,9 @@ export abstract class PageController {
      * Invocado al solicitarse la destruccion de la página
      */
     protected _destroy() {
+        for (let resource of this._resources){
+            resource.destroy();
+        }
         this.eventEmitter.trigger(PageController.ON_DESTROY, [this.$element, this]);
     }
 }

@@ -170,6 +170,10 @@ var PageController = PageController_1 = (function () {
      * Invocado al solicitarse la destruccion de la página
      */
     PageController.prototype._destroy = function () {
+        for (var _i = 0, _a = this._resources; _i < _a.length; _i++) {
+            var resource = _a[_i];
+            resource.destroy();
+        }
         this.eventEmitter.trigger(PageController_1.ON_DESTROY, [this.$element, this]);
     };
     return PageController;
@@ -195,3 +199,4 @@ PageController = PageController_1 = __decorate([
 ], PageController);
 exports.PageController = PageController;
 var PageController_1;
+//# sourceMappingURL=PageController.js.map
