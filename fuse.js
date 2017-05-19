@@ -1,6 +1,6 @@
 const {FuseBox,SassPlugin,CSSPlugin,UglifyJSPlugin,TypeScriptHelpers} = require("fuse-box");
 const {PugPlugin} = require("fusebox-pug-plugin");
-/*const fuseCore = FuseBox.init(
+const fuseCore = FuseBox.init(
     {
         homeDir: "src",
         output: "dev/modules/@haztivity/core/$name.js",
@@ -13,8 +13,8 @@ const {PugPlugin} = require("fusebox-pug-plugin");
 );
 fuseCore.bundle("index")
         .instructions(`index.ts`)//.instructions(`>index.ts`)
-        .watch("src/!**");
-fuseCore.run();*/
+        .watch("src/**");
+fuseCore.run();
 const fuseDev = FuseBox.init(
     {
         homeDir: ".",
