@@ -6,4 +6,4 @@ function __export(m) {
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-__export(require("./src/index"));
+__export(require("./src/index.ts"));

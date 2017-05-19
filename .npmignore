@@ -4,3 +4,6 @@ node_modules
 .idea
 *.log
 gulpfile.js
+dev
+build
+.fusebox
