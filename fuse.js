@@ -3,27 +3,26 @@ const {PugPlugin} = require("fusebox-pug-plugin");
 const fuseCore = FuseBox.init(
     {
         homeDir: "src",
-        output: "dev/modules/@haztivity/core/$name.js",
-        cache:false,
+        output: "dev/$name.js",
         package:{
             name:"@haztivity/core",
             main:"index.ts"
         },
+        cache:false
     }
 );
-fuseCore.bundle("index")
-        .instructions(`index.ts`)//.instructions(`>index.ts`)
+fuseCore.bundle("core")
+        .instructions(`> index.ts`)
         .watch("src/**");
 fuseCore.run();
 const fuseDev = FuseBox.init(
     {
-        homeDir: ".",
+        homeDir: "dev",
         output:"dev/$name.js",
         cache: false,
         log: true,
         debug: true,
         tsConfig:"dev/course/tsconfig.json",
-        modulesFolder:"dev/modules",
         plugins: [
             [
                 SassPlugin(
@@ -40,10 +39,10 @@ const fuseDev = FuseBox.init(
 );
 fuseDev.dev(
     {
-        root: "."
+        root: "dev"
     }
 );
 fuseDev.bundle("sco")
-       .instructions(`>dev/course/sco/index.ts`)
-       .watch("dev&course/**");
+       .instructions(`>course/sco/index.ts`)
+       .watch("dev/course/**");
 fuseDev.run();
