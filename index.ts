@@ -2,4 +2,4 @@
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-export * from "./src/index";
+export * from "./dist/haztivity-core-standalone.min.js";

@@ -7,3 +7,4 @@ gulpfile.js
 dev
 build
 .fusebox
+fuse.js

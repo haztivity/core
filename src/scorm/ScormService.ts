@@ -3,7 +3,7 @@
  * Copyright Davinchi. All Rights Reserved.
  */
 import {Service} from "../di";
-import {Logger} from "../debug";
+import {Logger} from "../devTools";
 @Service(
     {
         name: "ScormService",

@@ -4,7 +4,7 @@
  */
 import {$,EventEmitterFactory,ResourceController,Resource,IResourceParams} from "@haztivity/core";
 @Resource(<IResourceParams>{
-    name:"hzButton",
+    name:"HzButton",
     dependencies:[
         $,
         EventEmitterFactory

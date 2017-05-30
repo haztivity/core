@@ -3,7 +3,7 @@
  * Copyright Davinchi. All Rights Reserved.
  */
 export {$} from "./jquery";
-export {Logger} from "./debug";
+export {Logger} from "./devTools";
 export {
     InjectorService,
     IInjectorService,
@@ -25,7 +25,7 @@ export {
     IComponentParams
 } from "./di";
 import {Injector} from "./di/Injector";
-import {Logger} from "./debug";
+import {Logger} from "./devTools";
 Injector.getInstance().registerServiceInstance("Logger",Logger);
 export {EventEmitter, EventEmitterFactory,DataOptions,S} from "./utils";
 export {
@@ -60,3 +60,4 @@ export {
     ComponentInitializer
 } from "./component";
 export {ScormService} from "./scorm";
+export * from "./global";

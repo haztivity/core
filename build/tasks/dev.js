@@ -1,34 +1,42 @@
-const clean = require("gulp-clean");
-const path = require("path");
-const {FuseBox,SassPlugin,CSSPlugin,UglifyJSPlugin,TypeScriptHelpers} = require("fuse-box");
-const {PugPlugin} = require("fusebox-pug-plugin");
-(function() {
-    const fuse = FuseBox.init(
+export function run(program) {
+    const {FuseBox, SassPlugin, CSSPlugin, UglifyJSPlugin, TypeScriptHelpers} = require("fuse-box");
+    const {PugPlugin} = require("fusebox-pug-plugin");
+    const fuseCore = FuseBox.init(
         {
             homeDir: "src",
-            output: "dev/modules/@haztivity/core/$name.js",
-            cache:false,
-            package:{
-                name:"@haztivity/core",
-                main:"index.ts"
+            output: "dev/$name.js",
+            globals: {
+                "@haztivity/core": {
+                    "haztivity": "haztivity"
+                }
             },
+            package: {
+                name: "@haztivity/core",
+                main: "index.ts"
+            },
+            sourceMaps:true,
+            cache: false,
+            shim: {
+                jquery: {
+                    source: "node_modules/jquery/dist/jquery.js",
+                    exports: "$"
+                }
+            }
         }
     );
-    fuse.bundle("index")
-        .instructions(`index.ts`)//.instructions(`>index.ts`)
-        .watch("src/**");
-    fuse.run();
-})();
-(function() {
-    const fuse = FuseBox.init(
+    fuseCore.bundle("core")
+            .instructions(`> index.ts`)
+            .watch("src/**");
+    fuseCore.run();
+    const fuseDev = FuseBox.init(
         {
-            homeDir: ".",
-            output:"dev/$name.js",
+            homeDir: "dev",
+            output: "dev/$name.js",
             cache: false,
             log: true,
             debug: true,
-            tsConfig:path.resolve("dev/course/tsconfig.json"),
-            modulesFolder:"dev/modules",
+            tsConfig: "dev/course/tsconfig.json",
+            sourceMaps:true,
             plugins: [
                 [
                     SassPlugin(
@@ -40,16 +48,22 @@ const {PugPlugin} = require("fusebox-pug-plugin");
                 ],
                 CSSPlugin(),
                 PugPlugin()
-            ]
+            ],
+            shim: {
+                jquery: {
+                    source: "node_modules/jquery/dist/jquery.js",
+                    exports: "$"
+                }
+            }
         }
     );
-    fuse.dev(
+    fuseDev.dev(
         {
-            root: path.resolve(".")
+            root: "dev"
         }
     );
-    fuse.bundle("sco")
-        .instructions(`>course/sco/index.ts`)
-        .watch("course/**");
-    fuse.run();
-})();
+    fuseDev.bundle("sco")
+           .instructions(`>course/sco/index.ts`)
+           .watch("dev/course/**");
+    fuseDev.run();
+}

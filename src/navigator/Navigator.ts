@@ -50,7 +50,7 @@ export class Navigator implements IEventHandler, INavigatorService {
     protected _currentRenderProcess: JQueryDeferred<INavigatorPageData,INavigatorPageData>;
     protected _eventEmitter: EventEmitter;
     protected _disabled: boolean;
-
+    protected _development=false;
     /**
      * Gestiona la transición entre páginas y el renderizado de las mismas en un contexto específico
      * @param {JQueryStatic}                _$
@@ -65,7 +65,12 @@ export class Navigator implements IEventHandler, INavigatorService {
         this._$context = $context;
         this._eventEmitter = this._EventEmitterFactory.createEmitter();
     }
-
+    public enableDev(){
+        this._development = true;
+    }
+    public disableDev(){
+        this._development = false;
+    }
     /**
      * Navega a la página solicitada.
      * Debe estar registrada en PageManager
@@ -86,7 +91,7 @@ export class Navigator implements IEventHandler, INavigatorService {
                             ? -1
                             : 1;//check the position of the old page relative to the new page
                     //check if resources are completed to go to the next page
-                    if (currentPageIs === 1 || (currentPage == undefined || currentPage.getController().isCompleted())) {
+                    if (this._development === true || (currentPageIs === 1 || (currentPage == undefined || currentPage.getController().isCompleted()))) {
                         if (this._currentRenderProcess && this._currentRenderProcess.state() === "pending") {
                             this._currentRenderProcess.reject();
                         }
@@ -285,7 +290,6 @@ export class Navigator implements IEventHandler, INavigatorService {
     public getCurrentPage() {
         return this._currentPage;
     }
-
     /**
      * Devuelve los datos de la página actual
      * @returns {INavigatorPageData}

@@ -2,7 +2,7 @@
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-import {Logger} from "../debug";
+import {Logger} from "../devTools";
 Logger;
 export class BaseError extends Error {
     constructor(name, message: string) {

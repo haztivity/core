@@ -3,4 +3,4 @@
  * Copyright Davinchi. All Rights Reserved.
  */
 
-export {Logger} from "./debug/Logger";
+export {Logger} from "./devTools/Logger";
