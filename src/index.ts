@@ -60,4 +60,4 @@ export {
     ComponentInitializer
 } from "./component";
 export {ScormService} from "./scorm";
-export * from "./global";
+export {haztivity} from "./global";

@@ -1,9 +1,8 @@
 {
   "name": "@haztivity/core",
-  "version": "0.6.4",
+  "version": "0.6.5",
   "description": "Framework haztivity",
-  "main": "index.js",
-  "module": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "examples": "npm run require-self"
   },
@@ -17,33 +16,27 @@
   "author": "Davinchi",
   "license": "ISC",
   "homepage": "",
-  "devDependencies": {
-    "@haztivity/cli": "^0.2.5",
-    "@types/core-js": "^0.9.41",
-    "@types/jquery": "^2.0.45",
-    "@types/loglevel": "^1.4.29",
-    "@types/string": "0.0.28",
-    "autoprefixer": "^7.1.1",
-    "commander": "^2.9.0",
-    "dts-generator": "^2.1.0",
-    "fuse-box": "^2.0.0",
-    "merge2": "^1.0.3",
-    "postcss": "^6.0.1",
-    "pug": "^2.0.0-rc.1",
-    "require-dir": "^0.3.1",
-    "typescript": "^2.3.3"
-  },
-  "dependencies": {
-    "array-unique": "^0.3.2",
-    "bottlejs": "^1.6.1",
-    "fusebox": "^1.3.123",
-    "jquery": "^3.2.1",
-    "loglevel": "^1.4.1",
-    "string": "^3.3.3"
-  },
   "types": "src/index.ts",
   "typings": "src/index.ts",
   "directories": {
     "typings": "src"
+  },
+  "dependencies": {
+    "array-unique": "^0.3.2",
+    "bottlejs": "^1.6.1",
+    "jquery": "^3.2.1",
+    "loglevel": "^1.4.1"
+  },
+  "devDependencies": {
+    "@haztivity/cli": "^0.2.5",
+    "@types/core-js": "^0.9.41",
+    "@types/jquery": "^3.2.3",
+    "@types/loglevel": "^1.4.29",
+    "@types/string": "0.0.28",
+    "commander": "^2.9.0",
+    "fuse-box": "^2.1.0",
+    "require-dir": "^0.3.2",
+    "rimraf": "^2.6.1",
+    "typescript": "^2.3.4"
   }
 }

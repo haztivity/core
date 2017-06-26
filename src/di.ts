@@ -11,4 +11,23 @@ export {
     InjectorService,
     IInjectorService
 } from "./di/Injector";
-export * from "./di/decorators";
+export {
+    ServiceInstance,
+    Service,
+    Sco,
+    Resource,
+    Page,
+    Dependencies,
+    Component,
+    Module,
+    Core,
+    IServiceParams,
+    IServiceInstanceParams,
+    IScoParams,
+    IResourceParams,
+    IPageParams,
+    IModuleParams,
+    ICoreParams,
+    IComponentParams,
+    IBaseParams
+} from "./di/decorators";
