@@ -1,6 +1,6 @@
 {
   "name": "@haztivity/core",
-  "version": "0.6.5",
+  "version": "0.6.7",
   "description": "Framework haztivity",
   "main": "dist/index.js",
   "scripts": {
@@ -29,14 +29,15 @@
   },
   "devDependencies": {
     "@haztivity/cli": "^0.2.5",
-    "@types/core-js": "^0.9.41",
-    "@types/jquery": "^3.2.3",
+    "@types/core-js": "^0.9.42",
+    "@types/jquery": "^3.2.5",
     "@types/loglevel": "^1.4.29",
     "@types/string": "0.0.28",
     "commander": "^2.9.0",
+    "core-js": "^2.4.1",
     "fuse-box": "^2.1.0",
     "require-dir": "^0.3.2",
     "rimraf": "^2.6.1",
-    "typescript": "^2.3.4"
+    "typescript": "^2.4.0"
   }
 }

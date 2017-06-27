@@ -5,13 +5,16 @@
 import {Module} from "../di";
 import {Logger} from "./Logger";
 import {Navigator} from "../navigator";
-import {EventEmitter,EventEmitterFactory} from "../utils/EventEmitterFactory";
+import {EventEmitterFactory} from "../utils/EventEmitterFactory";
+import {EventEmitter} from "../utils/EventEmitter";
+import {PageManager} from "../page/PageManager";
 @Module(
     {
         name:"DevTools",
         dependencies:[
             Logger,
             Navigator,
+            PageManager,
             EventEmitterFactory
         ]
     }
@@ -22,7 +25,7 @@ export class DevTools {
     /**
      * Tools for development
      */
-    constructor(protected _logger, protected _navigator, protected _eventEmitterFactory){
+    constructor(protected _logger, protected _navigator:Navigator, protected _pageManager:PageManager, protected _eventEmitterFactory){
         
     }
 
@@ -69,7 +72,34 @@ export class DevTools {
             this._navigator.goTo(index);
         }
     }
-
+    /**
+     * Force to go to a specific page by name
+     * @param name
+     */
+    public goToPageByName(name){
+        if(this.isEnabled()) {
+            let pageIndex = this._pageManager.getPageIndex(name);
+            this._navigator.goTo(pageIndex);
+        }
+    }
+    /**
+     * Force to go to the next page
+     * @returns {string}
+     */
+    public goToNextPage(){
+        if(this.isEnabled()){
+            return this._navigator.next();
+        }
+    }
+    /**
+     * Force to go to the prev page
+     * @returns {string}
+     */
+    public goToPrevPage(){
+        if(this.isEnabled()){
+            return this._navigator.prev();
+        }
+    }
     /**
      * Get the name of the current page
      * @returns {string}

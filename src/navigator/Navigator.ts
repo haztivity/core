@@ -47,7 +47,7 @@ export class Navigator implements IEventHandler, INavigatorService {
     protected _$context: JQuery;
     protected _currentPage: PageImplementation;
     protected _currentPageIndex: number;
-    protected _currentRenderProcess: JQueryDeferred<INavigatorPageData,INavigatorPageData>;
+    protected _currentRenderProcess: JQueryDeferred<INavigatorPageData>;
     protected _eventEmitter: EventEmitter;
     protected _disabled: boolean;
     protected _development=false;

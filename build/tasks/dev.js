@@ -1,4 +1,5 @@
-export function run(program) {
+function run(program) {
+    debugger;
     const {FuseBox, SassPlugin, CSSPlugin, UglifyJSPlugin, TypeScriptHelpers} = require("fuse-box");
     const {PugPlugin} = require("fusebox-pug-plugin");
     const fuseCore = FuseBox.init(
@@ -66,4 +67,7 @@ export function run(program) {
            .instructions(`>course/sco/index.ts`)
            .watch("dev/course/**");
     fuseDev.run();
+}
+module.exports = {
+    run:run
 }

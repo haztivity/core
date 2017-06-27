@@ -3,7 +3,6 @@
  * Copyright Davinchi. All Rights Reserved.
  */
 import {$, Navigator,INavigatorPageData, Component, ComponentController,EventEmitterFactory,PageManager,PageController} from "@haztivity/core";
-
 @Component(
     {
         name: "HzNavbar",

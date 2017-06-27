@@ -1,5 +1,4 @@
 import * as loglevel from "loglevel";
-declare let loglevel: any;
 //Create log
 let log = loglevel.getLogger("haztivity-core");
 //Log plugin. Prepend [METHOD_NAME] CONTEXT - messages
