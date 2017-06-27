@@ -6,6 +6,7 @@
         "target": "es5",
         "sourceMap": true,
         "moduleResolution": "node",
+        "outDir":"../dist",
         "experimentalDecorators": true,
         "typeRoots": [
             "../node_modules/@types"

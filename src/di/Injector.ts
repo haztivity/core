@@ -572,9 +572,7 @@ export class Injector {
      * @see TYPES
      */
     public registerComponent(name: string, service, dependencies, factory?: Function) {
-        if (service._componentName == undefined) {
-            service._componentName = name;
-        }
+        service._componentName = name;
         this._registerService(TYPES.Component, name, service, dependencies, factory);
     }
 
