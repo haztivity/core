@@ -9,6 +9,7 @@ import {EventEmitter, EventEmitterFactory, IEventHandler} from "../utils";
 export interface INavigatorPageData{
     index:number;
     name:string;
+    state:IPageState;
 }
 export interface INavigatorService{
     goTo(index: number):JQueryPromise<INavigatorPageData>|boolean;
@@ -101,13 +102,15 @@ export class Navigator implements IEventHandler, INavigatorService {
                         let newPageName = newPage.getPageName(),//get name of new controller
                             newPageData:INavigatorPageData = {
                                 index: index,
-                                name: newPageName
+                                name: newPageName,
+                                state:newPage.getState()
                             },
                             currentPageData:INavigatorPageData;
                         if (currentPage) {
                             currentPageData = {
                                 index: currentPageIndex,
-                                name: currentPage.getPageName()
+                                name: currentPage.getPageName(),
+                                state:currentPage.getState()
                             }
                         }
                         //trigger event in navigator
@@ -268,6 +271,9 @@ export class Navigator implements IEventHandler, INavigatorService {
         }
         this._$context.removeAttr(Navigator.ATTR_TRANSITION_TO);
         this._$context.attr(Navigator.ATTR_CURRENT,newPageData.name);
+        if(newPage.isCompleted()){
+            this.enable();
+        }
         //trigger event in navigator
         this._eventEmitter.trigger(Navigator.ON_CHANGE_PAGE_END, [newPageData, oldPageData]);
         //trigger a global event that could be listened by anyone
@@ -297,7 +303,8 @@ export class Navigator implements IEventHandler, INavigatorService {
     public getCurrentPageData():INavigatorPageData{
         return {
             index:this._currentPageIndex,
-            name:this._currentPage.getPageName()
+            name:this._currentPage.getPageName(),
+            state:this._currentPage.getState()
         };
     }
 

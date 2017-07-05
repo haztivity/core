@@ -11,6 +11,8 @@ import {$,EventEmitterFactory,ResourceController,Resource,IResourceParams} from 
     ]
 })
 export class HzButton extends ResourceController{
+    protected _hasScore =true;
+    protected _score = 0;
     init(options, config?) {
         this._options = options;
         this._$element.text(this._options.content);
@@ -19,6 +21,7 @@ export class HzButton extends ResourceController{
     protected _onClick(e){
         let instance = e.data.instance;
         instance.disable();
+        instance._score = 100;
         instance._markAsCompleted();
     }
     public disable():boolean{

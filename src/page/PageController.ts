@@ -8,6 +8,7 @@ import {IPageOptions} from "./PageRegister";
 import {EventEmitter} from "../utils";
 import {ResourceController, ResourceInitializerService} from "../resource";
 import {HaztivityPageElementError} from "./Errors";
+import {ScormService} from "../scorm/ScormService";
 export interface IPageControllerOptions extends IPageOptions {
     name: string;
     template: string;
@@ -15,17 +16,20 @@ export interface IPageControllerOptions extends IPageOptions {
 export interface IPageStore {
     public?:any;
     private?:any;
+
 }
 export interface  IPageState {
     completed:boolean;
     visited:boolean;
+    score:number;
 }
 @Dependencies(
     {
         dependencies: [
             $,
             InjectorService,
-            ResourceInitializerService
+            ResourceInitializerService,
+            ScormService
         ]
     }
 )
@@ -82,6 +86,17 @@ export abstract class PageController {
         }
         return completed
     }
+    protected _getScore(){
+        let score = 0,
+            hasScore = false;
+        for (let resource of this._resources) {
+            score += resource.getScore();
+            if(hasScore == false){
+                hasScore = resource.hasScore();
+            }
+        }
+        return hasScore == false ? null : score
+    }
     public isCompleted(forceCheck?:boolean) {
         let result = this.state.completed,
             current = this.state.completed;
@@ -91,11 +106,11 @@ export abstract class PageController {
             this.state.completed = result;
             if(current !== result){
                 this.eventEmitter.trigger(PageController.ON_COMPLETE_CHANGE,[result,this.$element,this]);
+                this.eventEmitter.globalEmitter.trigger(PageController.ON_COMPLETE_CHANGE,[result,this.$element,this]);
             }
         }
         return result;
     }
-
     public render() {
         let event = this.eventEmitter.createEvent(PageController.ON_RENDERING),
             $element,
@@ -125,11 +140,17 @@ export abstract class PageController {
         for (let resource of this._resources) {
             resource.on(ResourceController.ON_COMPLETED,{instance:this,resource:resource},this._onResourceCompleted);
         }
+        if(this._resources.length == 0){
+            this.isCompleted(true);
+        }
         return this._resources;
     }
     protected _onResourceCompleted(e){
-        let instance:PageController = e.data.instance;
-        instance.eventEmitter.trigger(PageController.ON_RESOURCE_COMPLETED,[instance.$element,instance,e.data.resource]);
+        let instance:PageController = e.data.instance,
+            resource = e.data.resource;
+        instance.state.score = instance._getScore();
+        instance.eventEmitter.trigger(PageController.ON_RESOURCE_COMPLETED,[instance.$element,instance,resource]);
+        instance.eventEmitter.globalEmitter.trigger(PageController.ON_RESOURCE_COMPLETED,[instance.$element,instance,resource]);
         instance.isCompleted(true);
     }
     /**
@@ -174,6 +195,7 @@ export abstract class PageController {
      */
     protected _onShowEnd($oldPage, oldPageRelativePosition) {
         this.eventEmitter.trigger(PageController.ON_SHOWN, [this.$element, $oldPage, oldPageRelativePosition, this]);
+        this.eventEmitter.globalEmitter.trigger(PageController.ON_SHOWN, [this.$element, $oldPage, oldPageRelativePosition, this]);
     }
 
     /**

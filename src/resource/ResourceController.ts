@@ -27,6 +27,8 @@ export abstract class ResourceController implements IEventHandler {
     protected _completeDeferred = this._$.Deferred();
     protected _disabled = false;
     protected _locked = false;
+    protected _score:number;
+    protected _hasScore:boolean = false;
     /**
      * Controlador base para los recursos
      * @param {JQueryStatic}            _$
@@ -71,7 +73,12 @@ export abstract class ResourceController implements IEventHandler {
     public isLocked(){
         return this._locked;
     }
-
+    public hasScore(){
+        return this._hasScore;
+    }
+    public getScore(){
+        return this._score;
+    }
     /**
      * Indica si el recurso está deshabilitado
      * @returns {any}

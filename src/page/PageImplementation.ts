@@ -25,7 +25,7 @@ export class PageImplementation {
         public: {},
         private: {}
     };
-    protected _state: IPageState = {completed: false, visited: false};
+    protected _state: IPageState = {completed: false, visited: false,score:null};
     protected _page: PageRegister;
     protected _controllerFactory: any;
     protected _currentController: PageController;
@@ -63,7 +63,20 @@ export class PageImplementation {
     public getState():IPageState{
         return this._state;
     }
-
+    /**
+     * Obtiene si la página ha sido visitada
+     * @returns {boolean}
+     */
+    public isVisited(){
+        return this._state.visited;
+    }
+    /**
+     * Obtiene si la página ha sido completada
+     * @returns {boolean}
+     */
+    public isCompleted(){
+        return this._state.completed;
+    }
     /**
      * Actualiza el estado
      * @param {IPageState}  state       Estado a establecer

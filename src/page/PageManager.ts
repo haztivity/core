@@ -50,6 +50,22 @@ export class PageManager {
     }
 
     /**
+     * Devuelve un array con los ids o índices de las páginas completadas.
+     * @param {boolean} [returnName=false]      Indica si devolver los ids de las páginas o los índices
+     * @returns {String[]|Number[]}
+     */
+    public getCompleted(returnName?:boolean):String[]|Number[]{
+        let pages = this._pages,
+            completed = [];
+        for (let pageIndex = 0, pagesLength = pages.length; pageIndex < pagesLength; pageIndex++) {
+            let currentPage = pages[pageIndex];
+            if(currentPage.isCompleted()){
+                completed.push(returnName === true ? currentPage.getPageName() : pageIndex);
+            }
+        }
+        return completed;
+    }
+    /**
      * Añade una página
      * @param {Page}    page        Página a añadir
      */
