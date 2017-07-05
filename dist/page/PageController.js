@@ -14,7 +14,8 @@ var di_1 = require("../di");
 var jquery_1 = require("../jquery");
 var resource_1 = require("../resource");
 var Errors_1 = require("./Errors");
-var PageController = PageController_1 = (function () {
+var ScormService_1 = require("../scorm/ScormService");
+var PageController = (function () {
     /**
      * Controller base para todas las páginas.
      * Tipo Page
@@ -29,6 +30,7 @@ var PageController = PageController_1 = (function () {
         this._ResourceInitializerService = _ResourceInitializerService;
         this._resources = [];
     }
+    PageController_1 = PageController;
     /**
      * Configura la clase nada más instanciarla
      * @param {IPageControllerOptions}  options         Opciones para el controlador
@@ -53,6 +55,17 @@ var PageController = PageController_1 = (function () {
         }
         return completed;
     };
+    PageController.prototype._getScore = function () {
+        var score = 0, hasScore = false;
+        for (var _i = 0, _a = this._resources; _i < _a.length; _i++) {
+            var resource = _a[_i];
+            score += resource.getScore();
+            if (hasScore == false) {
+                hasScore = resource.hasScore();
+            }
+        }
+        return hasScore == false ? null : score;
+    };
     PageController.prototype.isCompleted = function (forceCheck) {
         var result = this.state.completed, current = this.state.completed;
         if (forceCheck || this.state.completed != true) {
@@ -61,6 +74,7 @@ var PageController = PageController_1 = (function () {
             this.state.completed = result;
             if (current !== result) {
                 this.eventEmitter.trigger(PageController_1.ON_COMPLETE_CHANGE, [result, this.$element, this]);
+                this.eventEmitter.globalEmitter.trigger(PageController_1.ON_COMPLETE_CHANGE, [result, this.$element, this]);
             }
         }
         return result;
@@ -93,11 +107,16 @@ var PageController = PageController_1 = (function () {
             var resource = _a[_i];
             resource.on(resource_1.ResourceController.ON_COMPLETED, { instance: this, resource: resource }, this._onResourceCompleted);
         }
+        if (this._resources.length == 0) {
+            this.isCompleted(true);
+        }
         return this._resources;
     };
     PageController.prototype._onResourceCompleted = function (e) {
-        var instance = e.data.instance;
-        instance.eventEmitter.trigger(PageController_1.ON_RESOURCE_COMPLETED, [instance.$element, instance, e.data.resource]);
+        var instance = e.data.instance, resource = e.data.resource;
+        instance.state.score = instance._getScore();
+        instance.eventEmitter.trigger(PageController_1.ON_RESOURCE_COMPLETED, [instance.$element, instance, resource]);
+        instance.eventEmitter.globalEmitter.trigger(PageController_1.ON_RESOURCE_COMPLETED, [instance.$element, instance, resource]);
         instance.isCompleted(true);
     };
     /**
@@ -139,6 +158,7 @@ var PageController = PageController_1 = (function () {
      */
     PageController.prototype._onShowEnd = function ($oldPage, oldPageRelativePosition) {
         this.eventEmitter.trigger(PageController_1.ON_SHOWN, [this.$element, $oldPage, oldPageRelativePosition, this]);
+        this.eventEmitter.globalEmitter.trigger(PageController_1.ON_SHOWN, [this.$element, $oldPage, oldPageRelativePosition, this]);
     };
     /**
      * Realiza la animación correspondiente
@@ -177,27 +197,28 @@ var PageController = PageController_1 = (function () {
         }
         this.eventEmitter.trigger(PageController_1.ON_DESTROY, [this.$element, this]);
     };
+    PageController.NAMESPACE = "pageController";
+    PageController.ON_RENDERING = PageController_1.NAMESPACE + ":rendering";
+    PageController.ON_RENDERED = PageController_1.NAMESPACE + ":rendered";
+    PageController.ON_APPENDED = PageController_1.NAMESPACE + ":appended";
+    PageController.ON_SHOW = PageController_1.NAMESPACE + ":show";
+    PageController.ON_SHOWN = PageController_1.NAMESPACE + ":shown";
+    PageController.ON_COMPLETE_CHANGE = PageController_1.NAMESPACE + ":completechange";
+    PageController.ON_RESOURCE_COMPLETED = PageController_1.NAMESPACE + ":resourcecomplete";
+    PageController.ON_DESTROY = PageController_1.NAMESPACE + ":destroy";
+    PageController.CLASS_PAGE = "hz-page";
+    PageController = PageController_1 = __decorate([
+        di_1.Dependencies({
+            dependencies: [
+                jquery_1.$,
+                di_1.InjectorService,
+                resource_1.ResourceInitializerService,
+                ScormService_1.ScormService
+            ]
+        })
+    ], PageController);
     return PageController;
+    var PageController_1;
 }());
-PageController.NAMESPACE = "pageController";
-PageController.ON_RENDERING = PageController_1.NAMESPACE + ":rendering";
-PageController.ON_RENDERED = PageController_1.NAMESPACE + ":rendered";
-PageController.ON_APPENDED = PageController_1.NAMESPACE + ":appended";
-PageController.ON_SHOW = PageController_1.NAMESPACE + ":show";
-PageController.ON_SHOWN = PageController_1.NAMESPACE + ":shown";
-PageController.ON_COMPLETE_CHANGE = PageController_1.NAMESPACE + ":completechange";
-PageController.ON_RESOURCE_COMPLETED = PageController_1.NAMESPACE + ":resourcecomplete";
-PageController.ON_DESTROY = PageController_1.NAMESPACE + ":destroy";
-PageController.CLASS_PAGE = "hz-page";
-PageController = PageController_1 = __decorate([
-    di_1.Dependencies({
-        dependencies: [
-            jquery_1.$,
-            di_1.InjectorService,
-            resource_1.ResourceInitializerService
-        ]
-    })
-], PageController);
 exports.PageController = PageController;
-var PageController_1;
 //# sourceMappingURL=PageController.js.map

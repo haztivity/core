@@ -12,9 +12,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 var Sco_1 = require("./Sco");
 var di_1 = require("../di");
-var ScoFactory = ScoFactory_1 = (function () {
+var ScoFactory = (function () {
     function ScoFactory() {
     }
+    ScoFactory_1 = ScoFactory;
     ScoFactory.createSco = function (options) {
         var ScoControllerFactory = di_1.Injector.getInstance(ScoFactory_1).get(Sco_1.ScoController);
         var sco = ScoControllerFactory.instance();
@@ -27,14 +28,14 @@ var ScoFactory = ScoFactory_1 = (function () {
         sco.activate(options);
         return sco;
     };
+    ScoFactory = ScoFactory_1 = __decorate([
+        di_1.Core({
+            name: "ScoFactory",
+            dependencies: []
+        })
+    ], ScoFactory);
     return ScoFactory;
+    var ScoFactory_1;
 }());
-ScoFactory = ScoFactory_1 = __decorate([
-    di_1.Core({
-        name: "ScoFactory",
-        dependencies: []
-    })
-], ScoFactory);
 exports.ScoFactory = ScoFactory;
-var ScoFactory_1;
 //# sourceMappingURL=ScoFactory.js.map

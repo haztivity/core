@@ -15,13 +15,14 @@ var ResourceManager_1 = require("./ResourceManager");
 var utils_1 = require("../utils");
 var jquery_1 = require("../jquery");
 var Errors_1 = require("./Errors");
-var ResourceInitializer = ResourceInitializer_1 = (function () {
+var ResourceInitializer = (function () {
     function ResourceInitializer(_$, _ResourceManager, _InjectorService, _DataOptions) {
         this._$ = _$;
         this._ResourceManager = _ResourceManager;
         this._InjectorService = _InjectorService;
         this._DataOptions = _DataOptions;
     }
+    ResourceInitializer_1 = ResourceInitializer;
     /**
      * Inicializa todos los recursos en un contexto en concreto
      * @param {JQuery}  $context    Contexto en el cual buscar recursos a inicializar
@@ -98,7 +99,7 @@ var ResourceInitializer = ResourceInitializer_1 = (function () {
         if (initState === void 0) { initState = 2; }
         var result = [], $elements = this._findElementsInContext($context);
         switch (initState) {
-            case 0:
+            case 0://only without init
                 for (var elementIndex = 0, $elementsLength = $elements.length; elementIndex < $elementsLength; elementIndex++) {
                     var $element = this._$($elements[elementIndex]);
                     if ($element.data(ResourceInitializer_1.PREFIX_INSTANCE) == undefined) {
@@ -106,7 +107,7 @@ var ResourceInitializer = ResourceInitializer_1 = (function () {
                     }
                 }
                 break;
-            case 1:
+            case 1://only initialized
                 for (var elementIndex = 0, $elementsLength = $elements.length; elementIndex < $elementsLength; elementIndex++) {
                     var $element = this._$($elements[elementIndex]);
                     if ($element.data(ResourceInitializer_1.PREFIX_INSTANCE) != undefined) {
@@ -162,23 +163,23 @@ var ResourceInitializer = ResourceInitializer_1 = (function () {
         $elements = parents.concat($context.find("[" + ResourceInitializer_1.PREFIX + "],[data-" + ResourceInitializer_1.PREFIX + "]").toArray()); //get elements with the prefix
         return this._$($elements);
     };
+    ResourceInitializer.PREFIX = "hz-resource";
+    ResourceInitializer.CAMEL_PREFIX = "hzResource";
+    ResourceInitializer.PREFIX_INSTANCE = "hzResourceInstance";
+    ResourceInitializer = ResourceInitializer_1 = __decorate([
+        di_1.Core({
+            name: "ResourceInitializer",
+            dependencies: [
+                jquery_1.$,
+                ResourceManager_1.ResourceManager,
+                di_1.InjectorService,
+                utils_1.DataOptions
+            ],
+            public: true
+        })
+    ], ResourceInitializer);
     return ResourceInitializer;
+    var ResourceInitializer_1;
 }());
-ResourceInitializer.PREFIX = "hz-resource";
-ResourceInitializer.CAMEL_PREFIX = "hzResource";
-ResourceInitializer.PREFIX_INSTANCE = "hzResourceInstance";
-ResourceInitializer = ResourceInitializer_1 = __decorate([
-    di_1.Core({
-        name: "ResourceInitializer",
-        dependencies: [
-            jquery_1.$,
-            ResourceManager_1.ResourceManager,
-            di_1.InjectorService,
-            utils_1.DataOptions
-        ],
-        public: true
-    })
-], ResourceInitializer);
 exports.ResourceInitializer = ResourceInitializer;
-var ResourceInitializer_1;
 //# sourceMappingURL=ResourceInitializer.js.map

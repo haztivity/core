@@ -14,7 +14,7 @@ var jquery_1 = require("../jquery");
 var di_1 = require("../di");
 var page_1 = require("../page");
 var utils_1 = require("../utils");
-var Navigator = Navigator_1 = (function () {
+var Navigator = (function () {
     /**
      * Gestiona la transición entre páginas y el renderizado de las mismas en un contexto específico
      * @param {JQueryStatic}                _$
@@ -27,6 +27,7 @@ var Navigator = Navigator_1 = (function () {
         this._EventEmitterFactory = _EventEmitterFactory;
         this._development = false;
     }
+    Navigator_1 = Navigator;
     Navigator.prototype.activate = function ($context) {
         this._$context = $context;
         this._eventEmitter = this._EventEmitterFactory.createEmitter();
@@ -66,12 +67,14 @@ var Navigator = Navigator_1 = (function () {
                         var newPageName = newPage.getPageName(), //get name of new controller
                         newPageData = {
                             index: index,
-                            name: newPageName
+                            name: newPageName,
+                            state: newPage.getState()
                         }, currentPageData = void 0;
                         if (currentPage) {
                             currentPageData = {
                                 index: currentPageIndex,
-                                name: currentPage.getPageName()
+                                name: currentPage.getPageName(),
+                                state: currentPage.getState()
                             };
                         }
                         //trigger event in navigator
@@ -210,6 +213,9 @@ var Navigator = Navigator_1 = (function () {
         }
         this._$context.removeAttr(Navigator_1.ATTR_TRANSITION_TO);
         this._$context.attr(Navigator_1.ATTR_CURRENT, newPageData.name);
+        if (newPage.isCompleted()) {
+            this.enable();
+        }
         //trigger event in navigator
         this._eventEmitter.trigger(Navigator_1.ON_CHANGE_PAGE_END, [newPageData, oldPageData]);
         //trigger a global event that could be listened by anyone
@@ -237,7 +243,8 @@ var Navigator = Navigator_1 = (function () {
     Navigator.prototype.getCurrentPageData = function () {
         return {
             index: this._currentPageIndex,
-            name: this._currentPage.getPageName()
+            name: this._currentPage.getPageName(),
+            state: this._currentPage.getState()
         };
     };
     /**
@@ -264,27 +271,27 @@ var Navigator = Navigator_1 = (function () {
         this._eventEmitter.off(events, handler);
         return this;
     };
+    Navigator.NAMESPACE = "navigator";
+    Navigator.ON_DRAW_PAGE = Navigator_1.NAMESPACE + ":draw";
+    Navigator.ON_DISABLE = Navigator_1.NAMESPACE + ":disable";
+    Navigator.ON_ENABLE = Navigator_1.NAMESPACE + ":enable";
+    Navigator.ON_CHANGE_PAGE_END = Navigator_1.NAMESPACE + ":changeend";
+    Navigator.ON_CHANGE_PAGE_START = Navigator_1.NAMESPACE + ":changestart";
+    Navigator.ATTR_TRANSITION_TO = "data-hz-navigator-transition-to";
+    Navigator.ATTR_CURRENT = "data-hz-navigator-page";
+    Navigator = Navigator_1 = __decorate([
+        di_1.Core({
+            name: "Navigator",
+            public: true,
+            dependencies: [
+                jquery_1.$,
+                page_1.PageManager,
+                utils_1.EventEmitterFactory
+            ]
+        })
+    ], Navigator);
     return Navigator;
+    var Navigator_1;
 }());
-Navigator.NAMESPACE = "navigator";
-Navigator.ON_DRAW_PAGE = Navigator_1.NAMESPACE + ":draw";
-Navigator.ON_DISABLE = Navigator_1.NAMESPACE + ":disable";
-Navigator.ON_ENABLE = Navigator_1.NAMESPACE + ":enable";
-Navigator.ON_CHANGE_PAGE_END = Navigator_1.NAMESPACE + ":changeend";
-Navigator.ON_CHANGE_PAGE_START = Navigator_1.NAMESPACE + ":changestart";
-Navigator.ATTR_TRANSITION_TO = "data-hz-navigator-transition-to";
-Navigator.ATTR_CURRENT = "data-hz-navigator-page";
-Navigator = Navigator_1 = __decorate([
-    di_1.Core({
-        name: "Navigator",
-        public: true,
-        dependencies: [
-            jquery_1.$,
-            page_1.PageManager,
-            utils_1.EventEmitterFactory
-        ]
-    })
-], Navigator);
 exports.Navigator = Navigator;
-var Navigator_1;
 //# sourceMappingURL=Navigator.js.map

@@ -111,18 +111,18 @@ var DevTools = (function () {
             return this._eventEmitterFactory.create();
         }
     };
+    DevTools = __decorate([
+        di_1.Module({
+            name: "DevTools",
+            dependencies: [
+                Logger_1.Logger,
+                navigator_1.Navigator,
+                PageManager_1.PageManager,
+                EventEmitterFactory_1.EventEmitterFactory
+            ]
+        })
+    ], DevTools);
     return DevTools;
 }());
-DevTools = __decorate([
-    di_1.Module({
-        name: "DevTools",
-        dependencies: [
-            Logger_1.Logger,
-            navigator_1.Navigator,
-            PageManager_1.PageManager,
-            EventEmitterFactory_1.EventEmitterFactory
-        ]
-    })
-], DevTools);
 exports.DevTools = DevTools;
 //# sourceMappingURL=DevTools.js.map

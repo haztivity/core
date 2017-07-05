@@ -61,15 +61,15 @@ var ComponentController = (function () {
         return this;
     };
     ;
+    ComponentController = __decorate([
+        di_1.Dependencies({
+            dependencies: [
+                jquery_1.default,
+                utils_1.EventEmitterFactory
+            ]
+        })
+    ], ComponentController);
     return ComponentController;
 }());
-ComponentController = __decorate([
-    di_1.Dependencies({
-        dependencies: [
-            jquery_1.default,
-            utils_1.EventEmitterFactory
-        ]
-    })
-], ComponentController);
 exports.ComponentController = ComponentController;
 //# sourceMappingURL=ComponentController.js.map

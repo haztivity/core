@@ -17,9 +17,10 @@ var GenericPageController_1 = require("./GenericPageController");
  * Factory para crear páginas genéricas
  * @class PageFactory
  */
-var PageFactory = PageFactory_1 = (function () {
+var PageFactory = (function () {
     function PageFactory() {
     }
+    PageFactory_1 = PageFactory;
     /**
      * Genera una página genérica
      * @static
@@ -36,16 +37,16 @@ var PageFactory = PageFactory_1 = (function () {
         page.activate(options);
         return page;
     };
+    PageFactory = PageFactory_1 = __decorate([
+        di_1.Core({
+            name: "PageFactory",
+            dependencies: [
+                GenericPageController_1.GenericPageController
+            ]
+        })
+    ], PageFactory);
     return PageFactory;
+    var PageFactory_1;
 }());
-PageFactory = PageFactory_1 = __decorate([
-    di_1.Core({
-        name: "PageFactory",
-        dependencies: [
-            GenericPageController_1.GenericPageController
-        ]
-    })
-], PageFactory);
 exports.PageFactory = PageFactory;
-var PageFactory_1;
 //# sourceMappingURL=PageFactory.js.map

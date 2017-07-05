@@ -31,15 +31,15 @@ var EventEmitterFactory = (function () {
         eventEmitter.activate(this._globalEmitter, bind);
         return eventEmitter;
     };
+    EventEmitterFactory = __decorate([
+        di_1.Service({
+            name: "EventEmitterFactory",
+            dependencies: [
+                EventEmitter_1.EventEmitter
+            ]
+        })
+    ], EventEmitterFactory);
     return EventEmitterFactory;
 }());
-EventEmitterFactory = __decorate([
-    di_1.Service({
-        name: "EventEmitterFactory",
-        dependencies: [
-            EventEmitter_1.EventEmitter
-        ]
-    })
-], EventEmitterFactory);
 exports.EventEmitterFactory = EventEmitterFactory;
 //# sourceMappingURL=EventEmitterFactory.js.map

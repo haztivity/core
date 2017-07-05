@@ -72,18 +72,18 @@ var GenericPageController = (function (_super) {
         }
         return defer.promise();
     };
+    GenericPageController = __decorate([
+        di_1.Page({
+            name: "GenericPageController",
+            dependencies: [
+                jquery_1.$,
+                di_1.InjectorService,
+                resource_1.ResourceInitializerService,
+                resource_1.ResourceSequenceFactory
+            ]
+        })
+    ], GenericPageController);
     return GenericPageController;
 }(PageController_1.PageController));
-GenericPageController = __decorate([
-    di_1.Page({
-        name: "GenericPageController",
-        dependencies: [
-            jquery_1.$,
-            di_1.InjectorService,
-            resource_1.ResourceInitializerService,
-            resource_1.ResourceSequenceFactory
-        ]
-    })
-], GenericPageController);
 exports.GenericPageController = GenericPageController;
 //# sourceMappingURL=GenericPageController.js.map

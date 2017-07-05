@@ -42,6 +42,21 @@ var PageManager = (function () {
         }
     };
     /**
+     * Devuelve un array con los ids o índices de las páginas completadas.
+     * @param {boolean} [returnName=false]      Indica si devolver los ids de las páginas o los índices
+     * @returns {String[]|Number[]}
+     */
+    PageManager.prototype.getCompleted = function (returnName) {
+        var pages = this._pages, completed = [];
+        for (var pageIndex = 0, pagesLength = pages.length; pageIndex < pagesLength; pageIndex++) {
+            var currentPage = pages[pageIndex];
+            if (currentPage.isCompleted()) {
+                completed.push(returnName === true ? currentPage.getPageName() : pageIndex);
+            }
+        }
+        return completed;
+    };
+    /**
      * Añade una página
      * @param {Page}    page        Página a añadir
      */
@@ -111,18 +126,18 @@ var PageManager = (function () {
     };
     PageManager.prototype.off = function () {
     };
+    PageManager = __decorate([
+        di_1.Core({
+            name: "PageManager",
+            public: true,
+            dependencies: [
+                resource_1.ResourceManager,
+                utils_1.EventEmitterFactory,
+                PageImplementation_1.PageImplementation
+            ]
+        })
+    ], PageManager);
     return PageManager;
 }());
-PageManager = __decorate([
-    di_1.Core({
-        name: "PageManager",
-        public: true,
-        dependencies: [
-            resource_1.ResourceManager,
-            utils_1.EventEmitterFactory,
-            PageImplementation_1.PageImplementation
-        ]
-    })
-], PageManager);
 exports.PageManager = PageManager;
 //# sourceMappingURL=PageManager.js.map

@@ -117,17 +117,17 @@ var EventEmitter = (function () {
     EventEmitter.prototype.createEvent = function (name) {
         return this._$.Event(name);
     };
+    EventEmitter = __decorate([
+        di_1.Core({
+            name: "EventEmitter",
+            instantiable: true,
+            public: true,
+            dependencies: [
+                jquery_1.$
+            ]
+        })
+    ], EventEmitter);
     return EventEmitter;
 }());
-EventEmitter = __decorate([
-    di_1.Core({
-        name: "EventEmitter",
-        instantiable: true,
-        public: true,
-        dependencies: [
-            jquery_1.$
-        ]
-    })
-], EventEmitter);
 exports.EventEmitter = EventEmitter;
 //# sourceMappingURL=EventEmitter.js.map

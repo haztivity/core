@@ -5,3 +5,4 @@ jspm_packages/
 dev/modules
 dev/*.js
 .fusebox
+dist

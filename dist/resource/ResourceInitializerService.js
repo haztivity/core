@@ -50,15 +50,15 @@ var ResourceInitializerService = (function () {
         if (config === void 0) { config = {}; }
         return undefined;
     };
+    ResourceInitializerService = __decorate([
+        di_1.Service({
+            name: "ResourceInitializerService",
+            dependencies: [
+                ResourceInitializer_1.ResourceInitializer
+            ]
+        })
+    ], ResourceInitializerService);
     return ResourceInitializerService;
 }());
-ResourceInitializerService = __decorate([
-    di_1.Service({
-        name: "ResourceInitializerService",
-        dependencies: [
-            ResourceInitializer_1.ResourceInitializer
-        ]
-    })
-], ResourceInitializerService);
 exports.ResourceInitializerService = ResourceInitializerService;
 //# sourceMappingURL=ResourceInitializerService.js.map

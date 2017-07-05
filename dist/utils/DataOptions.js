@@ -13,11 +13,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var di_1 = require("../di");
 var jquery_1 = require("../jquery");
 var String_1 = require("./String");
-var DataOptions = DataOptions_1 = (function () {
+var DataOptions = (function () {
     function DataOptions(_$, _S) {
         this._$ = _$;
         this._S = _S;
     }
+    DataOptions_1 = DataOptions;
     DataOptions.prototype.getDataOptions = function (element, prefix, optPrefix, mode) {
         if (optPrefix === void 0) { optPrefix = "opt"; }
         //extract data-_attributes with jquery data
@@ -40,7 +41,7 @@ var DataOptions = DataOptions_1 = (function () {
                         //myParam to my-param
                         parsedKey = parsedKey.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
                         break;
-                    default:
+                    default://camel
                         //myParam
                         parsedKey = parsedKey.charAt(0).toLowerCase().concat(parsedKey.substring(1));
                         break;
@@ -57,22 +58,22 @@ var DataOptions = DataOptions_1 = (function () {
         }
         return parsedParams;
     };
+    DataOptions.EXTRACT_DATA_MODE = {
+        underscore: "underscore",
+        hypen: "hypen",
+        camel: "camel"
+    };
+    DataOptions = DataOptions_1 = __decorate([
+        di_1.Service({
+            name: "DataOptions",
+            dependencies: [
+                jquery_1.$,
+                String_1.S
+            ]
+        })
+    ], DataOptions);
     return DataOptions;
+    var DataOptions_1;
 }());
-DataOptions.EXTRACT_DATA_MODE = {
-    underscore: "underscore",
-    hypen: "hypen",
-    camel: "camel"
-};
-DataOptions = DataOptions_1 = __decorate([
-    di_1.Service({
-        name: "DataOptions",
-        dependencies: [
-            jquery_1.$,
-            String_1.S
-        ]
-    })
-], DataOptions);
 exports.DataOptions = DataOptions;
-var DataOptions_1;
 //# sourceMappingURL=DataOptions.js.map

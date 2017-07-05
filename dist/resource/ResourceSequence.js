@@ -15,7 +15,7 @@ var jquery_1 = require("../jquery");
 var utils_1 = require("../utils");
 var ResourceController_1 = require("./ResourceController");
 var ResourceInitializer_1 = require("./ResourceInitializer");
-var ResourceSequence = ResourceSequence_1 = (function () {
+var ResourceSequence = (function () {
     function ResourceSequence(_$, _EventEmitterFactory) {
         this._items = [];
         this._itemsPromises = [];
@@ -26,6 +26,7 @@ var ResourceSequence = ResourceSequence_1 = (function () {
         this._completeDeferred = this._$.Deferred();
         this._locked = false;
     }
+    ResourceSequence_1 = ResourceSequence;
     /**
      * Activa la secuencia
      * @param {JQuery | ResourceController[] | ResourceSequence[]}  items       Conjunto de items a incluir en la secuencia.
@@ -204,31 +205,31 @@ var ResourceSequence = ResourceSequence_1 = (function () {
         return this;
     };
     ;
+    ResourceSequence.NAMESPACE = "resourceSequence";
+    ResourceSequence.ON_COMPLETED = ResourceSequence_1.NAMESPACE + ":completed";
+    ResourceSequence.ON_RESOURCE_STATE_CHANGE = ResourceSequence_1.NAMESPACE + ":resourcestatechange";
+    ResourceSequence.STATES = {
+        waiting: 0,
+        running: 1,
+        completed: 2
+    };
+    ResourceSequence.CLASS_WAITING = "hz-resource-sequence--waiting";
+    ResourceSequence.CLASS_RUNNING = "hz-resource-sequence--current";
+    ResourceSequence.CLASS_COMPLETED = "hz-resource-sequence--completed";
+    ResourceSequence.ATTR_SEQUENCE = "data-hz-resource-sequence";
+    ResourceSequence = ResourceSequence_1 = __decorate([
+        di_1.Core({
+            name: "ResourceSequence",
+            dependencies: [
+                jquery_1.$,
+                utils_1.EventEmitterFactory
+            ],
+            instantiable: true,
+            public: true
+        })
+    ], ResourceSequence);
     return ResourceSequence;
+    var ResourceSequence_1;
 }());
-ResourceSequence.NAMESPACE = "resourceSequence";
-ResourceSequence.ON_COMPLETED = ResourceSequence_1.NAMESPACE + ":completed";
-ResourceSequence.ON_RESOURCE_STATE_CHANGE = ResourceSequence_1.NAMESPACE + ":resourcestatechange";
-ResourceSequence.STATES = {
-    waiting: 0,
-    running: 1,
-    completed: 2
-};
-ResourceSequence.CLASS_WAITING = "hz-resource-sequence--waiting";
-ResourceSequence.CLASS_RUNNING = "hz-resource-sequence--current";
-ResourceSequence.CLASS_COMPLETED = "hz-resource-sequence--completed";
-ResourceSequence.ATTR_SEQUENCE = "data-hz-resource-sequence";
-ResourceSequence = ResourceSequence_1 = __decorate([
-    di_1.Core({
-        name: "ResourceSequence",
-        dependencies: [
-            jquery_1.$,
-            utils_1.EventEmitterFactory
-        ],
-        instantiable: true,
-        public: true
-    })
-], ResourceSequence);
 exports.ResourceSequence = ResourceSequence;
-var ResourceSequence_1;
 //# sourceMappingURL=ResourceSequence.js.map

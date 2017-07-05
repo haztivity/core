@@ -12,11 +12,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 var di_1 = require("../di");
 var devTools_1 = require("../devTools");
-var ScormService = ScormService_1 = (function () {
+var ScormService = (function () {
     function ScormService(Logger) {
         this.Logger = Logger;
         this._version = ScormService_1.VERSIONS.auto;
     }
+    ScormService_1 = ScormService;
     ScormService.prototype.setVersion = function (version) {
         var versions = ScormService_1.VERSIONS, keys = Object.keys(versions);
         for (var versionIndex = 0, keysLength = keys.length; versionIndex < keysLength; versionIndex++) {
@@ -119,21 +120,21 @@ var ScormService = ScormService_1 = (function () {
         }
     };
     ;
+    ScormService.VERSIONS = {
+        auto: "Auto",
+        v12: "1.2",
+        v2004: "2004"
+    };
+    ScormService = ScormService_1 = __decorate([
+        di_1.Service({
+            name: "ScormService",
+            dependencies: [
+                devTools_1.Logger
+            ]
+        })
+    ], ScormService);
     return ScormService;
+    var ScormService_1;
 }());
-ScormService.VERSIONS = {
-    auto: "Auto",
-    v12: "1.2",
-    v2004: "2004"
-};
-ScormService = ScormService_1 = __decorate([
-    di_1.Service({
-        name: "ScormService",
-        dependencies: [
-            devTools_1.Logger
-        ]
-    })
-], ScormService);
 exports.ScormService = ScormService;
-var ScormService_1;
 //# sourceMappingURL=ScormService.js.map

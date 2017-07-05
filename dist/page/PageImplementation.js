@@ -28,7 +28,7 @@ var PageImplementation = (function () {
             public: {},
             private: {}
         };
-        this._state = { completed: false, visited: false };
+        this._state = { completed: false, visited: false, score: null };
     }
     /**
      * Configura la clase nada más instanciarla
@@ -51,6 +51,20 @@ var PageImplementation = (function () {
      */
     PageImplementation.prototype.getState = function () {
         return this._state;
+    };
+    /**
+     * Obtiene si la página ha sido visitada
+     * @returns {boolean}
+     */
+    PageImplementation.prototype.isVisited = function () {
+        return this._state.visited;
+    };
+    /**
+     * Obtiene si la página ha sido completada
+     * @returns {boolean}
+     */
+    PageImplementation.prototype.isCompleted = function () {
+        return this._state.completed;
     };
     /**
      * Actualiza el estado
@@ -113,18 +127,18 @@ var PageImplementation = (function () {
         this._currentController = null;
         return this;
     };
+    PageImplementation = __decorate([
+        di_1.Core({
+            name: "PageImplementation",
+            dependencies: [
+                jquery_1.$,
+                resource_1.ResourceManager,
+                di_2.InjectorService
+            ],
+            instantiable: true
+        })
+    ], PageImplementation);
     return PageImplementation;
 }());
-PageImplementation = __decorate([
-    di_1.Core({
-        name: "PageImplementation",
-        dependencies: [
-            jquery_1.$,
-            resource_1.ResourceManager,
-            di_2.InjectorService
-        ],
-        instantiable: true
-    })
-], PageImplementation);
 exports.PageImplementation = PageImplementation;
 //# sourceMappingURL=PageImplementation.js.map

@@ -76,16 +76,16 @@ var ComponentManager = (function () {
             this.add(component);
         }
     };
+    ComponentManager = __decorate([
+        di_1.Core({
+            name: "ComponentManager",
+            dependencies: [
+                di_2.InjectorService,
+                utils_1.S
+            ]
+        })
+    ], ComponentManager);
     return ComponentManager;
 }());
-ComponentManager = __decorate([
-    di_1.Core({
-        name: "ComponentManager",
-        dependencies: [
-            di_2.InjectorService,
-            utils_1.S
-        ]
-    })
-], ComponentManager);
 exports.ComponentManager = ComponentManager;
 //# sourceMappingURL=ComponentManager.js.map

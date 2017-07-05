@@ -13,7 +13,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var di_1 = require("../di");
 var jquery_1 = require("../jquery");
 var utils_1 = require("../utils");
-var ResourceController = ResourceController_1 = (function () {
+var ResourceController = (function () {
     /**
      * Controlador base para los recursos
      * @param {JQueryStatic}            _$
@@ -28,7 +28,9 @@ var ResourceController = ResourceController_1 = (function () {
         this._completeDeferred = this._$.Deferred();
         this._disabled = false;
         this._locked = false;
+        this._hasScore = false;
     }
+    ResourceController_1 = ResourceController;
     /**
      * Marca el recurso como completado
      * @private
@@ -62,6 +64,12 @@ var ResourceController = ResourceController_1 = (function () {
      */
     ResourceController.prototype.isLocked = function () {
         return this._locked;
+    };
+    ResourceController.prototype.hasScore = function () {
+        return this._hasScore;
+    };
+    ResourceController.prototype.getScore = function () {
+        return this._score;
     };
     /**
      * Indica si el recurso está deshabilitado
@@ -160,21 +168,21 @@ var ResourceController = ResourceController_1 = (function () {
     ResourceController.prototype.getElement = function () {
         return this._$element;
     };
+    ResourceController.NAMESPACE = "resourceController";
+    ResourceController.ON_COMPLETED = ResourceController_1.NAMESPACE + ":completed";
+    ResourceController.CLASS_UNCOMPLETED = "hz-resource--uncompleted";
+    ResourceController.CLASS_COMPLETED = "hz-resource--completed";
+    ResourceController.CLASS_DISABLED = "hz-resource--disabled";
+    ResourceController = ResourceController_1 = __decorate([
+        di_1.Dependencies({
+            dependencies: [
+                jquery_1.$,
+                utils_1.EventEmitterFactory
+            ]
+        })
+    ], ResourceController);
     return ResourceController;
+    var ResourceController_1;
 }());
-ResourceController.NAMESPACE = "resourceController";
-ResourceController.ON_COMPLETED = ResourceController_1.NAMESPACE + ":completed";
-ResourceController.CLASS_UNCOMPLETED = "hz-resource--uncompleted";
-ResourceController.CLASS_COMPLETED = "hz-resource--completed";
-ResourceController.CLASS_DISABLED = "hz-resource--disabled";
-ResourceController = ResourceController_1 = __decorate([
-    di_1.Dependencies({
-        dependencies: [
-            jquery_1.$,
-            utils_1.EventEmitterFactory
-        ]
-    })
-], ResourceController);
 exports.ResourceController = ResourceController;
-var ResourceController_1;
 //# sourceMappingURL=ResourceController.js.map

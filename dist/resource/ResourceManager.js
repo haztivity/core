@@ -75,16 +75,16 @@ var ResourceManager = (function () {
             this.add(resource);
         }
     };
+    ResourceManager = __decorate([
+        di_1.Core({
+            name: "ResourceManager",
+            dependencies: [
+                di_2.InjectorService,
+                utils_1.S
+            ]
+        })
+    ], ResourceManager);
     return ResourceManager;
 }());
-ResourceManager = __decorate([
-    di_1.Core({
-        name: "ResourceManager",
-        dependencies: [
-            di_2.InjectorService,
-            utils_1.S
-        ]
-    })
-], ResourceManager);
 exports.ResourceManager = ResourceManager;
 //# sourceMappingURL=ResourceManager.js.map

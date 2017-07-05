@@ -13,7 +13,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var Logger_1 = require("../devTools/Logger");
 var DevTools_1 = require("../devTools/DevTools");
 var di_1 = require("../di");
-var Haztivity = Haztivity_1 = (function () {
+var Haztivity = (function () {
     /**
      * @class Haztivity
      * @description Global object
@@ -23,6 +23,7 @@ var Haztivity = Haztivity_1 = (function () {
     function Haztivity(_logger) {
         this._logger = _logger;
     }
+    Haztivity_1 = Haztivity;
     /**
      * Enables development mode
      * @see DevTools#enable
@@ -32,16 +33,16 @@ var Haztivity = Haztivity_1 = (function () {
         devTools.enable();
         return devTools;
     };
+    Haztivity = Haztivity_1 = __decorate([
+        di_1.Core({
+            name: "Haztivity",
+            dependencies: [
+                Logger_1.Logger
+            ]
+        })
+    ], Haztivity);
     return Haztivity;
+    var Haztivity_1;
 }());
-Haztivity = Haztivity_1 = __decorate([
-    di_1.Core({
-        name: "Haztivity",
-        dependencies: [
-            Logger_1.Logger
-        ]
-    })
-], Haztivity);
 exports.Haztivity = Haztivity;
-var Haztivity_1;
 //# sourceMappingURL=Haztivity.js.map

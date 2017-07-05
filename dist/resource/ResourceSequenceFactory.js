@@ -27,15 +27,15 @@ var ResourceSequenceFactory = (function () {
         sequence.activate(items, id);
         return sequence;
     };
+    ResourceSequenceFactory = __decorate([
+        di_1.Service({
+            name: "ResourceSequenceFactory",
+            dependencies: [
+                ResourceSequence_1.ResourceSequence
+            ]
+        })
+    ], ResourceSequenceFactory);
     return ResourceSequenceFactory;
 }());
-ResourceSequenceFactory = __decorate([
-    di_1.Service({
-        name: "ResourceSequenceFactory",
-        dependencies: [
-            ResourceSequence_1.ResourceSequence
-        ]
-    })
-], ResourceSequenceFactory);
 exports.ResourceSequenceFactory = ResourceSequenceFactory;
 //# sourceMappingURL=ResourceSequenceFactory.js.map

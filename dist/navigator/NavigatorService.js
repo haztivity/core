@@ -65,20 +65,20 @@ var NavigatorService = (function () {
     NavigatorService.prototype.off = function (events, handler) {
         return undefined;
     };
+    NavigatorService.ON_DRAW_PAGE = Navigator_1.Navigator.ON_DRAW_PAGE;
+    NavigatorService.ON_DISABLE = Navigator_1.Navigator.ON_DISABLE;
+    NavigatorService.ON_ENABLE = Navigator_1.Navigator.ON_ENABLE;
+    NavigatorService.ON_CHANGE_PAGE_END = Navigator_1.Navigator.ON_CHANGE_PAGE_END;
+    NavigatorService.ON_CHANGE_PAGE_START = Navigator_1.Navigator.ON_CHANGE_PAGE_START;
+    NavigatorService = __decorate([
+        di_1.Service({
+            name: "NavigatorService",
+            dependencies: [
+                Navigator_1.Navigator
+            ]
+        })
+    ], NavigatorService);
     return NavigatorService;
 }());
-NavigatorService.ON_DRAW_PAGE = Navigator_1.Navigator.ON_DRAW_PAGE;
-NavigatorService.ON_DISABLE = Navigator_1.Navigator.ON_DISABLE;
-NavigatorService.ON_ENABLE = Navigator_1.Navigator.ON_ENABLE;
-NavigatorService.ON_CHANGE_PAGE_END = Navigator_1.Navigator.ON_CHANGE_PAGE_END;
-NavigatorService.ON_CHANGE_PAGE_START = Navigator_1.Navigator.ON_CHANGE_PAGE_START;
-NavigatorService = __decorate([
-    di_1.Service({
-        name: "NavigatorService",
-        dependencies: [
-            Navigator_1.Navigator
-        ]
-    })
-], NavigatorService);
 exports.NavigatorService = NavigatorService;
 //# sourceMappingURL=NavigatorService.js.map

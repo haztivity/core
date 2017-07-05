@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 var di_1 = require("../di");
 var utils_1 = require("../utils");
-var PageRegister = PageRegister_1 = (function () {
+var PageRegister = (function () {
     /**
      * Almacena la información de una página.
      * Tipo Core
@@ -22,6 +22,7 @@ var PageRegister = PageRegister_1 = (function () {
     function PageRegister(_EventEmitterFactory) {
         this._EventEmitterFactory = _EventEmitterFactory;
     }
+    PageRegister_1 = PageRegister;
     PageRegister.prototype.getResources = function () {
         return this._options.resources;
     };
@@ -52,18 +53,18 @@ var PageRegister = PageRegister_1 = (function () {
     PageRegister.prototype.getName = function () {
         return this._options.name;
     };
+    PageRegister.NAMESPACE = "page";
+    PageRegister = PageRegister_1 = __decorate([
+        di_1.Core({
+            name: "PageRegister",
+            instantiable: true,
+            dependencies: [
+                utils_1.EventEmitterFactory
+            ]
+        })
+    ], PageRegister);
     return PageRegister;
+    var PageRegister_1;
 }());
-PageRegister.NAMESPACE = "page";
-PageRegister = PageRegister_1 = __decorate([
-    di_1.Core({
-        name: "PageRegister",
-        instantiable: true,
-        dependencies: [
-            utils_1.EventEmitterFactory
-        ]
-    })
-], PageRegister);
 exports.PageRegister = PageRegister;
-var PageRegister_1;
 //# sourceMappingURL=PageRegister.js.map

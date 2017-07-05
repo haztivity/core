@@ -111,7 +111,7 @@ var ComponentInitializer = (function () {
         if (initState === void 0) { initState = 2; }
         var result = [], $elements = this._findElementsInContext($context);
         switch (initState) {
-            case 0:
+            case 0://only without init
                 for (var elementIndex = 0, $elementsLength = $elements.length; elementIndex < $elementsLength; elementIndex++) {
                     var $element = this._$($elements[elementIndex]);
                     if ($element.data(this._instanceDataName) == undefined) {
@@ -119,7 +119,7 @@ var ComponentInitializer = (function () {
                     }
                 }
                 break;
-            case 1:
+            case 1://only initialized
                 for (var elementIndex = 0, $elementsLength = $elements.length; elementIndex < $elementsLength; elementIndex++) {
                     var $element = this._$($elements[elementIndex]);
                     if ($element.data(this._instanceDataName) != undefined) {
@@ -175,19 +175,19 @@ var ComponentInitializer = (function () {
         $elements = parents.concat($context.find("[" + this._prefix + "],[data-" + this._prefix + "]").toArray()); //get elements with the prefix
         return this._$($elements);
     };
+    ComponentInitializer = __decorate([
+        di_1.Core({
+            name: "ComponentInitializer",
+            dependencies: [
+                jquery_1.$,
+                ComponentManager_1.ComponentManager,
+                di_1.InjectorService,
+                utils_1.S,
+                utils_2.DataOptions
+            ]
+        })
+    ], ComponentInitializer);
     return ComponentInitializer;
 }());
-ComponentInitializer = __decorate([
-    di_1.Core({
-        name: "ComponentInitializer",
-        dependencies: [
-            jquery_1.$,
-            ComponentManager_1.ComponentManager,
-            di_1.InjectorService,
-            utils_1.S,
-            utils_2.DataOptions
-        ]
-    })
-], ComponentInitializer);
 exports.ComponentInitializer = ComponentInitializer;
 //# sourceMappingURL=ComponentInitializer.js.map
