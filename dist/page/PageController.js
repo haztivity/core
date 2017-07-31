@@ -159,6 +159,7 @@ var PageController = (function () {
     PageController.prototype._onShowEnd = function ($oldPage, oldPageRelativePosition) {
         this.eventEmitter.trigger(PageController_1.ON_SHOWN, [this.$element, $oldPage, oldPageRelativePosition, this]);
         this.eventEmitter.globalEmitter.trigger(PageController_1.ON_SHOWN, [this.$element, $oldPage, oldPageRelativePosition, this]);
+        this.isCompleted();
     };
     /**
      * Realiza la animación correspondiente

@@ -196,6 +196,7 @@ export abstract class PageController {
     protected _onShowEnd($oldPage, oldPageRelativePosition) {
         this.eventEmitter.trigger(PageController.ON_SHOWN, [this.$element, $oldPage, oldPageRelativePosition, this]);
         this.eventEmitter.globalEmitter.trigger(PageController.ON_SHOWN, [this.$element, $oldPage, oldPageRelativePosition, this]);
+        this.isCompleted();
     }
 
     /**
