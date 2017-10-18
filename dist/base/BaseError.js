@@ -16,7 +16,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 var devTools_1 = require("../devTools");
 devTools_1.Logger;
-var BaseError = (function (_super) {
+var BaseError = /** @class */ (function (_super) {
     __extends(BaseError, _super);
     function BaseError(name, message) {
         var _this = _super.call(this, message) || this;

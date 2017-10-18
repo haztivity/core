@@ -15,7 +15,7 @@ var Logger_1 = require("./Logger");
 var navigator_1 = require("../navigator");
 var EventEmitterFactory_1 = require("../utils/EventEmitterFactory");
 var PageManager_1 = require("../page/PageManager");
-var DevTools = (function () {
+var DevTools = /** @class */ (function () {
     /**
      * Tools for development
      */

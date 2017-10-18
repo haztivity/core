@@ -14,7 +14,7 @@ var jquery_1 = require("../jquery");
 var di_1 = require("../di");
 var page_1 = require("../page");
 var utils_1 = require("../utils");
-var Navigator = (function () {
+var Navigator = /** @class */ (function () {
     /**
      * Gestiona la transición entre páginas y el renderizado de las mismas en un contexto específico
      * @param {JQueryStatic}                _$

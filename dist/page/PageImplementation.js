@@ -14,7 +14,7 @@ var di_1 = require("../di");
 var di_2 = require("../di");
 var jquery_1 = require("../jquery");
 var resource_1 = require("../resource");
-var PageImplementation = (function () {
+var PageImplementation = /** @class */ (function () {
     /**
      * Gestiona el ciclo de vida de una página una vez registrada en el PageManager. Almacena el estado y el store y gestiona el ciclo de vida del controlador.
      * @class

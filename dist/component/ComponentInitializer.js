@@ -16,7 +16,7 @@ var utils_1 = require("../utils");
 var utils_2 = require("../utils");
 var jquery_1 = require("../jquery");
 var Errors_1 = require("./Errors");
-var ComponentInitializer = (function () {
+var ComponentInitializer = /** @class */ (function () {
     /**
      * Inicializador de componentes.
      * @class

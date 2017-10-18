@@ -20,7 +20,7 @@ var component_1 = require("../component");
 var jquery_1 = require("../jquery");
 var PageController_1 = require("../page/PageController");
 var ScormService_1 = require("../scorm/ScormService");
-var ScoController = (function () {
+var ScoController = /** @class */ (function () {
     function ScoController(_Navigator, _PageManager, _ResourceManager, _EventEmitterFactory, _ComponentManager, _ComponentInitializer, _$, _scormService) {
         this._Navigator = _Navigator;
         this._PageManager = _PageManager;
@@ -71,6 +71,13 @@ var ScoController = (function () {
             instance._scormService.doLMSCommit();
         }
     };
+    ScoController.prototype._getCurrentPage = function () {
+        var result = null;
+        if (this._scormService.LMSIsInitialized()) {
+            result = this._scormService.doLMSGetValue("cmi.core.lesson_location");
+        }
+        return result;
+    };
     ScoController.prototype._restorePagesState = function () {
         this._scormService.doLMSInitialize();
         if (this._scormService.LMSIsInitialized()) {
@@ -86,6 +93,7 @@ var ScoController = (function () {
                         var scormState = this._scormService.doLMSGetValue(currentKey + ".status"), scormScore = parseFloat(this._scormService.doLMSGetValue(currentKey + ".score.raw")), pageState = page.getState();
                         pageState.completed = scormState == "completed";
                         pageState.score = !isNaN(scormScore) ? scormScore : null;
+                        pageState.visited = true;
                         page.setState(pageState);
                     }
                 }
@@ -123,7 +131,14 @@ var ScoController = (function () {
         this._$pagesContainer.addClass(ScoController_1.CLASS_PAGES);
         this._ComponentInitializer.initialize(this._$context);
         //init components
-        this._Navigator.goTo(0);
+        var currentPage = this._getCurrentPage();
+        if (currentPage != null) {
+            var pageIndex = this._PageManager.getPageIndex(currentPage);
+            this._Navigator.goTo(pageIndex);
+        }
+        else {
+            this._Navigator.goTo(0);
+        }
         return this;
     };
     ScoController.CLASS_CONTEXT = "hz-container";

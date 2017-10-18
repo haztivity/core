@@ -15,7 +15,7 @@ var ResourceManager_1 = require("./ResourceManager");
 var utils_1 = require("../utils");
 var jquery_1 = require("../jquery");
 var Errors_1 = require("./Errors");
-var ResourceInitializer = (function () {
+var ResourceInitializer = /** @class */ (function () {
     function ResourceInitializer(_$, _ResourceManager, _InjectorService, _DataOptions) {
         this._$ = _$;
         this._ResourceManager = _ResourceManager;

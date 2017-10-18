@@ -17,7 +17,7 @@ var GenericPageController_1 = require("./GenericPageController");
  * Factory para crear páginas genéricas
  * @class PageFactory
  */
-var PageFactory = (function () {
+var PageFactory = /** @class */ (function () {
     function PageFactory() {
     }
     PageFactory_1 = PageFactory;

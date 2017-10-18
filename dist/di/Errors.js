@@ -18,7 +18,7 @@ var BaseError_1 = require("../base/BaseError");
 /**
  * Error al intentar obtener una dependencia no registrada
  */
-var HaztivityDependencyNotRegisteredError = (function (_super) {
+var HaztivityDependencyNotRegisteredError = /** @class */ (function (_super) {
     __extends(HaztivityDependencyNotRegisteredError, _super);
     function HaztivityDependencyNotRegisteredError(dependency, target) {
         return _super.call(this, "HaztivityDependencyNotRegisteredError", target
@@ -31,7 +31,7 @@ exports.HaztivityDependencyNotRegisteredError = HaztivityDependencyNotRegistered
 /**
  * Error al intentar registrar una dependencia ya registrada
  */
-var HaztivityDependencyAlreadyRegistered = (function (_super) {
+var HaztivityDependencyAlreadyRegistered = /** @class */ (function (_super) {
     __extends(HaztivityDependencyAlreadyRegistered, _super);
     function HaztivityDependencyAlreadyRegistered(dependency) {
         return _super.call(this, "HaztivityDependencyAlreadyRegistered", dependency + " is already registered") || this;
@@ -42,7 +42,7 @@ exports.HaztivityDependencyAlreadyRegistered = HaztivityDependencyAlreadyRegiste
 /**
  * Error al no indicarse un parámetro obligatorio
  */
-var HaztivityDependencyOptionRequired = (function (_super) {
+var HaztivityDependencyOptionRequired = /** @class */ (function (_super) {
     __extends(HaztivityDependencyOptionRequired, _super);
     function HaztivityDependencyOptionRequired(parameterName) {
         return _super.call(this, "HaztivityDependencyOptionRequired", "The parameter '" + parameterName + "' is required") || this;
@@ -53,7 +53,7 @@ exports.HaztivityDependencyOptionRequired = HaztivityDependencyOptionRequired;
 /**
  * Error al definir una clase como dependencia de ella misma
  */
-var HaztivityDependencyHasItsOwnAsDependency = (function (_super) {
+var HaztivityDependencyHasItsOwnAsDependency = /** @class */ (function (_super) {
     __extends(HaztivityDependencyHasItsOwnAsDependency, _super);
     function HaztivityDependencyHasItsOwnAsDependency(dependency) {
         return _super.call(this, "HaztivityDependencyHasItsOwnAsDependency", dependency + " has its own as dependency") || this;
@@ -64,7 +64,7 @@ exports.HaztivityDependencyHasItsOwnAsDependency = HaztivityDependencyHasItsOwnA
 /**
  * Error al intentar inyectar una dependencia a la que no se tiene acceso
  */
-var HaztivityDependencyAccessDenied = (function (_super) {
+var HaztivityDependencyAccessDenied = /** @class */ (function (_super) {
     __extends(HaztivityDependencyAccessDenied, _super);
     function HaztivityDependencyAccessDenied(target, dependency) {
         return _super.call(this, "HaztivityDependencyAccessDenied", target + " has not access to " + dependency) || this;
@@ -75,7 +75,7 @@ exports.HaztivityDependencyAccessDenied = HaztivityDependencyAccessDenied;
 /**
  * Error al intentar inyectar una dependencia a la que no se tiene acceso
  */
-var HaztivityDependencyNotValid = (function (_super) {
+var HaztivityDependencyNotValid = /** @class */ (function (_super) {
     __extends(HaztivityDependencyNotValid, _super);
     function HaztivityDependencyNotValid(target, dependencies) {
         return _super.call(this, "HaztivityDependencyNotValid", "Some dependency for " + target + " is undefined.") || this;

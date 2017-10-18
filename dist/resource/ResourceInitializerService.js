@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 var ResourceInitializer_1 = require("./ResourceInitializer");
 var di_1 = require("../di");
-var ResourceInitializerService = (function () {
+var ResourceInitializerService = /** @class */ (function () {
     /**
      * Servicio del inicializador de recursos
      * @class

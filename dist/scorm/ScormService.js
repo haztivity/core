@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 var di_1 = require("../di");
 var devTools_1 = require("../devTools");
-var ScormService = (function () {
+var ScormService = /** @class */ (function () {
     function ScormService(Logger) {
         this.Logger = Logger;
         this._version = ScormService_1.VERSIONS.auto;

@@ -13,7 +13,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var di_1 = require("../di");
 var jquery_1 = require("../jquery");
 var utils_1 = require("../utils");
-var ResourceController = (function () {
+var ResourceController = /** @class */ (function () {
     /**
      * Controlador base para los recursos
      * @param {JQueryStatic}            _$

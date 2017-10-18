@@ -15,7 +15,7 @@ var jquery_1 = require("../jquery");
 var utils_1 = require("../utils");
 var ResourceController_1 = require("./ResourceController");
 var ResourceInitializer_1 = require("./ResourceInitializer");
-var ResourceSequence = (function () {
+var ResourceSequence = /** @class */ (function () {
     function ResourceSequence(_$, _EventEmitterFactory) {
         this._items = [];
         this._itemsPromises = [];

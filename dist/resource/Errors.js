@@ -18,7 +18,7 @@ var BaseError_1 = require("../base/BaseError");
 /**
  * Error al intentar registrar un recurso inválido
  */
-var HaztivityResourceInvalidError = (function (_super) {
+var HaztivityResourceInvalidError = /** @class */ (function (_super) {
     __extends(HaztivityResourceInvalidError, _super);
     function HaztivityResourceInvalidError() {
         return _super.call(this, "HaztivityResourceInvalidError", "Invalid resource") || this;
@@ -29,7 +29,7 @@ exports.HaztivityResourceInvalidError = HaztivityResourceInvalidError;
 /**
  * Error al intentar registrar un recurso inválido
  */
-var HaztivityResourceAlreadyRegisteredError = (function (_super) {
+var HaztivityResourceAlreadyRegisteredError = /** @class */ (function (_super) {
     __extends(HaztivityResourceAlreadyRegisteredError, _super);
     function HaztivityResourceAlreadyRegisteredError(resource) {
         return _super.call(this, "HaztivityResourceInvalidError", "Resource '" + resource + "' already registered with another controller.") || this;
@@ -40,7 +40,7 @@ exports.HaztivityResourceAlreadyRegisteredError = HaztivityResourceAlreadyRegist
 /**
  * Error al intentar registrar un recurso inválido
  */
-var HaztivityResourceNameInvalidError = (function (_super) {
+var HaztivityResourceNameInvalidError = /** @class */ (function (_super) {
     __extends(HaztivityResourceNameInvalidError, _super);
     function HaztivityResourceNameInvalidError(resource) {
         //todo LINK
@@ -52,7 +52,7 @@ exports.HaztivityResourceNameInvalidError = HaztivityResourceNameInvalidError;
 /**
  * Error al intentar inicializar un recurso sin indicar el nombre del recurso a inicializar
  */
-var HaztivityResourceNameRequiredError = (function (_super) {
+var HaztivityResourceNameRequiredError = /** @class */ (function (_super) {
     __extends(HaztivityResourceNameRequiredError, _super);
     function HaztivityResourceNameRequiredError($element) {
         return _super.call(this, "HaztivityResourceNameRequiredError", "Resource name not provider in data-* attribute. " + $element) || this;
@@ -63,7 +63,7 @@ exports.HaztivityResourceNameRequiredError = HaztivityResourceNameRequiredError;
 /**
  * Error al intentar inicializar un recurso no registrado
  */
-var HaztivityResourceNotRegisteredError = (function (_super) {
+var HaztivityResourceNotRegisteredError = /** @class */ (function (_super) {
     __extends(HaztivityResourceNotRegisteredError, _super);
     function HaztivityResourceNotRegisteredError(resource) {
         return _super.call(this, "HaztivityResourceNotRegisteredError", "Attempt to initialize " + resource + " but is not registered") || this;
@@ -74,7 +74,7 @@ exports.HaztivityResourceNotRegisteredError = HaztivityResourceNotRegisteredErro
 /**
  * Error de controlador invalido
  */
-var HaztivityInvalidResourceControllerError = (function (_super) {
+var HaztivityInvalidResourceControllerError = /** @class */ (function (_super) {
     __extends(HaztivityInvalidResourceControllerError, _super);
     function HaztivityInvalidResourceControllerError(resource) {
         return _super.call(this, "HaztivityInvalidResourceControllerError", "Invalid controller for " + resource + " resource") || this;

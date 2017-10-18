@@ -13,7 +13,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var Logger_1 = require("../devTools/Logger");
 var DevTools_1 = require("../devTools/DevTools");
 var di_1 = require("../di");
-var Haztivity = (function () {
+var Haztivity = /** @class */ (function () {
     /**
      * @class Haztivity
      * @description Global object

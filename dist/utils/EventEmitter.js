@@ -13,7 +13,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var jquery_1 = require("../jquery");
 //Register EventEmitter in DI
 var di_1 = require("../di");
-var EventEmitter = (function () {
+var EventEmitter = /** @class */ (function () {
     function EventEmitter(_$) {
         this._$ = _$;
         this._namespace = ".eventEmitter" + new Date().getTime();

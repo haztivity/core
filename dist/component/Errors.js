@@ -18,7 +18,7 @@ var BaseError_1 = require("../base/BaseError");
 /**
  * Error al intentar registrar un componente inválido
  */
-var HaztivityComponentInvalidError = (function (_super) {
+var HaztivityComponentInvalidError = /** @class */ (function (_super) {
     __extends(HaztivityComponentInvalidError, _super);
     function HaztivityComponentInvalidError() {
         return _super.call(this, "HaztivityComponentInvalidError", "Invalid component") || this;
@@ -29,7 +29,7 @@ exports.HaztivityComponentInvalidError = HaztivityComponentInvalidError;
 /**
  * Error al intentar registrar un componente inválido
  */
-var HaztivityComponentAlreadyRegisteredError = (function (_super) {
+var HaztivityComponentAlreadyRegisteredError = /** @class */ (function (_super) {
     __extends(HaztivityComponentAlreadyRegisteredError, _super);
     function HaztivityComponentAlreadyRegisteredError(component) {
         return _super.call(this, "HaztivityComponentInvalidError", "Component '" + component + "' already registered with another controller.") || this;
@@ -40,7 +40,7 @@ exports.HaztivityComponentAlreadyRegisteredError = HaztivityComponentAlreadyRegi
 /**
  * Error al intentar registrar un componente inválido
  */
-var HaztivityComponentNameInvalidError = (function (_super) {
+var HaztivityComponentNameInvalidError = /** @class */ (function (_super) {
     __extends(HaztivityComponentNameInvalidError, _super);
     function HaztivityComponentNameInvalidError(component) {
         //todo LINK
@@ -52,7 +52,7 @@ exports.HaztivityComponentNameInvalidError = HaztivityComponentNameInvalidError;
 /**
  * Error al intentar inicializar un componente sin indicar el nombre del componente a inicializar
  */
-var HaztivityComponentNameRequiredError = (function (_super) {
+var HaztivityComponentNameRequiredError = /** @class */ (function (_super) {
     __extends(HaztivityComponentNameRequiredError, _super);
     function HaztivityComponentNameRequiredError($element) {
         return _super.call(this, "HaztivityComponentNameRequiredError", "Component name not provider in data-* attribute. " + $element) || this;
@@ -63,7 +63,7 @@ exports.HaztivityComponentNameRequiredError = HaztivityComponentNameRequiredErro
 /**
  * Error al intentar inicializar un componente no registrado
  */
-var HaztivityComponentNotRegisteredError = (function (_super) {
+var HaztivityComponentNotRegisteredError = /** @class */ (function (_super) {
     __extends(HaztivityComponentNotRegisteredError, _super);
     function HaztivityComponentNotRegisteredError(component) {
         return _super.call(this, "HaztivityComponentNotRegisteredError", "Attempt to initialize " + component + " but is not registered") || this;
@@ -74,7 +74,7 @@ exports.HaztivityComponentNotRegisteredError = HaztivityComponentNotRegisteredEr
 /**
  * Error de controlador invalido
  */
-var HaztivityInvalidComponentControllerError = (function (_super) {
+var HaztivityInvalidComponentControllerError = /** @class */ (function (_super) {
     __extends(HaztivityInvalidComponentControllerError, _super);
     function HaztivityInvalidComponentControllerError(component) {
         return _super.call(this, "HaztivityInvalidComponentControllerError", "Invalid controller for " + component + " component") || this;

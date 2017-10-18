@@ -24,7 +24,7 @@ var di_1 = require("../di");
 var jquery_1 = require("../jquery");
 var PageController_1 = require("./PageController");
 var resource_1 = require("../resource");
-var GenericPageController = (function (_super) {
+var GenericPageController = /** @class */ (function (_super) {
     __extends(GenericPageController, _super);
     function GenericPageController(_$, _InjectorService, _ResourceInitializerService, _ResourceSequenceFactory) {
         var _this = _super.call(this, _$, _InjectorService, _ResourceInitializerService) || this;

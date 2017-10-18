@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 var Sco_1 = require("./Sco");
 var di_1 = require("../di");
-var ScoFactory = (function () {
+var ScoFactory = /** @class */ (function () {
     function ScoFactory() {
     }
     ScoFactory_1 = ScoFactory;

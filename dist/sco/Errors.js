@@ -18,7 +18,7 @@ var BaseError_1 = require("../base/BaseError");
 /**
  * Error al no indicarse contexto para la aplicación
  */
-var HaztivityAppContextNotFound = (function (_super) {
+var HaztivityAppContextNotFound = /** @class */ (function (_super) {
     __extends(HaztivityAppContextNotFound, _super);
     function HaztivityAppContextNotFound() {
         return _super.call(this, "HaztivityAppContextNotFound", "not context found for the application. Please visit LINK TO HELP") || this;
@@ -29,7 +29,7 @@ exports.HaztivityAppContextNotFound = HaztivityAppContextNotFound;
 /**
  * Error al no indicarse contexto para las páginas
  */
-var HaztivityPagesContextNotFound = (function (_super) {
+var HaztivityPagesContextNotFound = /** @class */ (function (_super) {
     __extends(HaztivityPagesContextNotFound, _super);
     function HaztivityPagesContextNotFound() {
         return _super.call(this, "HaztivityPagesContextNotFound", "not context found for pages. Please visit LINK TO HELP") || this;

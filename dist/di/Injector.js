@@ -64,7 +64,7 @@ exports.TYPES = (function () {
  * Inyector de dependencias. Api para la manipulación de contenedores y dependencias
  * @class
  */
-var Injector = (function () {
+var Injector = /** @class */ (function () {
     /**
      * Instancia el Inyector. Por defecto se genera un contenedor root
      * @constructor
@@ -537,7 +537,7 @@ var Injector = (function () {
     return Injector;
 }());
 exports.Injector = Injector;
-var InjectorService = (function () {
+var InjectorService = /** @class */ (function () {
     function InjectorService(injector, target) {
         this.get = function (service) {
             var result;
@@ -572,7 +572,7 @@ var InjectorService = (function () {
 }());
 exports.InjectorService = InjectorService;
 //Map dynamically the methods
-var InjectorRegisterService = (function () {
+var InjectorRegisterService = /** @class */ (function () {
     function InjectorRegisterService(injector) {
         var publish = [
             "registerService",

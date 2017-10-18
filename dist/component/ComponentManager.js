@@ -14,7 +14,7 @@ var di_1 = require("../di");
 var di_2 = require("../di");
 var Errors_1 = require("./Errors");
 var utils_1 = require("../utils");
-var ComponentManager = (function () {
+var ComponentManager = /** @class */ (function () {
     function ComponentManager(_Injector, _S) {
         this._Injector = _Injector;
         this._S = _S;

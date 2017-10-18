@@ -15,7 +15,7 @@ var jquery_1 = require("../jquery");
 var resource_1 = require("../resource");
 var Errors_1 = require("./Errors");
 var ScormService_1 = require("../scorm/ScormService");
-var PageController = (function () {
+var PageController = /** @class */ (function () {
     /**
      * Controller base para todas las páginas.
      * Tipo Page

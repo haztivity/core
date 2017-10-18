@@ -13,7 +13,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var di_1 = require("../di");
 var jquery_1 = require("../jquery");
 var String_1 = require("./String");
-var DataOptions = (function () {
+var DataOptions = /** @class */ (function () {
     function DataOptions(_$, _S) {
         this._$ = _$;
         this._S = _S;

@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 var di_1 = require("../di");
 var ResourceSequence_1 = require("./ResourceSequence");
-var ResourceSequenceFactory = (function () {
+var ResourceSequenceFactory = /** @class */ (function () {
     function ResourceSequenceFactory(_ResourceSequence) {
         this._ResourceSequence = _ResourceSequence;
     }

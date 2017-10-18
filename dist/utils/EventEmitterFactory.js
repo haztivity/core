@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 var di_1 = require("../di");
 var EventEmitter_1 = require("./EventEmitter");
-var EventEmitterFactory = (function () {
+var EventEmitterFactory = /** @class */ (function () {
     /**
      * Factoria de EventEmitter. Permite generar instancias de EventEmitter para manipular eventos
      * @requires _EventEmitter

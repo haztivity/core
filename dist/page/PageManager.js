@@ -15,7 +15,7 @@ var PageImplementation_1 = require("./PageImplementation");
 var utils_1 = require("../utils");
 var Errors_1 = require("./Errors");
 var resource_1 = require("../resource");
-var PageManager = (function () {
+var PageManager = /** @class */ (function () {
     function PageManager(_ResourceManager, _EventEmitterFactory, _PageImplementationFactory) {
         this._ResourceManager = _ResourceManager;
         this._EventEmitterFactory = _EventEmitterFactory;

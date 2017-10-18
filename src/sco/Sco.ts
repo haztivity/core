@@ -14,6 +14,7 @@ import {$} from "../jquery";
 import {INavigatorPageData} from "../navigator/Navigator";
 import {PageController} from "../page/PageController";
 import {ScormService} from "../scorm/ScormService";
+import {NavigatorService} from "../";
 export interface ISco {
     on(): void;
     run(): void;
@@ -95,6 +96,13 @@ export class ScoController implements ISco {
             instance._scormService.doLMSCommit();
         }
     }
+    protected _getCurrentPage(){
+        let result = null;
+        if(this._scormService.LMSIsInitialized()) {
+            result = this._scormService.doLMSGetValue(`cmi.core.lesson_location`);
+        }
+        return result;
+    }
     protected _restorePagesState(){
         this._scormService.doLMSInitialize();
         if(this._scormService.LMSIsInitialized()) {
@@ -115,6 +123,7 @@ export class ScoController implements ISco {
                             pageState = page.getState();
                         pageState.completed = scormState == "completed";
                         pageState.score = !isNaN(scormScore) ? scormScore : null;
+                        pageState.visited = true;
                         page.setState(pageState);
                     }
                 }
@@ -157,7 +166,13 @@ export class ScoController implements ISco {
         this._$pagesContainer.addClass(ScoController.CLASS_PAGES);
         this._ComponentInitializer.initialize(this._$context);
         //init components
-        this._Navigator.goTo(0);
+        const currentPage = this._getCurrentPage();
+        if (currentPage != null) {
+            var pageIndex = this._PageManager.getPageIndex(currentPage);
+            this._Navigator.goTo(pageIndex);
+        }else {
+            this._Navigator.goTo(0);
+        }
         return this;
     }
 }

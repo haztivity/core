@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 var di_1 = require("../di");
 var Navigator_1 = require("./Navigator");
-var NavigatorService = (function () {
+var NavigatorService = /** @class */ (function () {
     function NavigatorService(_Navigator) {
         var publish = [
             "goTo",

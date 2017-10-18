@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 var di_1 = require("../di");
 var utils_1 = require("../utils");
-var PageRegister = (function () {
+var PageRegister = /** @class */ (function () {
     /**
      * Almacena la información de una página.
      * Tipo Core
