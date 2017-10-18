@@ -99,7 +99,10 @@ export class ScoController implements ISco {
     protected _getCurrentPage(){
         let result = null;
         if(this._scormService.LMSIsInitialized()) {
-            result = this._scormService.doLMSGetValue(`cmi.core.lesson_location`);
+            let page = this._scormService.doLMSGetValue(`cmi.core.lesson_location`);
+            if(!!page){
+                result = page;
+            }
         }
         return result;
     }
@@ -167,8 +170,9 @@ export class ScoController implements ISco {
         this._ComponentInitializer.initialize(this._$context);
         //init components
         const currentPage = this._getCurrentPage();
-        if (currentPage != null) {
+        if (!!currentPage) {
             var pageIndex = this._PageManager.getPageIndex(currentPage);
+            pageIndex = pageIndex != -1 ? pageIndex : 0;
             this._Navigator.goTo(pageIndex);
         }else {
             this._Navigator.goTo(0);
