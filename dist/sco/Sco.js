@@ -50,6 +50,8 @@ var ScoController = /** @class */ (function () {
             this._$context.prepend(this._options.template);
             this._$context.addClass(ScoController_1.CLASS_CONTEXT);
             this._$pagesContainer = this._$context.find("[data-hz-pages]");
+            this._$exit = this._$context.find("[data-hz-on-exit]");
+            this._$exit.detach();
             this._eventEmitter.globalEmitter.on(PageController_1.PageController.ON_COMPLETE_CHANGE, { instance: this }, this._onPageStateChange);
             this._eventEmitter.globalEmitter.on(PageController_1.PageController.ON_SHOWN, { instance: this }, this._onPageShown);
             //page contexts must exists
@@ -128,7 +130,36 @@ var ScoController = /** @class */ (function () {
             instance._scormService.doLMSCommit();
         }
     };
+    ScoController.prototype.exit = function () {
+        this._eventEmitter.globalEmitter.trigger(ScoController_1.ON_BEFORE_EXIT);
+        if (this._scormService.LMSIsInitialized()) {
+            // enviamos un exit
+            this._scormService.doLMSSetValue("cmi.core.exit", "");
+            //los tiempos
+            var sessionTime = this.getSessionTime();
+            this._scormService.doLMSSetValue("cmi.core.session_time", sessionTime);
+            this._scormService.doLMSCommit();
+            this._scormService.doLMSFinish();
+        }
+        this._$context.empty();
+        if (this._$exit && this._$exit.length > 0) {
+            this._$context.append(this._$exit);
+        }
+        else if (this._options.exitMessage) {
+            this._$context.text(this._options.exitMessage);
+        }
+        this._eventEmitter.globalEmitter.trigger(ScoController_1.ON_EXIT);
+    };
+    ScoController.prototype.getSessionTime = function () {
+        var now = Date.now(), sessionTime = now - this._dateStart.getTime();
+        var hours = Math.floor(sessionTime / (1000 * 60 * 60) % 60), minutes = Math.floor(sessionTime / (1000 * 60) % 60), seconds = Math.floor(sessionTime / 1000 % 60);
+        hours = hours < 10 ? '0' + hours : hours;
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        seconds = seconds < 10 ? '0' + seconds : seconds;
+        return hours + ':' + minutes + ':' + seconds;
+    };
     ScoController.prototype.run = function () {
+        this._dateStart = new Date();
         this._init();
         this._Navigator.activate(this._$pagesContainer);
         this._$pagesContainer.addClass(ScoController_1.CLASS_PAGES);
@@ -145,8 +176,11 @@ var ScoController = /** @class */ (function () {
         }
         return this;
     };
+    ScoController.NAMESPACE = "sco";
     ScoController.CLASS_CONTEXT = "hz-container";
     ScoController.CLASS_PAGES = "hz-pages-container";
+    ScoController.ON_EXIT = ScoController_1.NAMESPACE + ":exit";
+    ScoController.ON_BEFORE_EXIT = ScoController_1.NAMESPACE + ":beforeexit";
     ScoController = ScoController_1 = __decorate([
         di_1.Sco({
             name: "ScoController",

@@ -95,6 +95,7 @@ var PageController = /** @class */ (function () {
         }
         $element.addClass(PageController_1.CLASS_PAGE + " " + PageController_1.CLASS_PAGE + "-" + this.options.name);
         this.$element = $element;
+        this.eventEmitter.globalEmitter.trigger(PageController_1.ON_RENDERING, [this.$element, this]);
         return $element;
     };
     PageController.prototype._render = function (template) {
@@ -127,6 +128,7 @@ var PageController = /** @class */ (function () {
      */
     PageController.prototype.show = function ($oldPage, oldPageRelativePosition) {
         var deferred = this._$.Deferred(), promise = deferred.promise(), event = this.eventEmitter.createEvent(PageController_1.ON_SHOW), result = this.eventEmitter.trigger(event, [this.$element, $oldPage, oldPageRelativePosition, this]);
+        this.eventEmitter.globalEmitter.trigger(PageController_1.ON_SHOW, [this.$element, $oldPage, oldPageRelativePosition, this]);
         if (!event.isDefaultPrevented()) {
             //if the user doesn't prevent default
             this._show($oldPage, oldPageRelativePosition).then(function () {

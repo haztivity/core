@@ -18,12 +18,14 @@ import {NavigatorService} from "../";
 export interface ISco {
     on(): void;
     run(): void;
+    exit():void;
 }
 export interface IScoOptions {
     name: string;
     template:string;
     pages: PageRegister[];
     components?: ComponentController[];
+    exitMessage?:string;
 }
 @Sco(
     {
@@ -41,12 +43,17 @@ export interface IScoOptions {
     }
 )
 export class ScoController implements ISco {
+    public static readonly NAMESPACE = "sco";
     public static readonly CLASS_CONTEXT = "hz-container";
     public static readonly CLASS_PAGES = "hz-pages-container";
+    public static readonly ON_EXIT = `${ScoController.NAMESPACE}:exit`;
+    public static readonly ON_BEFORE_EXIT = `${ScoController.NAMESPACE}:beforeexit`;
     protected _eventEmitter: EventEmitter;
     protected _options: IScoOptions;
     protected _$context: JQuery;
     protected _$pagesContainer: JQuery;
+    protected _$exit:JQuery;
+    protected _dateStart:Date;
     constructor(protected _Navigator: Navigator,
                 protected _PageManager: PageManager,
                 protected _ResourceManager: ResourceManager,
@@ -77,6 +84,8 @@ export class ScoController implements ISco {
             this._$context.prepend(this._options.template);
             this._$context.addClass(ScoController.CLASS_CONTEXT);
             this._$pagesContainer = this._$context.find("[data-hz-pages]");
+            this._$exit = this._$context.find("[data-hz-on-exit]");
+            this._$exit.detach();
             this._eventEmitter.globalEmitter.on(PageController.ON_COMPLETE_CHANGE,{instance:this},this._onPageStateChange);
             this._eventEmitter.globalEmitter.on(PageController.ON_SHOWN,{instance:this},this._onPageShown);
             //page contexts must exists
@@ -163,7 +172,38 @@ export class ScoController implements ISco {
             instance._scormService.doLMSCommit();
         }
     }
+    public exit(){
+        this._eventEmitter.globalEmitter.trigger(ScoController.ON_BEFORE_EXIT);
+        if(this._scormService.LMSIsInitialized()){
+            // enviamos un exit
+            this._scormService.doLMSSetValue("cmi.core.exit","");
+            //los tiempos
+            const sessionTime = this.getSessionTime();
+            this._scormService.doLMSSetValue( "cmi.core.session_time", sessionTime );
+            this._scormService.doLMSCommit();
+            this._scormService.doLMSFinish();
+        }
+        this._$context.empty();
+        if(this._$exit && this._$exit.length > 0){
+            this._$context.append(this._$exit);
+        }else if(this._options.exitMessage){
+            this._$context.text(this._options.exitMessage);
+        }
+        this._eventEmitter.globalEmitter.trigger(ScoController.ON_EXIT);
+    }
+    public getSessionTime(){
+        const now = Date.now(),
+            sessionTime = now - this._dateStart.getTime();
+        let hours:any = Math.floor(sessionTime / (1000 * 60 * 60) % 60),
+            minutes:any = Math.floor(sessionTime / (1000 * 60) % 60),
+            seconds:any = Math.floor(sessionTime / 1000 % 60);
+        hours = hours < 10 ? '0' + hours : hours;
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        seconds = seconds < 10 ? '0' + seconds : seconds;
+        return hours + ':'+ minutes + ':' + seconds;
+    }
     public run(): ScoController {
+        this._dateStart = new Date();
         this._init();
         this._Navigator.activate(this._$pagesContainer);
         this._$pagesContainer.addClass(ScoController.CLASS_PAGES);

@@ -127,6 +127,7 @@ export abstract class PageController {
         }
         $element.addClass(`${PageController.CLASS_PAGE} ${PageController.CLASS_PAGE}-${this.options.name}`);
         this.$element = $element;
+        this.eventEmitter.globalEmitter.trigger(PageController.ON_RENDERING,[this.$element,this]);
         return $element;
     }
 
@@ -164,6 +165,7 @@ export abstract class PageController {
             promise = deferred.promise(),
             event = this.eventEmitter.createEvent(PageController.ON_SHOW),
             result = this.eventEmitter.trigger(event, [this.$element, $oldPage, oldPageRelativePosition, this]);
+        this.eventEmitter.globalEmitter.trigger(PageController.ON_SHOW,[this.$element, $oldPage, oldPageRelativePosition, this]);
         if (!event.isDefaultPrevented()) {
             //if the user doesn't prevent default
             this._show($oldPage, oldPageRelativePosition).then(

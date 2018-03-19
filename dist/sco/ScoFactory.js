@@ -17,17 +17,33 @@ var ScoFactory = /** @class */ (function () {
     }
     ScoFactory_1 = ScoFactory;
     ScoFactory.createSco = function (options) {
-        var ScoControllerFactory = di_1.Injector.getInstance(ScoFactory_1).get(Sco_1.ScoController);
-        var sco = ScoControllerFactory.instance();
-        sco.activate(options);
-        return sco;
+        if (!ScoFactory_1.SCO) {
+            var ScoControllerFactory = di_1.Injector.getInstance(ScoFactory_1).get(Sco_1.ScoController);
+            var sco = ScoControllerFactory.instance();
+            sco.activate(options);
+            ScoFactory_1.SCO = sco;
+            return sco;
+        }
+        else {
+            throw "[ScoFactory] Error, only 1 sco is allowed";
+        }
     };
     ScoFactory.registerSco = function (scoController, options) {
-        var ScoControllerFactory = di_1.Injector.getInstance(ScoFactory_1).get(scoController);
-        var sco = ScoControllerFactory.instance();
-        sco.activate(options);
-        return sco;
+        if (!ScoFactory_1.SCO) {
+            var ScoControllerFactory = di_1.Injector.getInstance(ScoFactory_1).get(scoController);
+            var sco = ScoControllerFactory.instance();
+            sco.activate(options);
+            ScoFactory_1.SCO = sco;
+            return sco;
+        }
+        else {
+            throw "[ScoFactory] Error, only 1 sco is allowed";
+        }
     };
+    ScoFactory.getCurrentSco = function () {
+        return ScoFactory_1.SCO;
+    };
+    ;
     ScoFactory = ScoFactory_1 = __decorate([
         di_1.Core({
             name: "ScoFactory",
