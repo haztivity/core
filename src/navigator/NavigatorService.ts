@@ -30,7 +30,8 @@ export class NavigatorService implements INavigatorService{
             "getCurrentPageData",
             "on",
             "one",
-            "off"
+            "off",
+            "getProgressPercentage"
         ];
         for (let method of publish) {
             this[method] = _Navigator[method].bind(_Navigator);
@@ -64,7 +65,9 @@ export class NavigatorService implements INavigatorService{
     public getCurrentPageData(): INavigatorPageData {
         return undefined;
     }
-
+    public getProgressPercentage():number{
+        return undefined;
+    }
     /**
      * @see EventEmitter#on
      */

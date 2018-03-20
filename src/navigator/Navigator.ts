@@ -61,7 +61,9 @@ export class Navigator implements IEventHandler, INavigatorService {
     constructor(protected _$: JQueryStatic, protected _PageManager: PageManager, protected _EventEmitterFactory: EventEmitterFactory) {
 
     }
-
+    public getProgressPercentage(){
+        return (this.getVisitedPages().length * 100) / this._PageManager.count();
+    }
     public activate($context: JQuery) {
         this._$context = $context;
         this._eventEmitter = this._EventEmitterFactory.createEmitter();

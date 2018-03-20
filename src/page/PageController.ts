@@ -141,9 +141,9 @@ export abstract class PageController {
         for (let resource of this._resources) {
             resource.on(ResourceController.ON_COMPLETED,{instance:this,resource:resource},this._onResourceCompleted);
         }
-        if(this._resources.length == 0){
+        /*if(this._resources.length == 0){
             this.isCompleted(true);
-        }
+        }*/
         return this._resources;
     }
     protected _onResourceCompleted(e){

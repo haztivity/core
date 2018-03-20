@@ -28,6 +28,9 @@ var Navigator = /** @class */ (function () {
         this._development = false;
     }
     Navigator_1 = Navigator;
+    Navigator.prototype.getProgressPercentage = function () {
+        return (this.getVisitedPages().length * 100) / this._PageManager.count();
+    };
     Navigator.prototype.activate = function ($context) {
         this._$context = $context;
         this._eventEmitter = this._EventEmitterFactory.createEmitter();

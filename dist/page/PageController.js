@@ -108,9 +108,9 @@ var PageController = /** @class */ (function () {
             var resource = _a[_i];
             resource.on(resource_1.ResourceController.ON_COMPLETED, { instance: this, resource: resource }, this._onResourceCompleted);
         }
-        if (this._resources.length == 0) {
+        /*if(this._resources.length == 0){
             this.isCompleted(true);
-        }
+        }*/
         return this._resources;
     };
     PageController.prototype._onResourceCompleted = function (e) {

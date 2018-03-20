@@ -25,7 +25,8 @@ var NavigatorService = /** @class */ (function () {
             "getCurrentPageData",
             "on",
             "one",
-            "off"
+            "off",
+            "getProgressPercentage"
         ];
         for (var _i = 0, publish_1 = publish; _i < publish_1.length; _i++) {
             var method = publish_1[_i];
@@ -51,6 +52,9 @@ var NavigatorService = /** @class */ (function () {
         return undefined;
     };
     NavigatorService.prototype.getCurrentPageData = function () {
+        return undefined;
+    };
+    NavigatorService.prototype.getProgressPercentage = function () {
         return undefined;
     };
     /**

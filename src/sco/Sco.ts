@@ -26,6 +26,7 @@ export interface IScoOptions {
     pages: PageRegister[];
     components?: ComponentController[];
     exitMessage?:string;
+    progressAsScore?:boolean;
 }
 @Sco(
     {
@@ -74,6 +75,7 @@ export class ScoController implements ISco {
     }
 
     public on(): ScoController {
+        this._eventEmitter.globalEmitter.on.apply(this,arguments);
         return this;
     }
 
@@ -154,7 +156,9 @@ export class ScoController implements ISco {
             if(pageController.state.score != undefined) {
                 instance._scormService.doLMSSetValue(`${key}.score.raw`, pageController.state.score);
             }
-
+            if(instance._options.progressAsScore){
+                instance._scormService.doLMSSetValue("cmi.core.score.raw",instance._Navigator.getProgressPercentage());
+            }
             if (completed.length == total) {
                 let score = 0.0,
                     hasScore =0;
@@ -166,7 +170,7 @@ export class ScoController implements ISco {
                         score += pageScore;
                     }
                 }
-                instance._scormService.doLMSSetValue("cmi.core.score.raw", (score*100)/(hasScore*100));
+                //instance._scormService.doLMSSetValue("cmi.core.score.raw", (score*100)/(hasScore*100));
                 instance._scormService.doLMSSetValue("cmi.core.lesson_status", "completed");
             }
             instance._scormService.doLMSCommit();

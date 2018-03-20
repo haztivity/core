@@ -41,6 +41,7 @@ var ScoController = /** @class */ (function () {
         return this;
     };
     ScoController.prototype.on = function () {
+        this._eventEmitter.globalEmitter.on.apply(this, arguments);
         return this;
     };
     ScoController.prototype._init = function () {
@@ -115,6 +116,9 @@ var ScoController = /** @class */ (function () {
             if (pageController.state.score != undefined) {
                 instance._scormService.doLMSSetValue(key + ".score.raw", pageController.state.score);
             }
+            if (instance._options.progressAsScore) {
+                instance._scormService.doLMSSetValue("cmi.core.score.raw", instance._Navigator.getProgressPercentage());
+            }
             if (completed.length == total) {
                 var score = 0.0, hasScore = 0;
                 for (var pageIndex = 0, completedLength = completed.length; pageIndex < completedLength; pageIndex++) {
@@ -124,7 +128,7 @@ var ScoController = /** @class */ (function () {
                         score += pageScore;
                     }
                 }
-                instance._scormService.doLMSSetValue("cmi.core.score.raw", (score * 100) / (hasScore * 100));
+                //instance._scormService.doLMSSetValue("cmi.core.score.raw", (score*100)/(hasScore*100));
                 instance._scormService.doLMSSetValue("cmi.core.lesson_status", "completed");
             }
             instance._scormService.doLMSCommit();
