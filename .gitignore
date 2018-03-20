@@ -6,3 +6,4 @@ dev/modules
 dev/*.js
 .fusebox
 dist
+.fusebox
