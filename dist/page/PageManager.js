@@ -57,6 +57,21 @@ var PageManager = /** @class */ (function () {
         return completed;
     };
     /**
+     * Devuelve un array con los ids o índices de las páginas visitadas.
+     * @param {boolean} [returnName=false]      Indica si devolver los ids de las páginas o los índices
+     * @returns {String[]|Number[]}
+     */
+    PageManager.prototype.getVisited = function (returnName) {
+        var pages = this._pages, completed = [];
+        for (var pageIndex = 0, pagesLength = pages.length; pageIndex < pagesLength; pageIndex++) {
+            var currentPage = pages[pageIndex];
+            if (currentPage.isVisited()) {
+                completed.push(returnName === true ? currentPage.getPageName() : pageIndex);
+            }
+        }
+        return completed;
+    };
+    /**
      * Añade una página
      * @param {Page}    page        Página a añadir
      */

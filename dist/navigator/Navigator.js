@@ -29,7 +29,7 @@ var Navigator = /** @class */ (function () {
     }
     Navigator_1 = Navigator;
     Navigator.prototype.getProgressPercentage = function () {
-        return (this.getVisitedPages().length * 100) / this._PageManager.count();
+        return (this._PageManager.getCompleted().length * 100) / this._PageManager.count();
     };
     Navigator.prototype.activate = function ($context) {
         this._$context = $context;
@@ -122,20 +122,6 @@ var Navigator = /** @class */ (function () {
             }
         }
         return false;
-    };
-    /**
-     * Devuelve un array con los índices de las páginas que hayan sido visitadas
-     * @returns {Number[]}
-     */
-    Navigator.prototype.getVisitedPages = function () {
-        var pagesLength = this._PageManager.count(), pages = [];
-        for (var pageIndex = 0; pageIndex < pagesLength; pageIndex++) {
-            var currentPage = this._PageManager.getPage(pageIndex), state = currentPage.getState();
-            if (state.visited) {
-                pages.push(pageIndex);
-            }
-        }
-        return pages;
     };
     /**
      * Devuelve el estado actual de deshabilitado
