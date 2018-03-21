@@ -29,7 +29,7 @@ var Navigator = /** @class */ (function () {
     }
     Navigator_1 = Navigator;
     Navigator.prototype.getProgressPercentage = function () {
-        return (this._PageManager.getCompleted().length * 100) / this._PageManager.count();
+        return parseFloat(((this._PageManager.getCompleted().length * 100) / this._PageManager.count()).toFixed(2));
     };
     Navigator.prototype.activate = function ($context) {
         this._$context = $context;

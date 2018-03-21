@@ -90,6 +90,7 @@ export class ScoController implements ISco {
             this._$exit.detach();
             this._eventEmitter.globalEmitter.on(PageController.ON_COMPLETE_CHANGE,{instance:this},this._onPageStateChange);
             this._eventEmitter.globalEmitter.on(PageController.ON_SHOWN,{instance:this},this._onPageShown);
+            this._scormService.doLMSInitialize();
             //page contexts must exists
             if (this._$pagesContainer.length > 0) {
                 return true;
@@ -100,6 +101,7 @@ export class ScoController implements ISco {
             throw new HaztivityAppContextNotFound();
         }
     }
+
     protected _onPageShown(e,$page, $oldPage, oldPageRelativePosition, pageController:PageController){
         let instance = e.data.instance;
         if(instance._scormService.LMSIsInitialized()){
@@ -118,7 +120,6 @@ export class ScoController implements ISco {
         return result;
     }
     protected _restorePagesState(){
-        this._scormService.doLMSInitialize();
         if(this._scormService.LMSIsInitialized()) {
             let count = this._scormService.doLMSGetValue("cmi.objectives._count"),
                 lessonStatus = this._scormService.doLMSGetValue("cmi.core.lesson_status");
@@ -144,20 +145,61 @@ export class ScoController implements ISco {
             }
         }
     }
+    protected _getSuspendData(){
+        let result;
+        if(this._scormService.LMSIsInitialized()){
+            let data = this._scormService.doLMSGetValue(`cmi.suspend_data`);
+            if(!!data){
+                try {
+                    result = JSON.parse(data);
+                } catch (e) {
+                    result = {};
+                    console.error("[ScoController] Failed getting suspend data:",e.message);
+                }
+            }else{
+                result = {};
+            }
+        }
+        return result;
+    }
+    protected _setSuspendData(data,commit=true){
+        let result=false;
+        if(this._scormService.LMSIsInitialized()){
+            try{
+                const parsed = JSON.stringify(data);
+                this._scormService.doLMSSetValue(`cmi.suspend_data`, parsed);
+                if(commit) {
+                    this._scormService.doLMSCommit();
+                }
+                result = true;
+            }catch(e){
+                console.error("[ScoController] Failed setting suspend data:",e.message);
+            }
+        }
+        return result;
+    }
     protected _onPageStateChange(e,result,$page,pageController:PageController){
         let instance:ScoController = e.data.instance;
         let total = instance._PageManager.count(),
             completed = instance._PageManager.getCompleted();
         if(instance._scormService.LMSIsInitialized()) {
             let count = parseInt(instance._scormService.doLMSGetValue("cmi.objectives._count")),
-                key = `cmi.objectives.${count}`;
+                key = `cmi.objectives.${count}`,
+                progress = instance._Navigator.getProgressPercentage();
             instance._scormService.doLMSSetValue(`${key}.id`, pageController.options.name);
             instance._scormService.doLMSSetValue(`${key}.status`, "completed");
             if(pageController.state.score != undefined) {
                 instance._scormService.doLMSSetValue(`${key}.score.raw`, pageController.state.score);
             }
             if(instance._options.progressAsScore){
-                instance._scormService.doLMSSetValue("cmi.core.score.raw",instance._Navigator.getProgressPercentage());
+                instance._scormService.doLMSSetValue("cmi.core.score.raw",progress);
+            }
+            try{
+                let suspendData = instance._getSuspendData();
+                suspendData["%progress"] = progress;
+                instance._setSuspendData(suspendData,false);
+            }catch(e){
+                console.error("[ScoController] Fail updating suspend data",e.message);
             }
             if (completed.length == total) {
                 let score = 0.0,

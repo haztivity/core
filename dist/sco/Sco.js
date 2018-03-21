@@ -55,6 +55,7 @@ var ScoController = /** @class */ (function () {
             this._$exit.detach();
             this._eventEmitter.globalEmitter.on(PageController_1.PageController.ON_COMPLETE_CHANGE, { instance: this }, this._onPageStateChange);
             this._eventEmitter.globalEmitter.on(PageController_1.PageController.ON_SHOWN, { instance: this }, this._onPageShown);
+            this._scormService.doLMSInitialize();
             //page contexts must exists
             if (this._$pagesContainer.length > 0) {
                 return true;
@@ -85,7 +86,6 @@ var ScoController = /** @class */ (function () {
         return result;
     };
     ScoController.prototype._restorePagesState = function () {
-        this._scormService.doLMSInitialize();
         if (this._scormService.LMSIsInitialized()) {
             var count = this._scormService.doLMSGetValue("cmi.objectives._count"), lessonStatus = this._scormService.doLMSGetValue("cmi.core.lesson_status");
             if (lessonStatus == "not attempted") {
@@ -106,18 +106,63 @@ var ScoController = /** @class */ (function () {
             }
         }
     };
+    ScoController.prototype._getSuspendData = function () {
+        var result;
+        if (this._scormService.LMSIsInitialized()) {
+            var data = this._scormService.doLMSGetValue("cmi.suspend_data");
+            if (!!data) {
+                try {
+                    result = JSON.parse(data);
+                }
+                catch (e) {
+                    result = {};
+                    console.error("[ScoController] Failed getting suspend data:", e.message);
+                }
+            }
+            else {
+                result = {};
+            }
+        }
+        return result;
+    };
+    ScoController.prototype._setSuspendData = function (data, commit) {
+        if (commit === void 0) { commit = true; }
+        var result = false;
+        if (this._scormService.LMSIsInitialized()) {
+            try {
+                var parsed = JSON.stringify(data);
+                this._scormService.doLMSSetValue("cmi.suspend_data", parsed);
+                if (commit) {
+                    this._scormService.doLMSCommit();
+                }
+                result = true;
+            }
+            catch (e) {
+                console.error("[ScoController] Failed setting suspend data:", e.message);
+            }
+        }
+        return result;
+    };
     ScoController.prototype._onPageStateChange = function (e, result, $page, pageController) {
         var instance = e.data.instance;
         var total = instance._PageManager.count(), completed = instance._PageManager.getCompleted();
         if (instance._scormService.LMSIsInitialized()) {
-            var count = parseInt(instance._scormService.doLMSGetValue("cmi.objectives._count")), key = "cmi.objectives." + count;
+            var count = parseInt(instance._scormService.doLMSGetValue("cmi.objectives._count")), key = "cmi.objectives." + count, progress = instance._Navigator.getProgressPercentage();
             instance._scormService.doLMSSetValue(key + ".id", pageController.options.name);
             instance._scormService.doLMSSetValue(key + ".status", "completed");
             if (pageController.state.score != undefined) {
                 instance._scormService.doLMSSetValue(key + ".score.raw", pageController.state.score);
             }
             if (instance._options.progressAsScore) {
-                instance._scormService.doLMSSetValue("cmi.core.score.raw", instance._Navigator.getProgressPercentage());
+                instance._scormService.doLMSSetValue("cmi.core.score.raw", progress);
+            }
+            try {
+                var suspendData = instance._getSuspendData();
+                suspendData["%progress"] = progress;
+                instance._setSuspendData(suspendData, false);
+            }
+            catch (e) {
+                console.error("[ScoController] Fail updating suspend data", e.message);
             }
             if (completed.length == total) {
                 var score = 0.0, hasScore = 0;

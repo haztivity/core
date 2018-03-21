@@ -62,7 +62,7 @@ export class Navigator implements IEventHandler, INavigatorService {
 
     }
     public getProgressPercentage(){
-        return (this._PageManager.getCompleted().length * 100) / this._PageManager.count();
+        return parseFloat(((this._PageManager.getCompleted().length * 100) / this._PageManager.count()).toFixed(2));
     }
     public activate($context: JQuery) {
         this._$context = $context;
