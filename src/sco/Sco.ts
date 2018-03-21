@@ -67,6 +67,7 @@ export class ScoController implements ISco {
     }
 
     public activate(options: IScoOptions): ScoController {
+        this._scormService.doLMSInitialize();
         this._options = options;
         this._ComponentManager.addAll(this._options.components || []);
         this._PageManager.addPages(this._options.pages);
@@ -90,7 +91,6 @@ export class ScoController implements ISco {
             this._$exit.detach();
             this._eventEmitter.globalEmitter.on(PageController.ON_COMPLETE_CHANGE,{instance:this},this._onPageStateChange);
             this._eventEmitter.globalEmitter.on(PageController.ON_SHOWN,{instance:this},this._onPageShown);
-            this._scormService.doLMSInitialize();
             //page contexts must exists
             if (this._$pagesContainer.length > 0) {
                 return true;

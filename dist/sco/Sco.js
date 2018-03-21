@@ -34,6 +34,7 @@ var ScoController = /** @class */ (function () {
     }
     ScoController_1 = ScoController;
     ScoController.prototype.activate = function (options) {
+        this._scormService.doLMSInitialize();
         this._options = options;
         this._ComponentManager.addAll(this._options.components || []);
         this._PageManager.addPages(this._options.pages);
@@ -55,7 +56,6 @@ var ScoController = /** @class */ (function () {
             this._$exit.detach();
             this._eventEmitter.globalEmitter.on(PageController_1.PageController.ON_COMPLETE_CHANGE, { instance: this }, this._onPageStateChange);
             this._eventEmitter.globalEmitter.on(PageController_1.PageController.ON_SHOWN, { instance: this }, this._onPageShown);
-            this._scormService.doLMSInitialize();
             //page contexts must exists
             if (this._$pagesContainer.length > 0) {
                 return true;
