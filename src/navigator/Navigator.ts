@@ -163,8 +163,11 @@ export class Navigator implements IEventHandler, INavigatorService {
                                 this._currentRenderProcess
                             );
                         }
+                        return this._currentRenderProcess;
+                    }else{
+                        return false;
                     }
-                    return this._currentRenderProcess;
+
                 }
             } else {
                 //todo throw
