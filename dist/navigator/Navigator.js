@@ -49,7 +49,7 @@ var Navigator = /** @class */ (function () {
      * página. False si no se realiza el cambio
      */
     Navigator.prototype.goTo = function (index) {
-        if (this.isDisabled() !== true) {
+        if (this.isDisabled() !== true && (!this._currentRenderProcess || this._currentRenderProcess.state() !== "pending")) {
             //get the page requested
             var newPage = this._PageManager.getPage(index);
             //the page must be provided and different of the current page
@@ -61,9 +61,6 @@ var Navigator = /** @class */ (function () {
                         : 1; //check the position of the old page relative to the new page
                     //check if resources are completed to go to the next page
                     if (this._development === true || (currentPageIs === 1 || (previousPageForTarget == undefined || previousPageForTarget.isCompleted()))) {
-                        if (this._currentRenderProcess && this._currentRenderProcess.state() === "pending") {
-                            this._currentRenderProcess.reject();
-                        }
                         this._currentRenderProcess = this._$.Deferred();
                         this._currentPage = newPage; //set new page as current
                         this._currentPageIndex = index;
@@ -113,8 +110,11 @@ var Navigator = /** @class */ (function () {
                         else { //otherwise, execute immediately
                             this._onPageShowEnd(newPage, newPageData, currentPage, currentPageData, this._currentRenderProcess);
                         }
+                        return this._currentRenderProcess;
                     }
-                    return this._currentRenderProcess;
+                    else {
+                        return false;
+                    }
                 }
             }
             else {

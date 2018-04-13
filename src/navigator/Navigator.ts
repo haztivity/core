@@ -82,7 +82,7 @@ export class Navigator implements IEventHandler, INavigatorService {
      * página. False si no se realiza el cambio
      */
     public goTo(index: number):JQueryPromise<INavigatorPageData>|boolean {
-        if (this.isDisabled() !== true) {
+        if (this.isDisabled() !== true && (!this._currentRenderProcess || this._currentRenderProcess.state() !== "pending")) {
             //get the page requested
             let newPage: PageImplementation = this._PageManager.getPage(index);
             //the page must be provided and different of the current page
@@ -96,9 +96,6 @@ export class Navigator implements IEventHandler, INavigatorService {
                             : 1;//check the position of the old page relative to the new page
                     //check if resources are completed to go to the next page
                     if (this._development === true || (currentPageIs === 1 || (previousPageForTarget == undefined || previousPageForTarget.isCompleted()))) {
-                        if (this._currentRenderProcess && this._currentRenderProcess.state() === "pending") {
-                            this._currentRenderProcess.reject();
-                        }
                         this._currentRenderProcess = this._$.Deferred();
                         this._currentPage = newPage;//set new page as current
                         this._currentPageIndex = index;
