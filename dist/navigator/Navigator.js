@@ -56,11 +56,11 @@ var Navigator = /** @class */ (function () {
             if (newPage) {
                 if (newPage !== this._currentPage) {
                     var currentPage = this.getCurrentPage(), //get current page and index
-                    currentPageIndex = this.getCurrentPageIndex(), currentPageIs = currentPageIndex - index < 0
+                    currentPageIndex = this.getCurrentPageIndex(), previousPageForTarget = this._PageManager.getPage(index - 1), currentPageIs = currentPageIndex - index < 0
                         ? -1
                         : 1; //check the position of the old page relative to the new page
                     //check if resources are completed to go to the next page
-                    if (this._development === true || (currentPageIs === 1 || (currentPage == undefined || currentPage.getController().isCompleted()))) {
+                    if (this._development === true || (currentPageIs === 1 || (previousPageForTarget == undefined || previousPageForTarget.isCompleted()))) {
                         if (this._currentRenderProcess && this._currentRenderProcess.state() === "pending") {
                             this._currentRenderProcess.reject();
                         }
@@ -93,7 +93,7 @@ var Navigator = /** @class */ (function () {
                         if (currentPageIndex === -1) {
                             this._$context.prepend(newPageElement);
                         }
-                        else {
+                        else { //if the new page is after the current page
                             this._$context.append(newPageElement);
                         }
                         //initialize resources and trigger rendered event
@@ -110,7 +110,7 @@ var Navigator = /** @class */ (function () {
                         if (typeof showPromise.then === "function") {
                             showPromise.then(this._onPageShowEnd.bind(this, newPage, newPageData, currentPage, currentPageData, this._currentRenderProcess));
                         }
-                        else {
+                        else { //otherwise, execute immediately
                             this._onPageShowEnd(newPage, newPageData, currentPage, currentPageData, this._currentRenderProcess);
                         }
                     }
