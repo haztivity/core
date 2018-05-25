@@ -1,6 +1,6 @@
 {
   "name": "@haztivity/core",
-  "version": "0.7.5",
+  "version": "0.7.6",
   "description": "Framework haztivity",
   "main": "dist/index.js",
   "scripts": {
