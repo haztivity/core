@@ -49,7 +49,7 @@ var Navigator = /** @class */ (function () {
      * página. False si no se realiza el cambio
      */
     Navigator.prototype.goTo = function (index) {
-        if (this.isDisabled() !== true && (!this._currentRenderProcess || this._currentRenderProcess.state() !== "pending")) {
+        if (this.isDisabled() !== true) {
             //get the page requested
             var newPage = this._PageManager.getPage(index);
             //the page must be provided and different of the current page
@@ -61,6 +61,7 @@ var Navigator = /** @class */ (function () {
                         : 1; //check the position of the old page relative to the new page
                     //check if resources are completed to go to the next page
                     if (this._development === true || (currentPageIs === 1 || (previousPageForTarget == undefined || previousPageForTarget.isCompleted()))) {
+                        this._forceCompleteTransition();
                         this._currentRenderProcess = this._$.Deferred();
                         this._currentPage = newPage; //set new page as current
                         this._currentPageIndex = index;
@@ -77,6 +78,17 @@ var Navigator = /** @class */ (function () {
                                 state: currentPage.getState()
                             };
                         }
+                        this._currentRenderData = {
+                            newPage: {
+                                page: newPage,
+                                data: newPageData
+                            },
+                            oldPage: {
+                                page: currentPage,
+                                data: currentPageData
+                            },
+                            defer: this._currentRenderProcess
+                        };
                         //trigger event in navigator
                         this._eventEmitter.trigger(Navigator_1.ON_CHANGE_PAGE_START, newPageData, currentPageData);
                         //trigger a global event that could be listened by anyone
@@ -185,6 +197,34 @@ var Navigator = /** @class */ (function () {
             return false;
         }
     };
+    Navigator.prototype._forceCompleteTransition = function () {
+        if (this._currentRenderData && this._currentRenderData.defer.state() == "pending") {
+            var oldPage = this._currentRenderData.oldPage.page, newPage = this._currentRenderData.newPage.page;
+            if (oldPage) {
+                var controller = oldPage.getController();
+                oldPage.detach();
+                if (controller) {
+                    var element = controller.getElement();
+                    if (element) {
+                        element.remove();
+                    }
+                }
+            }
+            this._$context.removeAttr(Navigator_1.ATTR_TRANSITION_TO);
+            this._$context.attr(Navigator_1.ATTR_CURRENT, this._currentRenderData.newPage.data.name);
+            //trigger event in navigator
+            this._eventEmitter.trigger(Navigator_1.ON_CHANGE_PAGE_END, [
+                this._currentRenderData.newPage.data,
+                this._currentRenderData.oldPage.data
+            ]);
+            //trigger a global event that could be listened by anyone
+            this._eventEmitter.globalEmitter.trigger(Navigator_1.ON_CHANGE_PAGE_END, [
+                this._currentRenderData.newPage.data,
+                this._currentRenderData.oldPage.data
+            ]);
+            this._currentRenderData.defer.reject(newPage, oldPage);
+        }
+    };
     /**
      * Invocado al finalizarse la animación del cambio de página
      * @param {PageImplementation}      newPage     Página activada
@@ -195,21 +235,29 @@ var Navigator = /** @class */ (function () {
      * @private
      */
     Navigator.prototype._onPageShowEnd = function (newPage, newPageData, oldPage, oldPageData, defer) {
-        if (oldPage) {
-            var controller = oldPage.getController();
-            oldPage.detach();
-            controller.getElement().remove();
+        if (defer.state() == "pending") {
+            if (oldPage) {
+                var controller = oldPage.getController();
+                oldPage.detach();
+                controller.getElement().remove();
+            }
+            this._$context.removeAttr(Navigator_1.ATTR_TRANSITION_TO);
+            this._$context.attr(Navigator_1.ATTR_CURRENT, newPageData.name);
+            if (newPage.isCompleted()) {
+                this.enable();
+            }
+            //trigger event in navigator
+            this._eventEmitter.trigger(Navigator_1.ON_CHANGE_PAGE_END, [
+                newPageData,
+                oldPageData
+            ]);
+            //trigger a global event that could be listened by anyone
+            this._eventEmitter.globalEmitter.trigger(Navigator_1.ON_CHANGE_PAGE_END, [
+                newPageData,
+                oldPageData
+            ]);
+            defer.resolve(newPageData, oldPageData);
         }
-        this._$context.removeAttr(Navigator_1.ATTR_TRANSITION_TO);
-        this._$context.attr(Navigator_1.ATTR_CURRENT, newPageData.name);
-        if (newPage.isCompleted()) {
-            this.enable();
-        }
-        //trigger event in navigator
-        this._eventEmitter.trigger(Navigator_1.ON_CHANGE_PAGE_END, [newPageData, oldPageData]);
-        //trigger a global event that could be listened by anyone
-        this._eventEmitter.globalEmitter.trigger(Navigator_1.ON_CHANGE_PAGE_END, [newPageData, oldPageData]);
-        defer.resolve(newPageData, oldPageData);
     };
     /**
      * Obtiene el índice de la página actual

@@ -49,6 +49,7 @@ export class Navigator implements IEventHandler, INavigatorService {
     protected _currentPage: PageImplementation;
     protected _currentPageIndex: number;
     protected _currentRenderProcess: JQueryDeferred<INavigatorPageData>;
+    protected _currentRenderData;
     protected _eventEmitter: EventEmitter;
     protected _disabled: boolean;
     protected _development=false;
@@ -82,7 +83,7 @@ export class Navigator implements IEventHandler, INavigatorService {
      * página. False si no se realiza el cambio
      */
     public goTo(index: number):JQueryPromise<INavigatorPageData>|boolean {
-        if (this.isDisabled() !== true && (!this._currentRenderProcess || this._currentRenderProcess.state() !== "pending")) {
+        if (this.isDisabled() !== true) {
             //get the page requested
             let newPage: PageImplementation = this._PageManager.getPage(index);
             //the page must be provided and different of the current page
@@ -96,6 +97,7 @@ export class Navigator implements IEventHandler, INavigatorService {
                             : 1;//check the position of the old page relative to the new page
                     //check if resources are completed to go to the next page
                     if (this._development === true || (currentPageIs === 1 || (previousPageForTarget == undefined || previousPageForTarget.isCompleted()))) {
+                        this._forceCompleteTransition();
                         this._currentRenderProcess = this._$.Deferred();
                         this._currentPage = newPage;//set new page as current
                         this._currentPageIndex = index;
@@ -113,6 +115,17 @@ export class Navigator implements IEventHandler, INavigatorService {
                                 state:currentPage.getState()
                             }
                         }
+                        this._currentRenderData = {
+                            newPage:{
+                                page:newPage,
+                                data:newPageData
+                            },
+                            oldPage:{
+                                page:currentPage,
+                                data:currentPageData
+                            },
+                            defer :this._currentRenderProcess
+                        };
                         //trigger event in navigator
                         this._eventEmitter.trigger(Navigator.ON_CHANGE_PAGE_START, newPageData,currentPageData);
                         //trigger a global event that could be listened by anyone
@@ -128,6 +141,7 @@ export class Navigator implements IEventHandler, INavigatorService {
                         } else {//if the new page is after the current page
                             this._$context.append(newPageElement);
                         }
+
                         //initialize resources and trigger rendered event
                         newPage.postRender();
                         this._$context.removeAttr(Navigator.ATTR_CURRENT);
@@ -239,7 +253,36 @@ export class Navigator implements IEventHandler, INavigatorService {
         }
 
     }
+    protected _forceCompleteTransition(){
+        if(this._currentRenderData && this._currentRenderData.defer.state() == "pending"){
+            let oldPage = this._currentRenderData.oldPage.page,
+                newPage = this._currentRenderData.newPage.page;
+            if (oldPage) {
+                let controller = oldPage.getController();
+                oldPage.detach();
+                if(controller){
+                    const element = controller.getElement();
+                    if(element) {
+                       element.remove();
+                    }
 
+                }
+            }
+            this._$context.removeAttr(Navigator.ATTR_TRANSITION_TO);
+            this._$context.attr(Navigator.ATTR_CURRENT,this._currentRenderData.newPage.data.name);
+            //trigger event in navigator
+            this._eventEmitter.trigger(Navigator.ON_CHANGE_PAGE_END, [
+                this._currentRenderData.newPage.data,
+                this._currentRenderData.oldPage.data
+            ]);
+            //trigger a global event that could be listened by anyone
+            this._eventEmitter.globalEmitter.trigger(Navigator.ON_CHANGE_PAGE_END, [
+                this._currentRenderData.newPage.data,
+                this._currentRenderData.oldPage.data
+            ]);
+            this._currentRenderData.defer.reject(newPage,oldPage);
+        }
+    }
     /**
      * Invocado al finalizarse la animación del cambio de página
      * @param {PageImplementation}      newPage     Página activada
@@ -250,21 +293,29 @@ export class Navigator implements IEventHandler, INavigatorService {
      * @private
      */
     protected _onPageShowEnd(newPage: PageImplementation, newPageData:INavigatorPageData, oldPage: PageImplementation, oldPageData:INavigatorPageData, defer) {
-        if (oldPage) {
-            let controller = oldPage.getController();
-            oldPage.detach();
-            controller.getElement().remove();
+        if(defer.state() == "pending") {
+            if (oldPage) {
+                let controller = oldPage.getController();
+                oldPage.detach();
+                controller.getElement().remove();
+            }
+            this._$context.removeAttr(Navigator.ATTR_TRANSITION_TO);
+            this._$context.attr(Navigator.ATTR_CURRENT, newPageData.name);
+            if (newPage.isCompleted()) {
+                this.enable();
+            }
+            //trigger event in navigator
+            this._eventEmitter.trigger(Navigator.ON_CHANGE_PAGE_END, [
+                newPageData,
+                oldPageData
+            ]);
+            //trigger a global event that could be listened by anyone
+            this._eventEmitter.globalEmitter.trigger(Navigator.ON_CHANGE_PAGE_END, [
+                newPageData,
+                oldPageData
+            ]);
+            defer.resolve(newPageData, oldPageData);
         }
-        this._$context.removeAttr(Navigator.ATTR_TRANSITION_TO);
-        this._$context.attr(Navigator.ATTR_CURRENT,newPageData.name);
-        if(newPage.isCompleted()){
-            this.enable();
-        }
-        //trigger event in navigator
-        this._eventEmitter.trigger(Navigator.ON_CHANGE_PAGE_END, [newPageData, oldPageData]);
-        //trigger a global event that could be listened by anyone
-        this._eventEmitter.globalEmitter.trigger(Navigator.ON_CHANGE_PAGE_END, [newPageData, oldPageData]);
-        defer.resolve(newPageData,oldPageData);
     }
 
     /**
