@@ -29,6 +29,46 @@ var ScormService = /** @class */ (function () {
         }
         this._version = this._version || versions.auto;
     };
+    ScormService.prototype.setSuspendData = function (data, commit) {
+        if (commit === void 0) { commit = true; }
+        var result = false;
+        if (this.LMSIsInitialized()) {
+            try {
+                var parsed = JSON.stringify(data);
+                this.doLMSSetValue("cmi.suspend_data", parsed);
+                if (commit) {
+                    this.doLMSCommit();
+                }
+                result = true;
+            }
+            catch (e) {
+                console.error("[ScormService] Failed setting suspend data:", e.message);
+            }
+        }
+        return result;
+    };
+    ScormService.prototype.getSuspendData = function () {
+        var result;
+        if (this.LMSIsInitialized()) {
+            var data = this.doLMSGetValue("cmi.suspend_data");
+            if (!!data) {
+                try {
+                    result = JSON.parse(data);
+                }
+                catch (e) {
+                    result = {};
+                    console.error("[ScormService] Failed getting suspend data:", e.message);
+                }
+            }
+            else {
+                result = {};
+            }
+        }
+        else {
+            result = {};
+        }
+        return result;
+    };
     ScormService.prototype.getAPIVersion = function () {
         return this._version;
     };

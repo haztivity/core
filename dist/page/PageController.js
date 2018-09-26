@@ -136,7 +136,7 @@ var PageController = /** @class */ (function () {
                     //call the event's function
                     result(deferred);
                 }
-                else { //if any function is provided by the event
+                else {
                     deferred.resolve();
                 }
             });

@@ -91,6 +91,11 @@ var ScoController = /** @class */ (function () {
             if (lessonStatus == "not attempted") {
                 this._scormService.doLMSSetValue("cmi.core.lesson_status", "incomplete");
                 this._scormService.doLMSCommit();
+                this._totalTime = 0;
+            }
+            else {
+                var totalTime = this._scormService.doLMSGetValue("cmi.core.total_time"), times = totalTime.split(":");
+                this._totalTime = (parseInt(times[0]) * 3600000) + (parseInt(times[1]) * 60000) + (parseInt(times[2]) * 1000);
             }
             if (count != undefined) {
                 for (var currentCount = 0; currentCount < count; currentCount++) {
@@ -105,43 +110,9 @@ var ScoController = /** @class */ (function () {
                 }
             }
         }
-    };
-    ScoController.prototype._getSuspendData = function () {
-        var result;
-        if (this._scormService.LMSIsInitialized()) {
-            var data = this._scormService.doLMSGetValue("cmi.suspend_data");
-            if (!!data) {
-                try {
-                    result = JSON.parse(data);
-                }
-                catch (e) {
-                    result = {};
-                    console.error("[ScoController] Failed getting suspend data:", e.message);
-                }
-            }
-            else {
-                result = {};
-            }
+        else {
+            this._totalTime = 0;
         }
-        return result;
-    };
-    ScoController.prototype._setSuspendData = function (data, commit) {
-        if (commit === void 0) { commit = true; }
-        var result = false;
-        if (this._scormService.LMSIsInitialized()) {
-            try {
-                var parsed = JSON.stringify(data);
-                this._scormService.doLMSSetValue("cmi.suspend_data", parsed);
-                if (commit) {
-                    this._scormService.doLMSCommit();
-                }
-                result = true;
-            }
-            catch (e) {
-                console.error("[ScoController] Failed setting suspend data:", e.message);
-            }
-        }
-        return result;
     };
     ScoController.prototype._onPageStateChange = function (e, result, $page, pageController) {
         var instance = e.data.instance;
@@ -157,9 +128,9 @@ var ScoController = /** @class */ (function () {
                 instance._scormService.doLMSSetValue("cmi.core.score.raw", progress);
             }
             try {
-                var suspendData = instance._getSuspendData();
+                var suspendData = instance._scormService.getSuspendData();
                 suspendData["%progress"] = progress;
-                instance._setSuspendData(suspendData, false);
+                instance._scormService.setSuspendData(suspendData, false);
             }
             catch (e) {
                 console.error("[ScoController] Fail updating suspend data", e.message);
@@ -185,7 +156,7 @@ var ScoController = /** @class */ (function () {
             // enviamos un exit
             this._scormService.doLMSSetValue("cmi.core.exit", "");
             //los tiempos
-            var sessionTime = this.getSessionTime();
+            var sessionTime = this.getSessionTimeFormatted();
             this._scormService.doLMSSetValue("cmi.core.session_time", sessionTime);
             this._scormService.doLMSCommit();
             this._scormService.doLMSFinish();
@@ -199,8 +170,28 @@ var ScoController = /** @class */ (function () {
         }
         this._eventEmitter.globalEmitter.trigger(ScoController_1.ON_EXIT);
     };
+    ScoController.prototype.getDateStart = function () {
+        return new Date(this._dateStart.getTime());
+    };
     ScoController.prototype.getSessionTime = function () {
-        var now = Date.now(), sessionTime = now - this._dateStart.getTime();
+        var now = Date.now(), sessionTime = now - this.getDateStart().getTime();
+        return sessionTime;
+    };
+    ScoController.prototype.getTotalTime = function (includeSession) {
+        if (includeSession === void 0) { includeSession = true; }
+        return (this._totalTime || 0) + (includeSession ? this.getSessionTime() || 0 : 0);
+    };
+    ScoController.prototype.getTotalTimeFormatted = function (includeSession) {
+        if (includeSession === void 0) { includeSession = true; }
+        var totalTime = this.getTotalTime(includeSession);
+        var hours = Math.floor(totalTime / (1000 * 60 * 60) % 60), minutes = Math.floor(totalTime / (1000 * 60) % 60), seconds = Math.floor(totalTime / 1000 % 60);
+        hours = hours < 10 ? '0' + hours : hours;
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        seconds = seconds < 10 ? '0' + seconds : seconds;
+        return hours + ':' + minutes + ':' + seconds;
+    };
+    ScoController.prototype.getSessionTimeFormatted = function () {
+        var sessionTime = this.getSessionTime();
         var hours = Math.floor(sessionTime / (1000 * 60 * 60) % 60), minutes = Math.floor(sessionTime / (1000 * 60) % 60), seconds = Math.floor(sessionTime / 1000 % 60);
         hours = hours < 10 ? '0' + hours : hours;
         minutes = minutes < 10 ? '0' + minutes : minutes;

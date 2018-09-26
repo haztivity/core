@@ -93,6 +93,9 @@ var PageManager = /** @class */ (function () {
             throw new Errors_1.HaztivityPageAlreadyRegistered(pageName);
         }
     };
+    PageManager.prototype.getPages = function () {
+        return this._pages.slice();
+    };
     PageManager.prototype._validatePageName = function (name) {
         return name.search(/[^\w|-]/g) == -1;
     };

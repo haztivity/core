@@ -49,18 +49,19 @@ var Navigator = /** @class */ (function () {
      * página. False si no se realiza el cambio
      */
     Navigator.prototype.goTo = function (index) {
-        if (this.isDisabled() !== true) {
+        var currentPage = this.getCurrentPage(), //get current page and index
+        currentPageIndex = this.getCurrentPageIndex(), previousPageForTarget = this._PageManager.getPage(index - 1), currentPageIs = currentPageIndex > index
+            ? -1
+            : 1; //check the position of the old page relative to the new page
+        if (this._development || (this.isDisabled() !== true && (currentPageIs == -1 || this._nextDisabled !== true))) {
+            this.disable();
             //get the page requested
             var newPage = this._PageManager.getPage(index);
             //the page must be provided and different of the current page
             if (newPage) {
                 if (newPage !== this._currentPage) {
-                    var currentPage = this.getCurrentPage(), //get current page and index
-                    currentPageIndex = this.getCurrentPageIndex(), previousPageForTarget = this._PageManager.getPage(index - 1), currentPageIs = currentPageIndex - index < 0
-                        ? -1
-                        : 1; //check the position of the old page relative to the new page
                     //check if resources are completed to go to the next page
-                    if (this._development === true || (currentPageIs === 1 || (previousPageForTarget == undefined || previousPageForTarget.isCompleted()))) {
+                    if (this._development === true || (currentPageIs === -1 || (previousPageForTarget == undefined || previousPageForTarget.isCompleted()))) {
                         this._forceCompleteTransition();
                         this._currentRenderProcess = this._$.Deferred();
                         this._currentPage = newPage; //set new page as current
@@ -90,9 +91,9 @@ var Navigator = /** @class */ (function () {
                             defer: this._currentRenderProcess
                         };
                         //trigger event in navigator
-                        this._eventEmitter.trigger(Navigator_1.ON_CHANGE_PAGE_START, newPageData, currentPageData);
+                        this._eventEmitter.trigger(Navigator_1.ON_CHANGE_PAGE_START, [newPageData, currentPageData]);
                         //trigger a global event that could be listened by anyone
-                        this._eventEmitter.globalEmitter.trigger(Navigator_1.ON_CHANGE_PAGE_START, newPageData, currentPageData);
+                        this._eventEmitter.globalEmitter.trigger(Navigator_1.ON_CHANGE_PAGE_START, [newPageData, currentPageData]);
                         var currentPageElement = currentPage
                             ? currentPage.getController().getElement()
                             : null, //get current element
@@ -102,7 +103,7 @@ var Navigator = /** @class */ (function () {
                         if (currentPageIndex === -1) {
                             this._$context.prepend(newPageElement);
                         }
-                        else { //if the new page is after the current page
+                        else {
                             this._$context.append(newPageElement);
                         }
                         //initialize resources and trigger rendered event
@@ -119,7 +120,7 @@ var Navigator = /** @class */ (function () {
                         if (typeof showPromise.then === "function") {
                             showPromise.then(this._onPageShowEnd.bind(this, newPage, newPageData, currentPage, currentPageData, this._currentRenderProcess));
                         }
-                        else { //otherwise, execute immediately
+                        else {
                             this._onPageShowEnd(newPage, newPageData, currentPage, currentPageData, this._currentRenderProcess);
                         }
                         return this._currentRenderProcess;
@@ -142,6 +143,9 @@ var Navigator = /** @class */ (function () {
     Navigator.prototype.isDisabled = function () {
         return this._disabled;
     };
+    Navigator.prototype.isNextDisabled = function () {
+        return this._nextDisabled;
+    };
     /**
      * Establece el estado de deshabilitado
      * @param {boolean}     disabled        Estado a establecer
@@ -150,10 +154,21 @@ var Navigator = /** @class */ (function () {
         if (this._disabled !== disabled) {
             this._disabled = disabled;
             if (disabled) {
-                this._eventEmitter.trigger(Navigator_1.ON_ENABLE);
+                this._eventEmitter.trigger(Navigator_1.ON_DISABLE);
             }
             else {
-                this._eventEmitter.trigger(Navigator_1.ON_DISABLE);
+                this._eventEmitter.trigger(Navigator_1.ON_ENABLE);
+            }
+        }
+    };
+    Navigator.prototype.setNextDisabled = function (disabled) {
+        if (this._nextDisabled !== disabled) {
+            this._nextDisabled = disabled;
+            if (disabled) {
+                this._eventEmitter.trigger(Navigator_1.ON_NEXT_DISABLE);
+            }
+            else {
+                this._eventEmitter.trigger(Navigator_1.ON_NEXT_ENABLE);
             }
         }
     };
@@ -243,8 +258,16 @@ var Navigator = /** @class */ (function () {
             }
             this._$context.removeAttr(Navigator_1.ATTR_TRANSITION_TO);
             this._$context.attr(Navigator_1.ATTR_CURRENT, newPageData.name);
+            if (oldPage) {
+                oldPage.getPage().off("." + Navigator_1.NAMESPACE);
+            }
+            this.enable();
             if (newPage.isCompleted()) {
-                this.enable();
+                this.setNextDisabled(false);
+            }
+            else {
+                this.setNextDisabled(true);
+                newPage.getPage().off("." + Navigator_1.NAMESPACE).on(page_1.PageController.ON_COMPLETE_CHANGE + "." + Navigator_1.NAMESPACE, { instance: this }, this._onPageCompletedChange);
             }
             //trigger event in navigator
             this._eventEmitter.trigger(Navigator_1.ON_CHANGE_PAGE_END, [
@@ -257,6 +280,15 @@ var Navigator = /** @class */ (function () {
                 oldPageData
             ]);
             defer.resolve(newPageData, oldPageData);
+        }
+    };
+    Navigator.prototype._onPageCompletedChange = function (e, completed) {
+        var instance = e.data.instance;
+        if (completed) {
+            instance.setNextDisabled(false);
+        }
+        else {
+            instance.setNextDisabled(true);
         }
     };
     /**
@@ -312,6 +344,8 @@ var Navigator = /** @class */ (function () {
     Navigator.ON_DRAW_PAGE = Navigator_1.NAMESPACE + ":draw";
     Navigator.ON_DISABLE = Navigator_1.NAMESPACE + ":disable";
     Navigator.ON_ENABLE = Navigator_1.NAMESPACE + ":enable";
+    Navigator.ON_NEXT_DISABLE = Navigator_1.NAMESPACE + ":nextdisable";
+    Navigator.ON_NEXT_ENABLE = Navigator_1.NAMESPACE + ":nextenable";
     Navigator.ON_CHANGE_PAGE_END = Navigator_1.NAMESPACE + ":changeend";
     Navigator.ON_CHANGE_PAGE_START = Navigator_1.NAMESPACE + ":changestart";
     Navigator.ATTR_TRANSITION_TO = "data-hz-navigator-transition-to";

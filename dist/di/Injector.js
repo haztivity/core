@@ -188,7 +188,7 @@ var Injector = /** @class */ (function () {
                         }
                         resolvedDependencies.push(dependency);
                     }
-                    else { //If doesn't has access to the requested dependency
+                    else {
                         throw new Errors_1.HaztivityDependencyAccessDenied(serviceName, dependencyToResolveName);
                     }
                 }
@@ -196,7 +196,7 @@ var Injector = /** @class */ (function () {
                     throw new Errors_1.HaztivityDependencyNotRegisteredError(dependencyToResolve, serviceName);
                 }
             }
-            else { //If the dependency requested is null
+            else {
                 throw new Errors_1.HaztivityDependencyNotValid(serviceName, dependencies);
             }
         }

@@ -112,8 +112,9 @@ var DevTools = /** @class */ (function () {
         }
     };
     DevTools = __decorate([
-        di_1.Module({
+        di_1.Core({
             name: "DevTools",
+            public: true,
             dependencies: [
                 Logger_1.Logger,
                 navigator_1.Navigator,

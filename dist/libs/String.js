@@ -590,7 +590,7 @@ else {
                                 qualifier = null;
                             if (this.orig instanceof Array)
                                 dataArray = this.orig;
-                            else { //object
+                            else {
                                 for (var key in this.orig)
                                     if (this.orig.hasOwnProperty(key))
                                         if (keys)
@@ -743,7 +743,7 @@ else {
                             results.splice(results.indexOf('toString'), 1);
                             return results;
                         }
-                        else { //meant for legacy cruft, this could probably be made more efficient
+                        else {
                             var stringNames = {};
                             var objectNames = [];
                             for (var name in String.prototype)

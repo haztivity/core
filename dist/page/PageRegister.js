@@ -46,6 +46,9 @@ var PageRegister = /** @class */ (function () {
         this._eventEmitter.off(events + "." + PageRegister_1.NAMESPACE, handler);
         return this;
     };
+    PageRegister.prototype.getOptions = function () {
+        return this._options;
+    };
     /**
      * Obtiene el nombre de la página
      * @returns {string}

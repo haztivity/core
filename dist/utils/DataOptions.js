@@ -41,7 +41,7 @@ var DataOptions = /** @class */ (function () {
                         //myParam to my-param
                         parsedKey = parsedKey.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
                         break;
-                    default: //camel
+                    default://camel
                         //myParam
                         parsedKey = parsedKey.charAt(0).toLowerCase().concat(parsedKey.substring(1));
                         break;
