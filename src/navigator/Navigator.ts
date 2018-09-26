@@ -15,6 +15,8 @@ export interface INavigatorService{
     goTo(index: number):JQueryPromise<INavigatorPageData>|boolean;
     isDisabled():boolean;
     setDisabled(disabled: boolean):void;
+    setNextDisabled(disabled:boolean):void;
+    isNextDisabled():boolean;
     enable():void;
     disable():void;
     next():JQueryPromise<INavigatorPageData>|boolean;
@@ -41,6 +43,8 @@ export class Navigator implements IEventHandler, INavigatorService {
     public static readonly ON_DRAW_PAGE = `${Navigator.NAMESPACE}:draw`;
     public static readonly ON_DISABLE = `${Navigator.NAMESPACE}:disable`;
     public static readonly ON_ENABLE = `${Navigator.NAMESPACE}:enable`;
+    public static readonly ON_NEXT_DISABLE = `${Navigator.NAMESPACE}:nextdisable`;
+    public static readonly ON_NEXT_ENABLE = `${Navigator.NAMESPACE}:nextenable`;
     public static readonly ON_CHANGE_PAGE_END = `${Navigator.NAMESPACE}:changeend`;
     public static readonly ON_CHANGE_PAGE_START = `${Navigator.NAMESPACE}:changestart`;
     protected static readonly ATTR_TRANSITION_TO = "data-hz-navigator-transition-to";
@@ -53,6 +57,7 @@ export class Navigator implements IEventHandler, INavigatorService {
     protected _eventEmitter: EventEmitter;
     protected _disabled: boolean;
     protected _development=false;
+    protected _nextDisabled:boolean;
     /**
      * Gestiona la transición entre páginas y el renderizado de las mismas en un contexto específico
      * @param {JQueryStatic}                _$
@@ -83,20 +88,21 @@ export class Navigator implements IEventHandler, INavigatorService {
      * página. False si no se realiza el cambio
      */
     public goTo(index: number):JQueryPromise<INavigatorPageData>|boolean {
-        if (this.isDisabled() !== true) {
+        let currentPage = this.getCurrentPage(),//get current page and index
+            currentPageIndex = this.getCurrentPageIndex(),
+            previousPageForTarget = this._PageManager.getPage(index-1),
+            currentPageIs = currentPageIndex > index
+                            ? -1
+                            : 1;//check the position of the old page relative to the new page
+        if (this._development || (this.isDisabled() !== true && (currentPageIs == -1 || this._nextDisabled !== true))) {
+            this.disable();
             //get the page requested
             let newPage: PageImplementation = this._PageManager.getPage(index);
             //the page must be provided and different of the current page
             if (newPage) {
                 if (newPage !== this._currentPage) {
-                    let currentPage = this.getCurrentPage(),//get current page and index
-                        currentPageIndex = this.getCurrentPageIndex(),
-                        previousPageForTarget = this._PageManager.getPage(index-1),
-                        currentPageIs = currentPageIndex - index < 0
-                            ? -1
-                            : 1;//check the position of the old page relative to the new page
                     //check if resources are completed to go to the next page
-                    if (this._development === true || (currentPageIs === 1 || (previousPageForTarget == undefined || previousPageForTarget.isCompleted()))) {
+                    if (this._development === true || (currentPageIs === -1 || (previousPageForTarget == undefined || previousPageForTarget.isCompleted()))) {
                         this._forceCompleteTransition();
                         this._currentRenderProcess = this._$.Deferred();
                         this._currentPage = newPage;//set new page as current
@@ -127,9 +133,9 @@ export class Navigator implements IEventHandler, INavigatorService {
                             defer :this._currentRenderProcess
                         };
                         //trigger event in navigator
-                        this._eventEmitter.trigger(Navigator.ON_CHANGE_PAGE_START, newPageData,currentPageData);
+                        this._eventEmitter.trigger(Navigator.ON_CHANGE_PAGE_START, [newPageData,currentPageData]);
                         //trigger a global event that could be listened by anyone
-                        this._eventEmitter.globalEmitter.trigger(Navigator.ON_CHANGE_PAGE_START, newPageData,currentPageData);
+                        this._eventEmitter.globalEmitter.trigger(Navigator.ON_CHANGE_PAGE_START, [newPageData,currentPageData]);
                         let currentPageElement = currentPage
                                 ? currentPage.getController().getElement()
                                 : null, //get current element
@@ -193,7 +199,9 @@ export class Navigator implements IEventHandler, INavigatorService {
     public isDisabled() {
         return this._disabled;
     }
-
+    public isNextDisabled(){
+        return this._nextDisabled;
+    }
     /**
      * Establece el estado de deshabilitado
      * @param {boolean}     disabled        Estado a establecer
@@ -202,13 +210,22 @@ export class Navigator implements IEventHandler, INavigatorService {
         if (this._disabled !== disabled) {
             this._disabled = disabled;
             if (disabled) {
-                this._eventEmitter.trigger(Navigator.ON_ENABLE);
-            } else {
                 this._eventEmitter.trigger(Navigator.ON_DISABLE);
+            } else {
+                this._eventEmitter.trigger(Navigator.ON_ENABLE);
             }
         }
     }
-
+    public setNextDisabled(disabled:boolean){
+        if(this._nextDisabled !== disabled){
+            this._nextDisabled = disabled;
+            if (disabled) {
+                this._eventEmitter.trigger(Navigator.ON_NEXT_DISABLE);
+            } else {
+                this._eventEmitter.trigger(Navigator.ON_NEXT_ENABLE);
+            }
+        }
+    }
     /**
      * Habilita la navegación
      */
@@ -301,8 +318,15 @@ export class Navigator implements IEventHandler, INavigatorService {
             }
             this._$context.removeAttr(Navigator.ATTR_TRANSITION_TO);
             this._$context.attr(Navigator.ATTR_CURRENT, newPageData.name);
+            if(oldPage) {
+                oldPage.getPage().off("." + Navigator.NAMESPACE);
+            }
+            this.enable();
             if (newPage.isCompleted()) {
-                this.enable();
+                this.setNextDisabled(false);
+            }else{
+                this.setNextDisabled(true);
+                newPage.getPage().off("."+Navigator.NAMESPACE).on(`${PageController.ON_COMPLETE_CHANGE}.${Navigator.NAMESPACE}`,{instance:this},this._onPageCompletedChange)
             }
             //trigger event in navigator
             this._eventEmitter.trigger(Navigator.ON_CHANGE_PAGE_END, [
@@ -317,7 +341,14 @@ export class Navigator implements IEventHandler, INavigatorService {
             defer.resolve(newPageData, oldPageData);
         }
     }
-
+    protected _onPageCompletedChange(e,completed){
+        let instance =e.data.instance;
+        if(completed){
+            instance.setNextDisabled(false);
+        }else{
+            instance.setNextDisabled(true);
+        }
+    }
     /**
      * Obtiene el índice de la página actual
      * @returns {number}

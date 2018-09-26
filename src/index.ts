@@ -40,7 +40,8 @@ export {
     IPageOptions,
     PageFactory,
     PageManager,
-    GenericPageController
+    GenericPageController,
+    PageImplementation
 } from "./page";
 export {
     ResourceInitializerService,
@@ -61,3 +62,4 @@ export {
 } from "./component";
 export {ScormService} from "./scorm";
 export {haztivity} from "./global";
+export {DevTools} from "./devTools/DevTools";

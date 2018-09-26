@@ -55,6 +55,7 @@ export class ScoController implements ISco {
     protected _$pagesContainer: JQuery;
     protected _$exit:JQuery;
     protected _dateStart:Date;
+    protected _totalTime:number;
     constructor(protected _Navigator: Navigator,
                 protected _PageManager: PageManager,
                 protected _ResourceManager: ResourceManager,
@@ -126,6 +127,11 @@ export class ScoController implements ISco {
             if(lessonStatus == "not attempted"){
                 this._scormService.doLMSSetValue("cmi.core.lesson_status","incomplete");
                 this._scormService.doLMSCommit();
+                this._totalTime = 0;
+            }else{
+                let totalTime = this._scormService.doLMSGetValue("cmi.core.total_time"),
+                    times = totalTime.split(":");
+                this._totalTime = (parseInt(times[0])*3600000)+(parseInt(times[1])*60000)+(parseInt(times[2])*1000);
             }
             if (count != undefined) {
                 for (let currentCount = 0; currentCount < count; currentCount++) {
@@ -143,40 +149,9 @@ export class ScoController implements ISco {
                     }
                 }
             }
+        }else{
+            this._totalTime = 0;
         }
-    }
-    protected _getSuspendData(){
-        let result;
-        if(this._scormService.LMSIsInitialized()){
-            let data = this._scormService.doLMSGetValue(`cmi.suspend_data`);
-            if(!!data){
-                try {
-                    result = JSON.parse(data);
-                } catch (e) {
-                    result = {};
-                    console.error("[ScoController] Failed getting suspend data:",e.message);
-                }
-            }else{
-                result = {};
-            }
-        }
-        return result;
-    }
-    protected _setSuspendData(data,commit=true){
-        let result=false;
-        if(this._scormService.LMSIsInitialized()){
-            try{
-                const parsed = JSON.stringify(data);
-                this._scormService.doLMSSetValue(`cmi.suspend_data`, parsed);
-                if(commit) {
-                    this._scormService.doLMSCommit();
-                }
-                result = true;
-            }catch(e){
-                console.error("[ScoController] Failed setting suspend data:",e.message);
-            }
-        }
-        return result;
     }
     protected _onPageStateChange(e,result,$page,pageController:PageController){
         let instance:ScoController = e.data.instance;
@@ -195,9 +170,9 @@ export class ScoController implements ISco {
                 instance._scormService.doLMSSetValue("cmi.core.score.raw",progress);
             }
             try{
-                let suspendData = instance._getSuspendData();
+                let suspendData = instance._scormService.getSuspendData();
                 suspendData["%progress"] = progress;
-                instance._setSuspendData(suspendData,false);
+                instance._scormService.setSuspendData(suspendData,false);
             }catch(e){
                 console.error("[ScoController] Fail updating suspend data",e.message);
             }
@@ -224,7 +199,7 @@ export class ScoController implements ISco {
             // enviamos un exit
             this._scormService.doLMSSetValue("cmi.core.exit","");
             //los tiempos
-            const sessionTime = this.getSessionTime();
+            const sessionTime = this.getSessionTimeFormatted();
             this._scormService.doLMSSetValue( "cmi.core.session_time", sessionTime );
             this._scormService.doLMSCommit();
             this._scormService.doLMSFinish();
@@ -237,9 +212,29 @@ export class ScoController implements ISco {
         }
         this._eventEmitter.globalEmitter.trigger(ScoController.ON_EXIT);
     }
-    public getSessionTime(){
+    public getDateStart():Date{
+        return new Date(this._dateStart.getTime());
+    }
+    public getSessionTime():number{
         const now = Date.now(),
-            sessionTime = now - this._dateStart.getTime();
+            sessionTime = now - this.getDateStart().getTime();
+        return sessionTime;
+    }
+    public getTotalTime(includeSession:boolean = true):number{
+        return (this._totalTime || 0) + (includeSession ? this.getSessionTime() || 0 : 0);
+    }
+    public getTotalTimeFormatted(includeSession:boolean = true):string{
+        const totalTime = this.getTotalTime(includeSession);
+        let hours:any = Math.floor(totalTime / (1000 * 60 * 60) % 60),
+            minutes:any = Math.floor(totalTime / (1000 * 60) % 60),
+            seconds:any = Math.floor(totalTime / 1000 % 60);
+        hours = hours < 10 ? '0' + hours : hours;
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        seconds = seconds < 10 ? '0' + seconds : seconds;
+        return hours + ':'+ minutes + ':' + seconds;
+    }
+    public getSessionTimeFormatted(){
+        const sessionTime = this.getSessionTime();
         let hours:any = Math.floor(sessionTime / (1000 * 60 * 60) % 60),
             minutes:any = Math.floor(sessionTime / (1000 * 60) % 60),
             seconds:any = Math.floor(sessionTime / 1000 % 60);

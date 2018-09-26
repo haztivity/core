@@ -101,7 +101,9 @@ export class PageManager {
             throw new HaztivityPageAlreadyRegistered(pageName);
         }
     }
-
+    public getPages():PageImplementation[]{
+       return this._pages.slice();
+    }
     protected _validatePageName(name: string) {
         return name.search(/[^\w|-]/g) == -1;
     }

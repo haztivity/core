@@ -2,15 +2,16 @@
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-import {Module} from "../di";
+import {Core} from "../di";
 import {Logger} from "./Logger";
 import {Navigator} from "../navigator";
 import {EventEmitterFactory} from "../utils/EventEmitterFactory";
 import {EventEmitter} from "../utils/EventEmitter";
 import {PageManager} from "../page/PageManager";
-@Module(
+@Core(
     {
         name:"DevTools",
+        public:true,
         dependencies:[
             Logger,
             Navigator,

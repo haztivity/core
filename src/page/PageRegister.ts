@@ -63,7 +63,9 @@ export class PageRegister implements IEventHandler {
         this._eventEmitter.off(events + "." + PageRegister.NAMESPACE, handler);
         return this;
     }
-
+    public getOptions():IPageOptions{
+        return this._options;
+    }
     /**
      * Obtiene el nombre de la página
      * @returns {string}
