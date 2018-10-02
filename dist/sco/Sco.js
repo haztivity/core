@@ -36,6 +36,7 @@ var ScoController = /** @class */ (function () {
     ScoController.prototype.activate = function (options) {
         this._scormService.doLMSInitialize();
         this._options = options;
+        this._options.autoSaveTime = this._options.autoSaveTime || 10;
         this._ComponentManager.addAll(this._options.components || []);
         this._PageManager.addPages(this._options.pages);
         this._restorePagesState();
@@ -56,6 +57,7 @@ var ScoController = /** @class */ (function () {
             this._$exit.detach();
             this._eventEmitter.globalEmitter.on(PageController_1.PageController.ON_COMPLETE_CHANGE, { instance: this }, this._onPageStateChange);
             this._eventEmitter.globalEmitter.on(PageController_1.PageController.ON_SHOWN, { instance: this }, this._onPageShown);
+            this._startAutoSaveTotalTime();
             //page contexts must exists
             if (this._$pagesContainer.length > 0) {
                 return true;
@@ -67,6 +69,26 @@ var ScoController = /** @class */ (function () {
         else {
             throw new Errors_1.HaztivityAppContextNotFound();
         }
+    };
+    ScoController.prototype._stopAutoSaveTotalTime = function () {
+        if (this._intervalTotalTime) {
+            clearInterval(this._intervalTotalTime);
+        }
+    };
+    ScoController.prototype._startAutoSaveTotalTime = function () {
+        this._stopAutoSaveTotalTime();
+        var that = this;
+        this._intervalTotalTime = setInterval(function () {
+            that._saveTotalTime();
+        }, this._options.autoSaveTime * 60000);
+    };
+    ScoController.prototype._saveTotalTime = function (commit, suspendData) {
+        if (commit === void 0) { commit = true; }
+        if (!suspendData) {
+            suspendData = this._scormService.getSuspendData();
+        }
+        suspendData["%time"] = this.getTotalTimeFormatted(true);
+        this._scormService.setSuspendData(suspendData, commit);
     };
     ScoController.prototype._onPageShown = function (e, $page, $oldPage, oldPageRelativePosition, pageController) {
         var instance = e.data.instance;
@@ -95,7 +117,10 @@ var ScoController = /** @class */ (function () {
             }
             else {
                 var totalTime = this._scormService.doLMSGetValue("cmi.core.total_time"), times = totalTime.split(":");
-                this._totalTime = (parseInt(times[0]) * 3600000) + (parseInt(times[1]) * 60000) + (parseInt(times[2]) * 1000);
+                var time = (parseInt(times[0]) * 3600000) + (parseInt(times[1]) * 60000) + (parseInt(times[2]) * 1000);
+                var suspendDataTime = (this._scormService.getSuspendData()["%time"] || "").split(":");
+                suspendDataTime = (parseInt(suspendDataTime[0]) * 3600000) + (parseInt(suspendDataTime[1]) * 60000) + (parseInt(suspendDataTime[2]) * 1000);
+                this._totalTime = suspendDataTime > time ? suspendDataTime : time;
             }
             if (count != undefined) {
                 for (var currentCount = 0; currentCount < count; currentCount++) {
@@ -130,6 +155,7 @@ var ScoController = /** @class */ (function () {
             try {
                 var suspendData = instance._scormService.getSuspendData();
                 suspendData["%progress"] = progress;
+                instance._saveTotalTime(false, suspendData);
                 instance._scormService.setSuspendData(suspendData, false);
             }
             catch (e) {
@@ -158,6 +184,8 @@ var ScoController = /** @class */ (function () {
             //los tiempos
             var sessionTime = this.getSessionTimeFormatted();
             this._scormService.doLMSSetValue("cmi.core.session_time", sessionTime);
+            this._saveTotalTime(false);
+            this._stopAutoSaveTotalTime();
             this._scormService.doLMSCommit();
             this._scormService.doLMSFinish();
         }

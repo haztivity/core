@@ -27,6 +27,7 @@ export interface IScoOptions {
     components?: ComponentController[];
     exitMessage?:string;
     progressAsScore?:boolean;
+    autoSaveTime?:number;
 }
 @Sco(
     {
@@ -56,6 +57,7 @@ export class ScoController implements ISco {
     protected _$exit:JQuery;
     protected _dateStart:Date;
     protected _totalTime:number;
+    protected _intervalTotalTime;
     constructor(protected _Navigator: Navigator,
                 protected _PageManager: PageManager,
                 protected _ResourceManager: ResourceManager,
@@ -70,6 +72,7 @@ export class ScoController implements ISco {
     public activate(options: IScoOptions): ScoController {
         this._scormService.doLMSInitialize();
         this._options = options;
+        this._options.autoSaveTime = this._options.autoSaveTime || 10;
         this._ComponentManager.addAll(this._options.components || []);
         this._PageManager.addPages(this._options.pages);
         this._restorePagesState();
@@ -92,6 +95,8 @@ export class ScoController implements ISco {
             this._$exit.detach();
             this._eventEmitter.globalEmitter.on(PageController.ON_COMPLETE_CHANGE,{instance:this},this._onPageStateChange);
             this._eventEmitter.globalEmitter.on(PageController.ON_SHOWN,{instance:this},this._onPageShown);
+
+            this._startAutoSaveTotalTime();
             //page contexts must exists
             if (this._$pagesContainer.length > 0) {
                 return true;
@@ -102,7 +107,25 @@ export class ScoController implements ISco {
             throw new HaztivityAppContextNotFound();
         }
     }
-
+    protected _stopAutoSaveTotalTime(){
+        if(this._intervalTotalTime){
+            clearInterval(this._intervalTotalTime);
+        }
+    }
+    protected _startAutoSaveTotalTime(){
+        this._stopAutoSaveTotalTime();
+        let that = this;
+        this._intervalTotalTime = setInterval(function(){
+            that._saveTotalTime();
+        },this._options.autoSaveTime * 60000);
+    }
+    protected _saveTotalTime(commit=true,suspendData?){
+        if(!suspendData) {
+            suspendData = this._scormService.getSuspendData();
+        }
+        suspendData["%time"] = this.getTotalTimeFormatted(true);
+        this._scormService.setSuspendData(suspendData,commit);
+    }
     protected _onPageShown(e,$page, $oldPage, oldPageRelativePosition, pageController:PageController){
         let instance = e.data.instance;
         if(instance._scormService.LMSIsInitialized()){
@@ -131,7 +154,10 @@ export class ScoController implements ISco {
             }else{
                 let totalTime = this._scormService.doLMSGetValue("cmi.core.total_time"),
                     times = totalTime.split(":");
-                this._totalTime = (parseInt(times[0])*3600000)+(parseInt(times[1])*60000)+(parseInt(times[2])*1000);
+                let time = (parseInt(times[0])*3600000)+(parseInt(times[1])*60000)+(parseInt(times[2])*1000);
+                let suspendDataTime = (this._scormService.getSuspendData()["%time"]||"").split(":");
+                suspendDataTime =  (parseInt(suspendDataTime[0])*3600000)+(parseInt(suspendDataTime[1])*60000)+(parseInt(suspendDataTime[2])*1000);
+                this._totalTime = suspendDataTime > time ? suspendDataTime : time;
             }
             if (count != undefined) {
                 for (let currentCount = 0; currentCount < count; currentCount++) {
@@ -172,6 +198,7 @@ export class ScoController implements ISco {
             try{
                 let suspendData = instance._scormService.getSuspendData();
                 suspendData["%progress"] = progress;
+                instance._saveTotalTime(false,suspendData);
                 instance._scormService.setSuspendData(suspendData,false);
             }catch(e){
                 console.error("[ScoController] Fail updating suspend data",e.message);
@@ -201,6 +228,8 @@ export class ScoController implements ISco {
             //los tiempos
             const sessionTime = this.getSessionTimeFormatted();
             this._scormService.doLMSSetValue( "cmi.core.session_time", sessionTime );
+            this._saveTotalTime(false);
+            this._stopAutoSaveTotalTime();
             this._scormService.doLMSCommit();
             this._scormService.doLMSFinish();
         }
