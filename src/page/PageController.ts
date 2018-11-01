@@ -48,6 +48,7 @@ export abstract class PageController {
     public options: IPageOptions;
     public eventEmitter: EventEmitter;
     public state: IPageState;
+    public prevState: IPageState;
     public store: IPageStore;
     protected _resources: ResourceController[] = [];
 
@@ -90,8 +91,8 @@ export abstract class PageController {
         let score = 0,
             hasScore = false;
         for (let resource of this._resources) {
-            score += resource.getScore();
-            if(hasScore == false){
+            if(resource.hasScore()) {
+                score += (resource.getScore() || 0);
                 hasScore = resource.hasScore();
             }
         }
@@ -101,10 +102,10 @@ export abstract class PageController {
         let result = this.state.completed,
             current = this.state.completed;
         if(forceCheck || this.state.completed != true){
-            result = this._getNumCompletedResources() === this._resources.length;
+            result = this.state.completed || this._getNumCompletedResources() === this._resources.length;
             //if the state changes, trigger event
             this.state.completed = result;
-            if(current !== result){
+            if(current !== result || (this.prevState && this.prevState.score != this._getScore())){
                 this.eventEmitter.trigger(PageController.ON_COMPLETE_CHANGE,[result,this.$element,this]);
                 this.eventEmitter.globalEmitter.trigger(PageController.ON_COMPLETE_CHANGE,[result,this.$element,this]);
             }
@@ -149,6 +150,7 @@ export abstract class PageController {
     protected _onResourceCompleted(e){
         let instance:PageController = e.data.instance,
             resource = e.data.resource;
+        instance.prevState = instance._$.extend({},instance.state);
         instance.state.score = instance._getScore();
         instance.eventEmitter.trigger(PageController.ON_RESOURCE_COMPLETED,[instance.$element,instance,resource]);
         instance.eventEmitter.globalEmitter.trigger(PageController.ON_RESOURCE_COMPLETED,[instance.$element,instance,resource]);

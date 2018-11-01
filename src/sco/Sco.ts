@@ -28,6 +28,8 @@ export interface IScoOptions {
     exitMessage?:string;
     progressAsScore?:boolean;
     autoSaveTime?:number;
+    averagePagesScoreAsScore?:boolean;
+    cutOffMark?:number;
 }
 @Sco(
     {
@@ -179,14 +181,35 @@ export class ScoController implements ISco {
             this._totalTime = 0;
         }
     }
+    protected _getPageObjective(page){
+        let result = null;
+        if(this._scormService.LMSIsInitialized()) {
+            let count = this._scormService.doLMSGetValue("cmi.objectives._count");
+            if (count != undefined) {
+                for (let currentCount = 0; currentCount < count; currentCount++) {
+                    let currentKey = `cmi.objectives.${currentCount}`,
+                        id = this._scormService.doLMSGetValue(currentKey + ".id");
+                    if(id == page){
+                        result = currentCount;
+                        currentCount = count;
+                    }
+                }
+            }
+        }
+        return result;
+    }
     protected _onPageStateChange(e,result,$page,pageController:PageController){
         let instance:ScoController = e.data.instance;
         let total = instance._PageManager.count(),
             completed = instance._PageManager.getCompleted();
         if(instance._scormService.LMSIsInitialized()) {
-            let count = parseInt(instance._scormService.doLMSGetValue("cmi.objectives._count")),
-                key = `cmi.objectives.${count}`,
+            let count = instance._getPageObjective(pageController.options.name),
+                key,
                 progress = instance._Navigator.getProgressPercentage();
+            if(count == undefined) {
+                count = parseInt(instance._scormService.doLMSGetValue("cmi.objectives._count"));
+            }
+            key = `cmi.objectives.${count}`;
             instance._scormService.doLMSSetValue(`${key}.id`, pageController.options.name);
             instance._scormService.doLMSSetValue(`${key}.status`, "completed");
             if(pageController.state.score != undefined) {
@@ -204,18 +227,32 @@ export class ScoController implements ISco {
                 console.error("[ScoController] Fail updating suspend data",e.message);
             }
             if (completed.length == total) {
-                let score = 0.0,
-                    hasScore =0;
-                for (let pageIndex = 0, completedLength = completed.length; pageIndex < completedLength; pageIndex++) {
-                    let page = instance._PageManager.getPage(<number>completed[pageIndex]),
-                        pageScore = page.getState().score;
-                    if (pageScore != undefined) {
-                        hasScore++;
-                        score += pageScore;
+                if(instance._options.averagePagesScoreAsScore) {
+                    let score = 0.0,
+                        hasScore = 0;
+                    for (let pageIndex = 0, completedLength = completed.length; pageIndex < completedLength; pageIndex++) {
+                        let page = instance._PageManager.getPage(<number>completed[pageIndex]),
+                            pageScore = page.getState().score;
+                        if (pageScore != undefined) {
+                            hasScore++;
+                            score += pageScore;
+                        }
                     }
+                    let finalScore = (score * 100) / (hasScore * 100);
+                    instance._scormService.doLMSSetValue("cmi.core.score.raw", finalScore);
+                    if(instance._options.cutOffMark){
+                        if(finalScore >= instance._options.cutOffMark){
+                            instance._scormService.doLMSSetValue("cmi.core.lesson_status", "passed");
+                        }else{
+                            instance._scormService.doLMSSetValue("cmi.core.lesson_status", "failed");
+                        }
+                    }else{
+                        instance._scormService.doLMSSetValue("cmi.core.lesson_status", "completed");
+                    }
+
+                }else{
+                    instance._scormService.doLMSSetValue("cmi.core.lesson_status", "completed");
                 }
-                //instance._scormService.doLMSSetValue("cmi.core.score.raw", (score*100)/(hasScore*100));
-                instance._scormService.doLMSSetValue("cmi.core.lesson_status", "completed");
             }
             instance._scormService.doLMSCommit();
         }

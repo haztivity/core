@@ -59,8 +59,8 @@ var PageController = /** @class */ (function () {
         var score = 0, hasScore = false;
         for (var _i = 0, _a = this._resources; _i < _a.length; _i++) {
             var resource = _a[_i];
-            score += resource.getScore();
-            if (hasScore == false) {
+            if (resource.hasScore()) {
+                score += (resource.getScore() || 0);
                 hasScore = resource.hasScore();
             }
         }
@@ -69,10 +69,10 @@ var PageController = /** @class */ (function () {
     PageController.prototype.isCompleted = function (forceCheck) {
         var result = this.state.completed, current = this.state.completed;
         if (forceCheck || this.state.completed != true) {
-            result = this._getNumCompletedResources() === this._resources.length;
+            result = this.state.completed || this._getNumCompletedResources() === this._resources.length;
             //if the state changes, trigger event
             this.state.completed = result;
-            if (current !== result) {
+            if (current !== result || (this.prevState && this.prevState.score != this._getScore())) {
                 this.eventEmitter.trigger(PageController_1.ON_COMPLETE_CHANGE, [result, this.$element, this]);
                 this.eventEmitter.globalEmitter.trigger(PageController_1.ON_COMPLETE_CHANGE, [result, this.$element, this]);
             }
@@ -115,6 +115,7 @@ var PageController = /** @class */ (function () {
     };
     PageController.prototype._onResourceCompleted = function (e) {
         var instance = e.data.instance, resource = e.data.resource;
+        instance.prevState = instance._$.extend({}, instance.state);
         instance.state.score = instance._getScore();
         instance.eventEmitter.trigger(PageController_1.ON_RESOURCE_COMPLETED, [instance.$element, instance, resource]);
         instance.eventEmitter.globalEmitter.trigger(PageController_1.ON_RESOURCE_COMPLETED, [instance.$element, instance, resource]);

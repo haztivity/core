@@ -139,11 +139,31 @@ var ScoController = /** @class */ (function () {
             this._totalTime = 0;
         }
     };
+    ScoController.prototype._getPageObjective = function (page) {
+        var result = null;
+        if (this._scormService.LMSIsInitialized()) {
+            var count = this._scormService.doLMSGetValue("cmi.objectives._count");
+            if (count != undefined) {
+                for (var currentCount = 0; currentCount < count; currentCount++) {
+                    var currentKey = "cmi.objectives." + currentCount, id = this._scormService.doLMSGetValue(currentKey + ".id");
+                    if (id == page) {
+                        result = currentCount;
+                        currentCount = count;
+                    }
+                }
+            }
+        }
+        return result;
+    };
     ScoController.prototype._onPageStateChange = function (e, result, $page, pageController) {
         var instance = e.data.instance;
         var total = instance._PageManager.count(), completed = instance._PageManager.getCompleted();
         if (instance._scormService.LMSIsInitialized()) {
-            var count = parseInt(instance._scormService.doLMSGetValue("cmi.objectives._count")), key = "cmi.objectives." + count, progress = instance._Navigator.getProgressPercentage();
+            var count = instance._getPageObjective(pageController.options.name), key = void 0, progress = instance._Navigator.getProgressPercentage();
+            if (count == undefined) {
+                count = parseInt(instance._scormService.doLMSGetValue("cmi.objectives._count"));
+            }
+            key = "cmi.objectives." + count;
             instance._scormService.doLMSSetValue(key + ".id", pageController.options.name);
             instance._scormService.doLMSSetValue(key + ".status", "completed");
             if (pageController.state.score != undefined) {
@@ -162,16 +182,32 @@ var ScoController = /** @class */ (function () {
                 console.error("[ScoController] Fail updating suspend data", e.message);
             }
             if (completed.length == total) {
-                var score = 0.0, hasScore = 0;
-                for (var pageIndex = 0, completedLength = completed.length; pageIndex < completedLength; pageIndex++) {
-                    var page = instance._PageManager.getPage(completed[pageIndex]), pageScore = page.getState().score;
-                    if (pageScore != undefined) {
-                        hasScore++;
-                        score += pageScore;
+                if (instance._options.averagePagesScoreAsScore) {
+                    var score = 0.0, hasScore = 0;
+                    for (var pageIndex = 0, completedLength = completed.length; pageIndex < completedLength; pageIndex++) {
+                        var page = instance._PageManager.getPage(completed[pageIndex]), pageScore = page.getState().score;
+                        if (pageScore != undefined) {
+                            hasScore++;
+                            score += pageScore;
+                        }
+                    }
+                    var finalScore = (score * 100) / (hasScore * 100);
+                    instance._scormService.doLMSSetValue("cmi.core.score.raw", finalScore);
+                    if (instance._options.cutOffMark) {
+                        if (finalScore >= instance._options.cutOffMark) {
+                            instance._scormService.doLMSSetValue("cmi.core.lesson_status", "passed");
+                        }
+                        else {
+                            instance._scormService.doLMSSetValue("cmi.core.lesson_status", "failed");
+                        }
+                    }
+                    else {
+                        instance._scormService.doLMSSetValue("cmi.core.lesson_status", "completed");
                     }
                 }
-                //instance._scormService.doLMSSetValue("cmi.core.score.raw", (score*100)/(hasScore*100));
-                instance._scormService.doLMSSetValue("cmi.core.lesson_status", "completed");
+                else {
+                    instance._scormService.doLMSSetValue("cmi.core.lesson_status", "completed");
+                }
             }
             instance._scormService.doLMSCommit();
         }
