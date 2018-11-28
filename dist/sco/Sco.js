@@ -34,7 +34,7 @@ var ScoController = /** @class */ (function () {
     }
     ScoController_1 = ScoController;
     ScoController.prototype.activate = function (options) {
-        this._scormService.escapeSuspendData = this._options.escapeSuspendData;
+        this._scormService.escapeSuspendData = options.escapeSuspendData;
         this._scormService.doLMSInitialize();
         this._options = options;
         this._options.autoSaveTime = this._options.autoSaveTime || 10;

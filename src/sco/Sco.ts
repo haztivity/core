@@ -73,7 +73,7 @@ export class ScoController implements ISco {
     }
 
     public activate(options: IScoOptions): ScoController {
-        this._scormService.escapeSuspendData = this._options.escapeSuspendData;
+        this._scormService.escapeSuspendData = options.escapeSuspendData;
         this._scormService.doLMSInitialize();
         this._options = options;
         this._options.autoSaveTime = this._options.autoSaveTime || 10;
