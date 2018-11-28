@@ -18,7 +18,7 @@ export class ScormService {
         v12: "1.2",
         v2004: "2004"
     };
-
+    public escapeSuspendData = false;
     protected _version: string;
     protected _API: any;
 
@@ -43,7 +43,11 @@ export class ScormService {
         let result = false;
         if(this.LMSIsInitialized()){
             try{
-                const parsed = JSON.stringify(data);
+                let parsed = JSON.stringify(data);
+                //escape "
+                if(this.escapeSuspendData){
+                    parsed = parsed.replace(/"/g,'\\w');
+                }
                 this.doLMSSetValue(`cmi.suspend_data`, parsed);
                 if(commit) {
                     this.doLMSCommit();

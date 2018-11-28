@@ -15,6 +15,7 @@ var devTools_1 = require("../devTools");
 var ScormService = /** @class */ (function () {
     function ScormService(Logger) {
         this.Logger = Logger;
+        this.escapeSuspendData = false;
         this._version = ScormService_1.VERSIONS.auto;
     }
     ScormService_1 = ScormService;
@@ -35,6 +36,10 @@ var ScormService = /** @class */ (function () {
         if (this.LMSIsInitialized()) {
             try {
                 var parsed = JSON.stringify(data);
+                //escape "
+                if (this.escapeSuspendData) {
+                    parsed = parsed.replace(/"/g, '\\w');
+                }
                 this.doLMSSetValue("cmi.suspend_data", parsed);
                 if (commit) {
                     this.doLMSCommit();
