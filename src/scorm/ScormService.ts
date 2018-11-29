@@ -46,7 +46,7 @@ export class ScormService {
                 let parsed = JSON.stringify(data);
                 //escape "
                 if(this.escapeSuspendData){
-                    parsed = parsed.replace(/"/g,'\\w');
+                    parsed = parsed.replace(/"/g,'\\"');
                 }
                 this.doLMSSetValue(`cmi.suspend_data`, parsed);
                 if(commit) {
