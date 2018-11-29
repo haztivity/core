@@ -30,15 +30,21 @@ var ScormService = /** @class */ (function () {
         }
         this._version = this._version || versions.auto;
     };
+    ScormService.prototype.escapeJSONString = function (str) {
+        return str.replace(/({"|"}|\["|"\]|":"?|"?,"?)/g, function (match) { return match.replace(/"/g, '\"'); });
+    };
+    ScormService.prototype.unescapeJSONString = function (str) {
+        return str.replace(/({'|'}|\['|'\]|':'?|'?,'?)/g, function (match) { return match.replace(/'/g, '"'); });
+    };
     ScormService.prototype.setSuspendData = function (data, commit) {
         if (commit === void 0) { commit = true; }
         var result = false;
         if (this.LMSIsInitialized()) {
             try {
                 var parsed = JSON.stringify(data);
-                //escape "
+                //replace " with '
                 if (this.escapeSuspendData) {
-                    parsed = parsed.replace(/"/g, '\"');
+                    parsed = this.escapeJSONString(parsed);
                 }
                 this.doLMSSetValue("cmi.suspend_data", parsed);
                 if (commit) {
@@ -57,6 +63,9 @@ var ScormService = /** @class */ (function () {
         if (this.LMSIsInitialized()) {
             var data = this.doLMSGetValue("cmi.suspend_data");
             if (!!data) {
+                if (this.escapeSuspendData) {
+                    data = this.unescapeJSONString(data);
+                }
                 try {
                     result = JSON.parse(data);
                 }

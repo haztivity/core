@@ -39,14 +39,20 @@ export class ScormService {
         }
         this._version = this._version || versions.auto;
     }
+    public escapeJSONString(str){
+        return str.replace(/({"|"}|\["|"\]|":"?|"?,"?)/g,(match)=>match.replace(/"/g,'\"'));
+    }
+    public unescapeJSONString(str){
+        return str.replace(/({'|'}|\['|'\]|':'?|'?,'?)/g,(match)=>match.replace(/'/g,'"'));
+    }
     public setSuspendData(data,commit=true):boolean{
         let result = false;
         if(this.LMSIsInitialized()){
             try{
                 let parsed = JSON.stringify(data);
-                //escape "
+                //replace " with '
                 if(this.escapeSuspendData){
-                    parsed = parsed.replace(/"/g,'\"');
+                    parsed = this.escapeJSONString(parsed);
                 }
                 this.doLMSSetValue(`cmi.suspend_data`, parsed);
                 if(commit) {
@@ -64,6 +70,9 @@ export class ScormService {
         if(this.LMSIsInitialized()){
             let data = this.doLMSGetValue(`cmi.suspend_data`);
             if(!!data){
+                if(this.escapeSuspendData){
+                    data = this.unescapeJSONString(data);
+                }
                 try {
                     result = JSON.parse(data);
                 } catch (e) {
