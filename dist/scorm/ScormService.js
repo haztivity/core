@@ -38,7 +38,7 @@ var ScormService = /** @class */ (function () {
                 var parsed = JSON.stringify(data);
                 //escape "
                 if (this.escapeSuspendData) {
-                    parsed = parsed.replace(/"/g, '\\"');
+                    parsed = parsed.replace(/"/g, '\"');
                 }
                 this.doLMSSetValue("cmi.suspend_data", parsed);
                 if (commit) {
