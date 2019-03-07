@@ -156,11 +156,10 @@ export class ScoController implements ISco {
                 this._scormService.doLMSCommit();
                 this._totalTime = 0;
             }else{
-                let totalTime = this._scormService.doLMSGetValue("cmi.core.total_time"),
-                    times = totalTime.split(":");
-                let time = (parseInt(times[0])*3600000)+(parseInt(times[1])*60000)+(parseInt(times[2])*1000);
-                let suspendDataTime = (this._scormService.getSuspendData()["%time"]||"").split(":");
-                suspendDataTime =  (parseInt(suspendDataTime[0])*3600000)+(parseInt(suspendDataTime[1])*60000)+(parseInt(suspendDataTime[2])*1000);
+                let totalTime = this._scormService.doLMSGetValue("cmi.core.total_time");
+                let time = this._timeFormattedToMillies(totalTime);
+                let suspendDataTime = (this._scormService.getSuspendData()["%time"]||"");
+                suspendDataTime =  this._timeFormattedToMillies(suspendDataTime);
                 this._totalTime = suspendDataTime > time ? suspendDataTime : time;
             }
             if (count != undefined) {
@@ -182,6 +181,10 @@ export class ScoController implements ISco {
         }else{
             this._totalTime = 0;
         }
+    }
+    protected _timeFormattedToMillies(time){
+        const times = time.split(":");
+        return (parseInt(times[0])*3600000)+(parseInt(times[1])*60000)+(parseInt(times[2])*1000);
     }
     protected _getPageObjective(page){
         let result = null;
@@ -260,14 +263,25 @@ export class ScoController implements ISco {
         }
     }
     public exit(){
+        window.onbeforeunload = null;
         this._eventEmitter.globalEmitter.trigger(ScoController.ON_BEFORE_EXIT);
         if(this._scormService.LMSIsInitialized()){
             // enviamos un exit
             this._scormService.doLMSSetValue("cmi.core.exit","");
-            //los tiempos
-            const sessionTime = this.getSessionTimeFormatted();
-            this._scormService.doLMSSetValue( "cmi.core.session_time", sessionTime );
+            // se obtiene tiempo total de todas las sesiones de suspend data
             this._saveTotalTime(false);
+            const totalTimeSD = this.getTotalTime(false);
+            // se obtiene tiempo total de scorm
+            const totalTimeSC = this._timeFormattedToMillies(this._scormService.doLMSGetValue("cmi.core.total_time"));
+            // se obtiene tiempo de la sesión actual
+            let sessionTime: string | number = this.getSessionTime();
+            // se guarda el que mayor sume
+            if ((totalTimeSD+sessionTime) > (totalTimeSC+sessionTime)){
+                // se compensan los tiempos
+                sessionTime = (totalTimeSD - totalTimeSC) + sessionTime;
+            }
+            sessionTime = this.formatTime(sessionTime);
+            this._scormService.doLMSSetValue( "cmi.core.session_time", sessionTime );
             this._stopAutoSaveTotalTime();
             this._scormService.doLMSCommit();
             this._scormService.doLMSFinish();
@@ -293,9 +307,12 @@ export class ScoController implements ISco {
     }
     public getTotalTimeFormatted(includeSession:boolean = true):string{
         const totalTime = this.getTotalTime(includeSession);
-        let hours:any = Math.floor(totalTime / (1000 * 60 * 60) % 60),
-            minutes:any = Math.floor(totalTime / (1000 * 60) % 60),
-            seconds:any = Math.floor(totalTime / 1000 % 60);
+        return this.formatTime(totalTime);
+    }
+    public formatTime(timeInMillis) {
+        let hours:any = Math.floor(timeInMillis / (1000 * 60 * 60) % 60),
+            minutes:any = Math.floor(timeInMillis / (1000 * 60) % 60),
+            seconds:any = Math.floor(timeInMillis / 1000 % 60);
         hours = hours < 10 ? '0' + hours : hours;
         minutes = minutes < 10 ? '0' + minutes : minutes;
         seconds = seconds < 10 ? '0' + seconds : seconds;
@@ -313,6 +330,9 @@ export class ScoController implements ISco {
     }
     public run(): ScoController {
         this._dateStart = new Date();
+        window.onbeforeunload = () => {
+            this.exit();
+        };
         this._init();
         this._Navigator.activate(this._$pagesContainer);
         this._$pagesContainer.addClass(ScoController.CLASS_PAGES);

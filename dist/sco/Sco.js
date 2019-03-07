@@ -117,10 +117,10 @@ var ScoController = /** @class */ (function () {
                 this._totalTime = 0;
             }
             else {
-                var totalTime = this._scormService.doLMSGetValue("cmi.core.total_time"), times = totalTime.split(":");
-                var time = (parseInt(times[0]) * 3600000) + (parseInt(times[1]) * 60000) + (parseInt(times[2]) * 1000);
-                var suspendDataTime = (this._scormService.getSuspendData()["%time"] || "").split(":");
-                suspendDataTime = (parseInt(suspendDataTime[0]) * 3600000) + (parseInt(suspendDataTime[1]) * 60000) + (parseInt(suspendDataTime[2]) * 1000);
+                var totalTime = this._scormService.doLMSGetValue("cmi.core.total_time");
+                var time = this._timeFormattedToMillies(totalTime);
+                var suspendDataTime = (this._scormService.getSuspendData()["%time"] || "");
+                suspendDataTime = this._timeFormattedToMillies(suspendDataTime);
                 this._totalTime = suspendDataTime > time ? suspendDataTime : time;
             }
             if (count != undefined) {
@@ -139,6 +139,10 @@ var ScoController = /** @class */ (function () {
         else {
             this._totalTime = 0;
         }
+    };
+    ScoController.prototype._timeFormattedToMillies = function (time) {
+        var times = time.split(":");
+        return (parseInt(times[0]) * 3600000) + (parseInt(times[1]) * 60000) + (parseInt(times[2]) * 1000);
     };
     ScoController.prototype._getPageObjective = function (page) {
         var result = null;
@@ -214,14 +218,25 @@ var ScoController = /** @class */ (function () {
         }
     };
     ScoController.prototype.exit = function () {
+        window.onbeforeunload = null;
         this._eventEmitter.globalEmitter.trigger(ScoController_1.ON_BEFORE_EXIT);
         if (this._scormService.LMSIsInitialized()) {
             // enviamos un exit
             this._scormService.doLMSSetValue("cmi.core.exit", "");
-            //los tiempos
-            var sessionTime = this.getSessionTimeFormatted();
-            this._scormService.doLMSSetValue("cmi.core.session_time", sessionTime);
+            // se obtiene tiempo total de todas las sesiones de suspend data
             this._saveTotalTime(false);
+            var totalTimeSD = this.getTotalTime(false);
+            // se obtiene tiempo total de scorm
+            var totalTimeSC = this._timeFormattedToMillies(this._scormService.doLMSGetValue("cmi.core.total_time"));
+            // se obtiene tiempo de la sesión actual
+            var sessionTime = this.getSessionTime();
+            // se guarda el que mayor sume
+            if ((totalTimeSD + sessionTime) > (totalTimeSC + sessionTime)) {
+                // se compensan los tiempos
+                sessionTime = (totalTimeSD - totalTimeSC) + sessionTime;
+            }
+            sessionTime = this.formatTime(sessionTime);
+            this._scormService.doLMSSetValue("cmi.core.session_time", sessionTime);
             this._stopAutoSaveTotalTime();
             this._scormService.doLMSCommit();
             this._scormService.doLMSFinish();
@@ -249,7 +264,10 @@ var ScoController = /** @class */ (function () {
     ScoController.prototype.getTotalTimeFormatted = function (includeSession) {
         if (includeSession === void 0) { includeSession = true; }
         var totalTime = this.getTotalTime(includeSession);
-        var hours = Math.floor(totalTime / (1000 * 60 * 60) % 60), minutes = Math.floor(totalTime / (1000 * 60) % 60), seconds = Math.floor(totalTime / 1000 % 60);
+        return this.formatTime(totalTime);
+    };
+    ScoController.prototype.formatTime = function (timeInMillis) {
+        var hours = Math.floor(timeInMillis / (1000 * 60 * 60) % 60), minutes = Math.floor(timeInMillis / (1000 * 60) % 60), seconds = Math.floor(timeInMillis / 1000 % 60);
         hours = hours < 10 ? '0' + hours : hours;
         minutes = minutes < 10 ? '0' + minutes : minutes;
         seconds = seconds < 10 ? '0' + seconds : seconds;
@@ -264,7 +282,11 @@ var ScoController = /** @class */ (function () {
         return hours + ':' + minutes + ':' + seconds;
     };
     ScoController.prototype.run = function () {
+        var _this = this;
         this._dateStart = new Date();
+        window.onbeforeunload = function () {
+            _this.exit();
+        };
         this._init();
         this._Navigator.activate(this._$pagesContainer);
         this._$pagesContainer.addClass(ScoController_1.CLASS_PAGES);
