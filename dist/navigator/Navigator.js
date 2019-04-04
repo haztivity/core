@@ -14,6 +14,11 @@ var jquery_1 = require("../jquery");
 var di_1 = require("../di");
 var page_1 = require("../page");
 var utils_1 = require("../utils");
+var NavigationMode;
+(function (NavigationMode) {
+    NavigationMode[NavigationMode["restricted"] = 0] = "restricted";
+    NavigationMode[NavigationMode["free"] = 1] = "free";
+})(NavigationMode = exports.NavigationMode || (exports.NavigationMode = {}));
 var Navigator = /** @class */ (function () {
     /**
      * Gestiona la transición entre páginas y el renderizado de las mismas en un contexto específico
@@ -26,6 +31,7 @@ var Navigator = /** @class */ (function () {
         this._PageManager = _PageManager;
         this._EventEmitterFactory = _EventEmitterFactory;
         this._development = false;
+        this._mode = NavigationMode.restricted;
     }
     Navigator_1 = Navigator;
     Navigator.prototype.getProgressPercentage = function () {
@@ -40,6 +46,12 @@ var Navigator = /** @class */ (function () {
     };
     Navigator.prototype.disableDev = function () {
         this._development = false;
+    };
+    Navigator.prototype.setMode = function (mode) {
+        this._mode = mode || NavigationMode.restricted;
+    };
+    Navigator.prototype.getMode = function () {
+        return this._mode;
     };
     /**
      * Navega a la página solicitada.
@@ -61,7 +73,7 @@ var Navigator = /** @class */ (function () {
             if (newPage) {
                 if (newPage !== this._currentPage) {
                     //check if resources are completed to go to the next page
-                    if (this._development === true || (currentPageIs === -1 || (previousPageForTarget == undefined || previousPageForTarget.isCompleted()))) {
+                    if (this._development === true || this._mode === NavigationMode.free || (currentPageIs === -1 || (previousPageForTarget == undefined || previousPageForTarget.isCompleted()))) {
                         this._forceCompleteTransition();
                         this._currentRenderProcess = this._$.Deferred();
                         this._currentPage = newPage; //set new page as current
@@ -262,7 +274,7 @@ var Navigator = /** @class */ (function () {
                 oldPage.getPage().off("." + Navigator_1.NAMESPACE);
             }
             this.enable();
-            if (newPage.isCompleted()) {
+            if (newPage.isCompleted() || this._mode === NavigationMode.free) {
                 this.setNextDisabled(false);
             }
             else {
@@ -284,7 +296,7 @@ var Navigator = /** @class */ (function () {
     };
     Navigator.prototype._onPageCompletedChange = function (e, completed) {
         var instance = e.data.instance;
-        if (completed) {
+        if (completed || instance._mode === NavigationMode.free) {
             instance.setNextDisabled(false);
         }
         else {

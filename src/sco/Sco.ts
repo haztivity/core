@@ -11,10 +11,14 @@ import {ResourceManager} from "../resource";
 import {ComponentManager, ComponentInitializer} from "../component";
 import {ComponentController} from "../component/ComponentController";
 import {$} from "../jquery";
-import {INavigatorPageData} from "../navigator/Navigator";
+import {
+    INavigatorPageData,
+    NavigationMode
+} from "../navigator/Navigator";
 import {PageController} from "../page/PageController";
 import {ScormService} from "../scorm/ScormService";
 import {NavigatorService} from "../";
+
 export interface ISco {
     on(): void;
     run(): void;
@@ -31,6 +35,7 @@ export interface IScoOptions {
     averagePagesScoreAsScore?:boolean;
     cutOffMark?:number;
     escapeSuspendData?:boolean;
+    navigationMode?: NavigationMode;
 }
 @Sco(
     {
@@ -73,6 +78,7 @@ export class ScoController implements ISco {
     }
 
     public activate(options: IScoOptions): ScoController {
+        this._Navigator.setMode(options.navigationMode);
         this._scormService.escapeSuspendData = options.escapeSuspendData;
         this._scormService.doLMSInitialize();
         this._options = options;

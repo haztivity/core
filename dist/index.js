@@ -44,6 +44,7 @@ exports.ResourceSequenceFactory = resource_1.ResourceSequenceFactory;
 exports.ResourceSequence = resource_1.ResourceSequence;
 var navigator_1 = require("./navigator");
 exports.Navigator = navigator_1.Navigator;
+exports.NavigationMode = navigator_1.NavigationMode;
 exports.NavigatorService = navigator_1.NavigatorService;
 var component_1 = require("./component");
 exports.ComponentController = component_1.ComponentController;

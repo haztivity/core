@@ -11,6 +11,10 @@ export interface INavigatorPageData{
     name:string;
     state:IPageState;
 }
+export enum NavigationMode {
+    restricted,
+    free
+}
 export interface INavigatorService{
     goTo(index: number):JQueryPromise<INavigatorPageData>|boolean;
     isDisabled():boolean;
@@ -58,6 +62,7 @@ export class Navigator implements IEventHandler, INavigatorService {
     protected _disabled: boolean;
     protected _development=false;
     protected _nextDisabled:boolean;
+    protected _mode: NavigationMode = NavigationMode.restricted;
     /**
      * Gestiona la transición entre páginas y el renderizado de las mismas en un contexto específico
      * @param {JQueryStatic}                _$
@@ -79,6 +84,12 @@ export class Navigator implements IEventHandler, INavigatorService {
     }
     public disableDev(){
         this._development = false;
+    }
+    public setMode (mode: NavigationMode){
+        this._mode = mode || NavigationMode.restricted;
+    }
+    public getMode(): NavigationMode {
+        return this._mode;
     }
     /**
      * Navega a la página solicitada.
@@ -102,7 +113,7 @@ export class Navigator implements IEventHandler, INavigatorService {
             if (newPage) {
                 if (newPage !== this._currentPage) {
                     //check if resources are completed to go to the next page
-                    if (this._development === true || (currentPageIs === -1 || (previousPageForTarget == undefined || previousPageForTarget.isCompleted()))) {
+                    if (this._development === true || this._mode === NavigationMode.free || (currentPageIs === -1 || (previousPageForTarget == undefined || previousPageForTarget.isCompleted()))) {
                         this._forceCompleteTransition();
                         this._currentRenderProcess = this._$.Deferred();
                         this._currentPage = newPage;//set new page as current
@@ -322,7 +333,7 @@ export class Navigator implements IEventHandler, INavigatorService {
                 oldPage.getPage().off("." + Navigator.NAMESPACE);
             }
             this.enable();
-            if (newPage.isCompleted()) {
+            if (newPage.isCompleted() || this._mode === NavigationMode.free) {
                 this.setNextDisabled(false);
             }else{
                 this.setNextDisabled(true);
@@ -343,7 +354,7 @@ export class Navigator implements IEventHandler, INavigatorService {
     }
     protected _onPageCompletedChange(e,completed){
         let instance =e.data.instance;
-        if(completed){
+        if(completed || instance._mode === NavigationMode.free){
             instance.setNextDisabled(false);
         }else{
             instance.setNextDisabled(true);

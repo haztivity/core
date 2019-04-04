@@ -34,6 +34,7 @@ var ScoController = /** @class */ (function () {
     }
     ScoController_1 = ScoController;
     ScoController.prototype.activate = function (options) {
+        this._Navigator.setMode(options.navigationMode);
         this._scormService.escapeSuspendData = options.escapeSuspendData;
         this._scormService.doLMSInitialize();
         this._options = options;

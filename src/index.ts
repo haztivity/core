@@ -53,6 +53,7 @@ export {
 export {
     Navigator,
     INavigatorPageData,
+    NavigationMode,
     NavigatorService
 } from "./navigator";
 export {
