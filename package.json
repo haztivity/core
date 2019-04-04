@@ -23,21 +23,22 @@
   },
   "dependencies": {
     "array-unique": "^0.3.2",
-    "bottlejs": "^1.6.1",
-    "jquery": "^3.2.1",
+    "bottlejs": "^1.7.2",
+    "jquery": "^3.3.1",
     "loglevel": "^1.5.1"
   },
   "devDependencies": {
-    "@haztivity/cli": "^0.3.0",
-    "@types/core-js": "^0.9.43",
-    "@types/jquery": "^3.2.15",
-    "@types/loglevel": "^1.5.3",
+    "@haztivity/cli": "^0.5.3",
+    "@types/core-js": "^2.5.0",
+    "@types/jquery": "^3.3.29",
+    "@types/loglevel": "^1.5.4",
     "@types/string": "0.0.29",
-    "commander": "^2.11.0",
+    "commander": "^2.20.0",
     "core-js": "^2.5.1",
     "fuse-box": "^2.3.3",
+    "node-sass": "^4.11.0",
     "require-dir": "^0.3.2",
-    "rimraf": "^2.6.2",
+    "rimraf": "^2.6.3",
     "typescript": "^2.5.3"
   }
 }
