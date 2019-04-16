@@ -33,6 +33,7 @@ export interface IScoOptions {
     progressAsScore?:boolean;
     autoSaveTime?:number;
     averagePagesScoreAsScore?:boolean;
+    totalPagesScoreAsScore?:boolean;
     cutOffMark?:number;
     escapeSuspendData?:boolean;
     navigationMode?: NavigationMode;
@@ -261,7 +262,26 @@ export class ScoController implements ISco {
                         instance._scormService.doLMSSetValue("cmi.core.lesson_status", "completed");
                     }
 
-                }else{
+                } else if (instance._options.totalPagesScoreAsScore){
+                    let score = 0.0;
+                    for (let pageIndex = 0, completedLength = completed.length; pageIndex < completedLength; pageIndex++) {
+                        let page = instance._PageManager.getPage(<number>completed[pageIndex]),
+                            pageScore = page.getState().score;
+                        if (pageScore != undefined) {
+                            score += pageScore;
+                        }
+                    }
+                    instance._scormService.doLMSSetValue("cmi.core.score.raw", score);
+                    if(instance._options.cutOffMark){
+                        if(score >= instance._options.cutOffMark){
+                            instance._scormService.doLMSSetValue("cmi.core.lesson_status", "passed");
+                        }else{
+                            instance._scormService.doLMSSetValue("cmi.core.lesson_status", "failed");
+                        }
+                    }else{
+                        instance._scormService.doLMSSetValue("cmi.core.lesson_status", "completed");
+                    }
+                } else{
                     instance._scormService.doLMSSetValue("cmi.core.lesson_status", "completed");
                 }
             }

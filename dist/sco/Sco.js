@@ -211,6 +211,27 @@ var ScoController = /** @class */ (function () {
                         instance._scormService.doLMSSetValue("cmi.core.lesson_status", "completed");
                     }
                 }
+                else if (instance._options.totalPagesScoreAsScore) {
+                    var score = 0.0;
+                    for (var pageIndex = 0, completedLength = completed.length; pageIndex < completedLength; pageIndex++) {
+                        var page = instance._PageManager.getPage(completed[pageIndex]), pageScore = page.getState().score;
+                        if (pageScore != undefined) {
+                            score += pageScore;
+                        }
+                    }
+                    instance._scormService.doLMSSetValue("cmi.core.score.raw", score);
+                    if (instance._options.cutOffMark) {
+                        if (score >= instance._options.cutOffMark) {
+                            instance._scormService.doLMSSetValue("cmi.core.lesson_status", "passed");
+                        }
+                        else {
+                            instance._scormService.doLMSSetValue("cmi.core.lesson_status", "failed");
+                        }
+                    }
+                    else {
+                        instance._scormService.doLMSSetValue("cmi.core.lesson_status", "completed");
+                    }
+                }
                 else {
                     instance._scormService.doLMSSetValue("cmi.core.lesson_status", "completed");
                 }
