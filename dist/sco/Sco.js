@@ -21,7 +21,7 @@ var jquery_1 = require("../jquery");
 var PageController_1 = require("../page/PageController");
 var ScormService_1 = require("../scorm/ScormService");
 var ScoController = /** @class */ (function () {
-    function ScoController(_Navigator, _PageManager, _ResourceManager, _EventEmitterFactory, _ComponentManager, _ComponentInitializer, _$, _scormService) {
+    function ScoController(_Navigator, _PageManager, _ResourceManager, _EventEmitterFactory, _ComponentManager, _ComponentInitializer, _$, _scormService, _InjectorService) {
         this._Navigator = _Navigator;
         this._PageManager = _PageManager;
         this._ResourceManager = _ResourceManager;
@@ -30,14 +30,15 @@ var ScoController = /** @class */ (function () {
         this._ComponentInitializer = _ComponentInitializer;
         this._$ = _$;
         this._scormService = _scormService;
+        this._InjectorService = _InjectorService;
         this._eventEmitter = this._EventEmitterFactory.createEmitter();
     }
     ScoController_1 = ScoController;
     ScoController.prototype.activate = function (options) {
         this._Navigator.setMode(options.navigationMode);
         this._scormService.escapeSuspendData = options.escapeSuspendData;
-        this._scormService.doLMSInitialize();
         this._options = options;
+        this._scormService.doLMSInitialize();
         this._options.autoSaveTime = this._options.autoSaveTime || 10;
         this._ComponentManager.addAll(this._options.components || []);
         this._PageManager.addPages(this._options.pages);
@@ -49,7 +50,6 @@ var ScoController = /** @class */ (function () {
         return this;
     };
     ScoController.prototype._init = function () {
-        this._$context = this._$("[data-hz-app]");
         //context must exists
         if (this._$context.length > 0) {
             this._$context.prepend(this._options.template);
@@ -67,9 +67,6 @@ var ScoController = /** @class */ (function () {
             else {
                 throw new Errors_1.HaztivityPagesContextNotFound();
             }
-        }
-        else {
-            throw new Errors_1.HaztivityAppContextNotFound();
         }
     };
     ScoController.prototype._stopAutoSaveTotalTime = function () {
@@ -309,19 +306,46 @@ var ScoController = /** @class */ (function () {
         window.onbeforeunload = function () {
             _this.exit();
         };
-        this._init();
-        this._Navigator.activate(this._$pagesContainer);
-        this._$pagesContainer.addClass(ScoController_1.CLASS_PAGES);
-        this._ComponentInitializer.initialize(this._$context);
-        //init components
-        var currentPage = this._getCurrentPage();
-        if (!!currentPage) {
-            var pageIndex = this._PageManager.getPageIndex(currentPage);
-            pageIndex = pageIndex != -1 ? pageIndex : 0;
-            this._Navigator.goTo(pageIndex);
+        this._$context = this._$("[data-hz-app]");
+        if (this._$context.length > 0) {
+            var continueRun = void 0;
+            var canRunPromise = void 0;
+            if ((typeof this._options.canRun).toLowerCase() == "function") {
+                continueRun = this._options.canRun(this._$, this._$context, this._scormService, this._PageManager, this._ResourceManager, this._ComponentManager, this._InjectorService);
+            }
+            else {
+                continueRun = true;
+            }
+            if ((typeof continueRun.then).toLowerCase() != "function") {
+                canRunPromise = jquery_1.$.Deferred().resolve(continueRun).promise();
+            }
+            else {
+                canRunPromise = continueRun;
+            }
+            canRunPromise.then(function (result) {
+                if (result === true) {
+                    _this._init();
+                    _this._Navigator.activate(_this._$pagesContainer);
+                    _this._$pagesContainer.addClass(ScoController_1.CLASS_PAGES);
+                    _this._ComponentInitializer.initialize(_this._$context);
+                    //init components
+                    var currentPage = _this._getCurrentPage();
+                    if (!!currentPage) {
+                        var pageIndex = _this._PageManager.getPageIndex(currentPage);
+                        pageIndex = pageIndex != -1 ? pageIndex : 0;
+                        _this._Navigator.goTo(pageIndex);
+                    }
+                    else {
+                        _this._Navigator.goTo(0);
+                    }
+                }
+                else if (result instanceof _this._$) {
+                    _this._$context.append(result);
+                }
+            });
         }
         else {
-            this._Navigator.goTo(0);
+            throw new Errors_1.HaztivityAppContextNotFound();
         }
         return this;
     };
@@ -341,7 +365,8 @@ var ScoController = /** @class */ (function () {
                 component_1.ComponentManager,
                 component_1.ComponentInitializer,
                 jquery_1.$,
-                ScormService_1.ScormService
+                ScormService_1.ScormService,
+                di_1.InjectorService
             ]
         })
     ], ScoController);

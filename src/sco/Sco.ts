@@ -3,7 +3,7 @@
  * Copyright Davinchi. All Rights Reserved.
  */
 import {EventEmitter, EventEmitterFactory} from "../utils";
-import {Sco} from "../di";
+import {Sco,InjectorService} from "../di";
 import {PageRegister, PageManager} from "../page";
 import {Navigator} from "../navigator";
 import {HaztivityAppContextNotFound, HaztivityPagesContextNotFound} from "./Errors";
@@ -37,6 +37,15 @@ export interface IScoOptions {
     cutOffMark?:number;
     escapeSuspendData?:boolean;
     navigationMode?: NavigationMode;
+    canRun?(
+        $:JQueryStatic,
+        $context: JQuery,
+        ScormService: ScormService,
+        PageManager: PageManager,
+        ResourceManager: ResourceManager,
+        ComponentManager: ComponentManager,
+        InjectorService: InjectorService
+    ): boolean | JQuery.Promise<boolean>;
 }
 @Sco(
     {
@@ -49,7 +58,8 @@ export interface IScoOptions {
             ComponentManager,
             ComponentInitializer,
             $,
-            ScormService
+            ScormService,
+            InjectorService
         ]
     }
 )
@@ -74,15 +84,16 @@ export class ScoController implements ISco {
                 protected _ComponentManager: ComponentManager,
                 protected _ComponentInitializer: ComponentInitializer,
                 protected _$: JQueryStatic,
-                protected _scormService:ScormService) {
+                protected _scormService:ScormService,
+                protected _InjectorService:InjectorService) {
         this._eventEmitter = this._EventEmitterFactory.createEmitter();
     }
 
     public activate(options: IScoOptions): ScoController {
         this._Navigator.setMode(options.navigationMode);
         this._scormService.escapeSuspendData = options.escapeSuspendData;
-        this._scormService.doLMSInitialize();
         this._options = options;
+        this._scormService.doLMSInitialize();
         this._options.autoSaveTime = this._options.autoSaveTime || 10;
         this._ComponentManager.addAll(this._options.components || []);
         this._PageManager.addPages(this._options.pages);
@@ -96,7 +107,6 @@ export class ScoController implements ISco {
     }
 
     protected _init() {
-        this._$context = this._$("[data-hz-app]");
         //context must exists
         if (this._$context.length > 0) {
             this._$context.prepend(this._options.template);
@@ -114,8 +124,6 @@ export class ScoController implements ISco {
             } else {
                 throw new HaztivityPagesContextNotFound();
             }
-        } else {
-            throw new HaztivityAppContextNotFound();
         }
     }
     protected _stopAutoSaveTotalTime(){
@@ -359,18 +367,47 @@ export class ScoController implements ISco {
         window.onbeforeunload = () => {
             this.exit();
         };
-        this._init();
-        this._Navigator.activate(this._$pagesContainer);
-        this._$pagesContainer.addClass(ScoController.CLASS_PAGES);
-        this._ComponentInitializer.initialize(this._$context);
-        //init components
-        const currentPage = this._getCurrentPage();
-        if (!!currentPage) {
-            var pageIndex = this._PageManager.getPageIndex(currentPage);
-            pageIndex = pageIndex != -1 ? pageIndex : 0;
-            this._Navigator.goTo(pageIndex);
-        }else {
-            this._Navigator.goTo(0);
+        this._$context = this._$("[data-hz-app]");
+        if (this._$context.length > 0) {
+            let continueRun: boolean | JQuery | JQuery.Promise<boolean> | JQuery.Promise<JQuery>;
+            let canRunPromise;
+            if ((typeof this._options.canRun).toLowerCase() == "function") {
+                continueRun = this._options.canRun(
+                    this._$,
+                    this._$context,
+                    this._scormService,
+                    this._PageManager,
+                    this._ResourceManager,
+                    this._ComponentManager,
+                    this._InjectorService
+                );
+            } else {
+                continueRun = true;
+            }
+            if ((typeof (<any>continueRun).then).toLowerCase() != "function"){
+                canRunPromise = $.Deferred().resolve(continueRun).promise();
+            } else {
+                canRunPromise = continueRun;
+            }
+            canRunPromise.then((result) => {
+                if (result === true) {
+                    this._init();
+                    this._Navigator.activate(this._$pagesContainer);
+                    this._$pagesContainer.addClass(ScoController.CLASS_PAGES);
+                    this._ComponentInitializer.initialize(this._$context);
+                    //init components
+                    const currentPage = this._getCurrentPage();
+                    if (!!currentPage) {
+                        var pageIndex = this._PageManager.getPageIndex(currentPage);
+                        pageIndex = pageIndex != -1 ? pageIndex : 0;
+                        this._Navigator.goTo(pageIndex);
+                    } else {
+                        this._Navigator.goTo(0);
+                    }
+                }
+            });
+        }  else {
+            throw new HaztivityAppContextNotFound();
         }
         return this;
     }
