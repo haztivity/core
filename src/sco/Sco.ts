@@ -148,14 +148,14 @@ export class ScoController implements ISco {
     protected _onPageShown(e,$page, $oldPage, oldPageRelativePosition, pageController:PageController){
         let instance = e.data.instance;
         if(instance._scormService.LMSIsInitialized()){
-            instance._scormService.doLMSSetValue(`cmi.core.lesson_location`,pageController.options.name);
+            instance._scormService.doLMSSetValue(`cmi.location`,pageController.options.name);
             instance._scormService.doLMSCommit();
         }
     }
     protected _getCurrentPage(){
         let result = null;
         if(this._scormService.LMSIsInitialized()) {
-            let page = this._scormService.doLMSGetValue(`cmi.core.lesson_location`);
+            let page = this._scormService.doLMSGetValue(`cmi.location`);
             if(!!page){
                 result = page;
             }
@@ -165,25 +165,27 @@ export class ScoController implements ISco {
     protected _restorePagesState(){
         if(this._scormService.LMSIsInitialized()) {
             let count = this._scormService.doLMSGetValue("cmi.objectives._count"),
-                lessonStatus = this._scormService.doLMSGetValue("cmi.core.lesson_status");
-            if(lessonStatus == "not attempted"){
-                this._scormService.doLMSSetValue("cmi.core.lesson_status","incomplete");
+                lessonStatus = (this._scormService.doLMSGetValue("cmi.completion_status") || "").toLowerCase();
+            if(lessonStatus == "not attempted" || lessonStatus == "unknown" || !lessonStatus){
+                this._scormService.doLMSSetValue("cmi.completion_status","incomplete");
+                this._scormService.doLMSSetValue("cmi.score.raw",0);
+                this._scormService.doLMSSetValue("cmi.success_status","unknown");
                 this._scormService.doLMSCommit();
                 this._totalTime = 0;
-            }else{
-                let totalTime = this._scormService.doLMSGetValue("cmi.core.total_time");
+            }
+            if (count != undefined) {
+                let totalTime = this._scormService.doLMSGetValue("cmi.total_time");
                 let time = this._timeFormattedToMillies(totalTime);
                 let suspendDataTime = (this._scormService.getSuspendData()["%time"]||"");
                 suspendDataTime =  this._timeFormattedToMillies(suspendDataTime);
                 this._totalTime = suspendDataTime > time ? suspendDataTime : time;
-            }
-            if (count != undefined) {
                 for (let currentCount = 0; currentCount < count; currentCount++) {
                     let currentKey = `cmi.objectives.${currentCount}`,
                         id = this._scormService.doLMSGetValue(currentKey + ".id"),
                         page = this._PageManager.getPageByName(id);
                     if (page != undefined) {
-                        let scormState = this._scormService.doLMSGetValue(currentKey + ".status"),
+                        let scormState = this._scormService.doLMSGetValue(currentKey + ".completion_status"),
+                            successStatus = this._scormService.doLMSGetValue(currentKey + ".success_status"),
                             scormScore = parseFloat(this._scormService.doLMSGetValue(currentKey + ".score.raw")),
                             pageState = page.getState();
                         pageState.completed = scormState == "completed";
@@ -198,8 +200,7 @@ export class ScoController implements ISco {
         }
     }
     protected _timeFormattedToMillies(time){
-        const times = time.split(":");
-        return (parseInt(times[0])*3600000)+(parseInt(times[1])*60000)+(parseInt(times[2])*1000);
+        return time*1000;
     }
     protected _getPageObjective(page){
         let result = null;
@@ -231,12 +232,13 @@ export class ScoController implements ISco {
             }
             key = `cmi.objectives.${count}`;
             instance._scormService.doLMSSetValue(`${key}.id`, pageController.options.name);
-            instance._scormService.doLMSSetValue(`${key}.status`, "completed");
+            instance._scormService.doLMSSetValue(`${key}.completion_status`, "completed");
+            instance._scormService.doLMSSetValue(`${key}.success_status`, "passed");
             if(pageController.state.score != undefined) {
                 instance._scormService.doLMSSetValue(`${key}.score.raw`, pageController.state.score);
             }
             if(instance._options.progressAsScore){
-                instance._scormService.doLMSSetValue("cmi.core.score.raw",progress);
+                instance._scormService.doLMSSetValue("cmi.score.raw",progress);
             }
             try{
                 let suspendData = instance._scormService.getSuspendData();
@@ -259,15 +261,16 @@ export class ScoController implements ISco {
                         }
                     }
                     let finalScore = (score * 100) / (hasScore * 100);
-                    instance._scormService.doLMSSetValue("cmi.core.score.raw", finalScore);
+                    instance._scormService.doLMSSetValue("cmi.score.raw", finalScore);
+                    instance._scormService.doLMSSetValue("cmi.completion_status", "completed");
                     if(instance._options.cutOffMark){
                         if(finalScore >= instance._options.cutOffMark){
-                            instance._scormService.doLMSSetValue("cmi.core.lesson_status", "passed");
+                            instance._scormService.doLMSSetValue("cmi.success_status", "passed");
                         }else{
-                            instance._scormService.doLMSSetValue("cmi.core.lesson_status", "failed");
+                            instance._scormService.doLMSSetValue("cmi.success_status", "failed");
                         }
                     }else{
-                        instance._scormService.doLMSSetValue("cmi.core.lesson_status", "completed");
+                        instance._scormService.doLMSSetValue("cmi.success_status", "passed");
                     }
 
                 } else if (instance._options.totalPagesScoreAsScore){
@@ -279,18 +282,20 @@ export class ScoController implements ISco {
                             score += pageScore;
                         }
                     }
-                    instance._scormService.doLMSSetValue("cmi.core.score.raw", score);
+                    instance._scormService.doLMSSetValue("cmi.score.raw", score);
+                    instance._scormService.doLMSSetValue("cmi.completion_status", "completed");
                     if(instance._options.cutOffMark){
                         if(score >= instance._options.cutOffMark){
-                            instance._scormService.doLMSSetValue("cmi.core.lesson_status", "passed");
+                            instance._scormService.doLMSSetValue("cmi.success_status", "passed");
                         }else{
-                            instance._scormService.doLMSSetValue("cmi.core.lesson_status", "failed");
+                            instance._scormService.doLMSSetValue("cmi.success_status", "failed");
                         }
                     }else{
-                        instance._scormService.doLMSSetValue("cmi.core.lesson_status", "completed");
+                        instance._scormService.doLMSSetValue("cmi.core.success_status", "passed");
                     }
                 } else{
-                    instance._scormService.doLMSSetValue("cmi.core.lesson_status", "completed");
+                    instance._scormService.doLMSSetValue("cmi.completion_status", "completed");
+                    instance._scormService.doLMSSetValue("cmi.core.success_status", "passed");
                 }
             }
             instance._scormService.doLMSCommit();
@@ -344,13 +349,7 @@ export class ScoController implements ISco {
         return this.formatTime(totalTime);
     }
     public formatTime(timeInMillis) {
-        let hours:any = Math.floor(timeInMillis / (1000 * 60 * 60) % 60),
-            minutes:any = Math.floor(timeInMillis / (1000 * 60) % 60),
-            seconds:any = Math.floor(timeInMillis / 1000 % 60);
-        hours = hours < 10 ? '0' + hours : hours;
-        minutes = minutes < 10 ? '0' + minutes : minutes;
-        seconds = seconds < 10 ? '0' + seconds : seconds;
-        return hours + ':'+ minutes + ':' + seconds;
+        return timeInMillis / 1000;
     }
     public getSessionTimeFormatted(){
         const sessionTime = this.getSessionTime();
