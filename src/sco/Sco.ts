@@ -18,6 +18,7 @@ import {
 import {PageController} from "../page/PageController";
 import {ScormService} from "../scorm/ScormService";
 import {NavigatorService} from "../";
+import {ScormPageData} from "../scorm/ScormPageData";
 
 export interface ISco {
     on(): void;
@@ -162,9 +163,68 @@ export class ScoController implements ISco {
         }
         return result;
     }
+    protected _getPagesCount() {
+        return this._scormService.doLMSGetValue("cmi.objectives._count");
+    }
+    protected _getPageId(index) {
+        const currentKey = `cmi.objectives.${index}`;
+        return this._scormService.doLMSGetValue(currentKey + ".id")
+    }
+    protected _setPageData(data: ScormPageData, commit = true) {
+        const currentKey = `cmi.objectives.${data.index}`;
+        this._scormService.doLMSSetValue(currentKey+".id",data.id);
+        this._scormService.doLMSSetValue(currentKey+".status",data.status);
+        if (data.score != null) {
+            this._scormService.doLMSSetValue(currentKey + ".score.raw", data.score);
+        }
+        if (commit) {
+            this._scormService.doLMSCommit();
+        }
+    }
+    protected _getPageData(indexOrId) :ScormPageData {
+        let pageIndex = indexOrId;
+        let pageId = null;
+        if (isNaN(parseInt(indexOrId))) {
+            pageIndex = this._getPageObjective(indexOrId);
+            pageId = indexOrId;
+        } else {
+            pageId = this._getPageId(indexOrId);
+            pageIndex = indexOrId;
+        }
+        if (pageIndex != undefined) {
+            const currentKey = `cmi.objectives.${pageIndex}`;
+            const status = this._scormService.doLMSGetValue(currentKey + ".status");
+            const score = this._scormService.doLMSGetValue(currentKey + ".score.raw");
+            return {
+                id: pageId,
+                index: pageIndex,
+                status: status,
+                score: !isNaN(score) ? score : null
+            }
+        } else {
+            return null;
+        }
+    }
+    protected _getPageObjective(page){
+        let result = null;
+        if(this._scormService.LMSIsInitialized()) {
+            let count = this._getPagesCount()
+            if (count != undefined) {
+                for (let currentCount = 0; currentCount < count; currentCount++) {
+                    let currentKey = `cmi.objectives.${currentCount}`,
+                        id = this._scormService.doLMSGetValue(currentKey + ".id");
+                    if(id == page){
+                        result = currentCount;
+                        currentCount = count;
+                    }
+                }
+            }
+        }
+        return result;
+    }
     protected _restorePagesState(){
         if(this._scormService.LMSIsInitialized()) {
-            let count = this._scormService.doLMSGetValue("cmi.objectives._count"),
+            let count = this._getPagesCount(),
                 lessonStatus = this._scormService.doLMSGetValue("cmi.core.lesson_status");
             if(lessonStatus == "not attempted"){
                 this._scormService.doLMSSetValue("cmi.core.lesson_status","incomplete");
@@ -179,15 +239,13 @@ export class ScoController implements ISco {
             }
             if (count != undefined) {
                 for (let currentCount = 0; currentCount < count; currentCount++) {
-                    let currentKey = `cmi.objectives.${currentCount}`,
-                        id = this._scormService.doLMSGetValue(currentKey + ".id"),
+                    let id = this._getPageId(currentCount),
                         page = this._PageManager.getPageByName(id);
                     if (page != undefined) {
-                        let scormState = this._scormService.doLMSGetValue(currentKey + ".status"),
-                            scormScore = parseFloat(this._scormService.doLMSGetValue(currentKey + ".score.raw")),
+                        let pageData = this._getPageData(currentCount),
                             pageState = page.getState();
-                        pageState.completed = scormState == "completed";
-                        pageState.score = !isNaN(scormScore) ? scormScore : null;
+                        pageState.completed = pageData.status == "completed";
+                        pageState.score = pageData.score;
                         pageState.visited = true;
                         page.setState(pageState);
                     }
@@ -201,23 +259,7 @@ export class ScoController implements ISco {
         const times = time.split(":");
         return (parseInt(times[0])*3600000)+(parseInt(times[1])*60000)+(parseInt(times[2])*1000);
     }
-    protected _getPageObjective(page){
-        let result = null;
-        if(this._scormService.LMSIsInitialized()) {
-            let count = this._scormService.doLMSGetValue("cmi.objectives._count");
-            if (count != undefined) {
-                for (let currentCount = 0; currentCount < count; currentCount++) {
-                    let currentKey = `cmi.objectives.${currentCount}`,
-                        id = this._scormService.doLMSGetValue(currentKey + ".id");
-                    if(id == page){
-                        result = currentCount;
-                        currentCount = count;
-                    }
-                }
-            }
-        }
-        return result;
-    }
+
     protected _onPageStateChange(e,result,$page,pageController:PageController){
         let instance:ScoController = e.data.instance;
         let total = instance._PageManager.count(),
@@ -227,14 +269,14 @@ export class ScoController implements ISco {
                 key,
                 progress = instance._Navigator.getProgressPercentage();
             if(count == undefined) {
-                count = parseInt(instance._scormService.doLMSGetValue("cmi.objectives._count"));
+                count = parseInt(instance._getPagesCount());
             }
-            key = `cmi.objectives.${count}`;
-            instance._scormService.doLMSSetValue(`${key}.id`, pageController.options.name);
-            instance._scormService.doLMSSetValue(`${key}.status`, "completed");
-            if(pageController.state.score != undefined) {
-                instance._scormService.doLMSSetValue(`${key}.score.raw`, pageController.state.score);
-            }
+            instance._setPageData({
+                id: pageController.options.name,
+                index: count,
+                score: pageController.state.score,
+                status: "completed"
+            });
             if(instance._options.progressAsScore){
                 instance._scormService.doLMSSetValue("cmi.core.score.raw",progress);
             }
