@@ -92,7 +92,16 @@ export class ScormService {
     }
 
     public doLMSInitialize(): boolean {
-        return this.cmiBooleanToJs(this._getAPICall("LMSInitialize", "Initialize")(""));
+        this.getAPIHandle();
+        if (!this._API?.Initialized) {
+            const result = this.cmiBooleanToJs(this._getAPICall("LMSInitialize", "Initialize")(""));
+            if (this._version == ScormService.VERSIONS.v12) {
+                this._API.Initialized = result;
+            }
+            return result;
+        } else {
+            return false;
+        }
     }
 
     public doLMSFinish(): boolean {
@@ -124,7 +133,7 @@ export class ScormService {
     }
 
     public LMSIsInitialized() {
-        return this._API;
+        return this._API.Initialized;
     }
 
     public ErrorHandler() {
@@ -157,6 +166,7 @@ export class ScormService {
         for (findAttempts; findAttempts < findAttemptLimit; findAttempts++) {
             if (win.API && (this._version === ScormService.VERSIONS.v12 || this._version === ScormService.VERSIONS.auto)) {
                 this._API = win.API;
+                this._API.Initialized = false;
                 this._version = ScormService.VERSIONS.v12;
                 findAttempts = findAttemptLimit;
             } else if (win.API_1484_11 && (this._version === ScormService.VERSIONS.v2004 || this._version === ScormService.VERSIONS.auto)) {
