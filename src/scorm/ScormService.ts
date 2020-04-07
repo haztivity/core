@@ -46,26 +46,70 @@ export class ScormService {
         return str.replace(/({'|'}|\['|'\]|':'?|'?,'?)/g,(match)=>match.replace(/'/g,'"'));
     }
     public getTotalTimeAsMillis() {
-        const raw = this.doLMSGetValue("cmi.core.total_time");
+        const raw = this.doLMSGetValue("cmi.total_time");
         const parsed= this.parseScormTimeToMillis(raw);
         return parsed;
     }
     public setSessionTimeAsMillis(millis){
         const parsed = this.parseMillisToScormTime(millis);
-        return this.doLMSSetValue( "cmi.core.session_time", parsed);
+        return this.doLMSSetValue( "cmi.session_time", parsed);
     }
     public parseMillisToScormTime(timeInMillis) {
-        let hours:any = Math.floor(timeInMillis / (1000 * 60 * 60) % 60),
-            minutes:any = Math.floor(timeInMillis / (1000 * 60) % 60),
-            seconds:any = Math.floor(timeInMillis / 1000 % 60);
-        hours = hours < 10 ? '0' + hours : hours;
-        minutes = minutes < 10 ? '0' + minutes : minutes;
-        seconds = seconds < 10 ? '0' + seconds : seconds;
-        return hours + ':'+ minutes + ':' + seconds;
+        let days = Math.floor(timeInMillis / (86400000)),
+            hours = Math.floor((timeInMillis / (3600000)) % 24),
+            minutes = Math.floor((timeInMillis / (60000)) % 60),
+            seconds = Math.floor((timeInMillis / 1000) % 60);
+        let timestring = 'P';
+        if (days > 0) {
+            timestring += days + 'D';
+        }
+        if ((hours > 0) || (minutes > 0) || (seconds > 0)) {
+            timestring += 'T';
+            if (hours > 0) {
+                timestring += hours + 'H';
+            }
+            if (minutes > 0) {
+                timestring += minutes + 'M';
+            }
+            if (seconds > 0) {
+                timestring += seconds + 'S';
+            }
+        }
+        return timestring
     }
     public parseScormTimeToMillis(scoTime) {
-        const times = scoTime.split(":");
-        return (parseInt(times[0])*3600000)+(parseInt(times[1])*60000)+(parseInt(times[2])*1000);
+        let result = 0;
+        const matchexpr = /^P((\d+)Y)?((\d+)M)?((\d+)D)?(T((\d+)H)?((\d+)M)?((\d+(\.\d{1,2})?)S)?)?$/;
+        const firstarray = scoTime.match(matchexpr);
+        if ((firstarray != null)) {
+            let secs = 0;
+            if (parseFloat(firstarray[13], 10) > 0) {
+                secs = parseFloat(firstarray[13], 10);
+            }
+            let change = Math.floor(secs / 60);
+            secs = Math.round((secs - (change * 60)) * 100) / 100;
+            let mins = 0;
+            if (parseInt(firstarray[11], 10) > 0) {
+                mins = parseInt(firstarray[11], 10);
+            }
+            mins = mins + change;   //Minutes
+            change = Math.floor(mins / 60);
+            mins = Math.round(mins - (change * 60));
+            let hours = 0;
+            if (parseInt(firstarray[9], 10) > 0) {
+                hours = parseInt(firstarray[9], 10);
+            }
+            hours = hours + change; //Hours
+            change = Math.floor(hours / 24);
+            hours = Math.round(hours - (change * 24));
+            let days = 0;
+            if (parseInt(firstarray[6], 10) > 0) {
+                days = parseInt(firstarray[6], 10);
+            }
+            days = Math.round(days + change); // Days
+            result = (days * 86400000) + (hours * 3600000) + (mins * 60000) + (secs * 1000);
+        }
+        return result;
     }
     public setSuspendData(data,commit=true):boolean{
         let result = false;
