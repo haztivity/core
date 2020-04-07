@@ -55,7 +55,7 @@ export class ScormService {
         return this.doLMSSetValue( "cmi.core.session_time", parsed);
     }
     public parseMillisToScormTime(timeInMillis) {
-        let hours:any = Math.floor(timeInMillis / (1000 * 60 * 60) % 60),
+        let hours:any = Math.floor(timeInMillis / (1000 * 60 * 60) % 24),
             minutes:any = Math.floor(timeInMillis / (1000 * 60) % 60),
             seconds:any = Math.floor(timeInMillis / 1000 % 60);
         hours = hours < 10 ? '0' + hours : hours;
