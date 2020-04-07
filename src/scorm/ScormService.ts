@@ -45,6 +45,28 @@ export class ScormService {
     public unescapeJSONString(str){
         return str.replace(/({'|'}|\['|'\]|':'?|'?,'?)/g,(match)=>match.replace(/'/g,'"'));
     }
+    public getTotalTimeAsMillis() {
+        const raw = this.doLMSGetValue("cmi.core.total_time");
+        const parsed= this.parseScormTimeToMillis(raw);
+        return parsed;
+    }
+    public setSessionTimeAsMillis(millis){
+        const parsed = this.parseMillisToScormTime(millis);
+        return this.doLMSSetValue( "cmi.core.session_time", parsed);
+    }
+    public parseMillisToScormTime(timeInMillis) {
+        let hours:any = Math.floor(timeInMillis / (1000 * 60 * 60) % 60),
+            minutes:any = Math.floor(timeInMillis / (1000 * 60) % 60),
+            seconds:any = Math.floor(timeInMillis / 1000 % 60);
+        hours = hours < 10 ? '0' + hours : hours;
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        seconds = seconds < 10 ? '0' + seconds : seconds;
+        return hours + ':'+ minutes + ':' + seconds;
+    }
+    public parseScormTimeToMillis(scoTime) {
+        const times = scoTime.split(":");
+        return (parseInt(times[0])*3600000)+(parseInt(times[1])*60000)+(parseInt(times[2])*1000);
+    }
     public setSuspendData(data,commit=true):boolean{
         let result = false;
         if(this.LMSIsInitialized()){
