@@ -137,7 +137,7 @@ var PageController = /** @class */ (function () {
                     //call the event's function
                     result(deferred);
                 }
-                else {
+                else { //if any function is provided by the event
                     deferred.resolve();
                 }
             });
@@ -201,6 +201,7 @@ var PageController = /** @class */ (function () {
         }
         this.eventEmitter.trigger(PageController_1.ON_DESTROY, [this.$element, this]);
     };
+    var PageController_1;
     PageController.NAMESPACE = "pageController";
     PageController.ON_RENDERING = PageController_1.NAMESPACE + ":rendering";
     PageController.ON_RENDERED = PageController_1.NAMESPACE + ":rendered";
@@ -222,7 +223,6 @@ var PageController = /** @class */ (function () {
         })
     ], PageController);
     return PageController;
-    var PageController_1;
 }());
 exports.PageController = PageController;
 //# sourceMappingURL=PageController.js.map

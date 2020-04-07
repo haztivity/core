@@ -115,7 +115,7 @@ var Navigator = /** @class */ (function () {
                         if (currentPageIndex === -1) {
                             this._$context.prepend(newPageElement);
                         }
-                        else {
+                        else { //if the new page is after the current page
                             this._$context.append(newPageElement);
                         }
                         //initialize resources and trigger rendered event
@@ -132,7 +132,7 @@ var Navigator = /** @class */ (function () {
                         if (typeof showPromise.then === "function") {
                             showPromise.then(this._onPageShowEnd.bind(this, newPage, newPageData, currentPage, currentPageData, this._currentRenderProcess));
                         }
-                        else {
+                        else { //otherwise, execute immediately
                             this._onPageShowEnd(newPage, newPageData, currentPage, currentPageData, this._currentRenderProcess);
                         }
                         return this._currentRenderProcess;
@@ -352,6 +352,7 @@ var Navigator = /** @class */ (function () {
         this._eventEmitter.off(events, handler);
         return this;
     };
+    var Navigator_1;
     Navigator.NAMESPACE = "navigator";
     Navigator.ON_DRAW_PAGE = Navigator_1.NAMESPACE + ":draw";
     Navigator.ON_DISABLE = Navigator_1.NAMESPACE + ":disable";
@@ -374,7 +375,6 @@ var Navigator = /** @class */ (function () {
         })
     ], Navigator);
     return Navigator;
-    var Navigator_1;
 }());
 exports.Navigator = Navigator;
 //# sourceMappingURL=Navigator.js.map

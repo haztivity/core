@@ -20,6 +20,7 @@ var component_1 = require("../component");
 var jquery_1 = require("../jquery");
 var PageController_1 = require("../page/PageController");
 var ScormService_1 = require("../scorm/ScormService");
+var ScormPageData_1 = require("../scorm/ScormPageData");
 var ScoController = /** @class */ (function () {
     function ScoController(_Navigator, _PageManager, _ResourceManager, _EventEmitterFactory, _ComponentManager, _ComponentInitializer, _$, _scormService, _InjectorService) {
         this._Navigator = _Navigator;
@@ -106,9 +107,115 @@ var ScoController = /** @class */ (function () {
         }
         return result;
     };
+    ScoController.prototype._getPagesCount = function () {
+        if (!this._options.useSuspendDataForPagesState) {
+            return this._scormService.doLMSGetValue("cmi.objectives._count");
+        }
+        else {
+            var suspendData = this._scormService.getSuspendData();
+            var rawPages = suspendData["%pages"] || "";
+            return ScormPageData_1.GetPagesCountFromDeserialized(rawPages);
+        }
+    };
+    ScoController.prototype._getPageId = function (index) {
+        if (!this._options.useSuspendDataForPagesState) {
+            var currentKey = "cmi.objectives." + index;
+            return this._scormService.doLMSGetValue(currentKey + ".id");
+        }
+        else {
+            var pageData = this._getPageData(index);
+            return pageData ? pageData.id : null;
+        }
+    };
+    ScoController.prototype._setPageData = function (data, commit) {
+        if (commit === void 0) { commit = true; }
+        if (!this._options.useSuspendDataForPagesState) {
+            var currentKey = "cmi.objectives." + data.index;
+            this._scormService.doLMSSetValue(currentKey + ".id", data.id);
+            this._scormService.doLMSSetValue(currentKey + ".status", data.status);
+            if (data.score != null) {
+                this._scormService.doLMSSetValue(currentKey + ".score.raw", data.score);
+            }
+        }
+        else {
+            var suspendData = this._scormService.getSuspendData();
+            var rawPages = suspendData["%pages"] || "";
+            var pages = ScormPageData_1.DeserializeMultiplePagesData(rawPages);
+            var currentPageIndex = pages.findIndex(function (p) { return p.id == data.id; });
+            if (currentPageIndex != -1) {
+                pages[currentPageIndex] = data;
+            }
+            else {
+                pages.push(data);
+            }
+            suspendData["%pages"] = ScormPageData_1.SerializeMultiplePagesData(pages);
+            this._scormService.setSuspendData(suspendData, false);
+        }
+        if (commit) {
+            this._scormService.doLMSCommit();
+        }
+    };
+    ScoController.prototype._getPagesData = function () {
+        return;
+    };
+    ScoController.prototype._getPageData = function (indexOrId) {
+        var pageIndex = indexOrId;
+        var pageId = null;
+        var result = null;
+        var pageIsId = (typeof indexOrId).toLowerCase() == "string";
+        if (!this._options.useSuspendDataForPagesState) {
+            if (pageIsId) {
+                pageIndex = this._getPageIndex(indexOrId);
+                pageId = indexOrId;
+            }
+            else {
+                pageId = this._getPageId(indexOrId);
+                pageIndex = indexOrId;
+            }
+            if (pageIndex != undefined) {
+                var currentKey = "cmi.objectives." + pageIndex;
+                var status_1 = this._scormService.doLMSGetValue(currentKey + ".status");
+                var score = this._scormService.doLMSGetValue(currentKey + ".score.raw");
+                result = {
+                    id: pageId,
+                    index: pageIndex,
+                    status: status_1,
+                    score: !isNaN(score) ? score : null
+                };
+            }
+        }
+        else {
+            var suspendData = this._scormService.getSuspendData();
+            var rawPages = suspendData["%pages"] || "";
+            var pages = ScormPageData_1.DeserializeMultiplePagesData(rawPages);
+            if (pageIsId) {
+                result = pages.find(function (p) { return p.id == indexOrId; });
+            }
+            else {
+                result = pages.find(function (p) { return p.index == indexOrId; });
+            }
+        }
+        return result;
+    };
+    ScoController.prototype._getPageIndex = function (pageId) {
+        var result = null;
+        if (this._scormService.LMSIsInitialized()) {
+            var count = this._getPagesCount();
+            if (count != undefined) {
+                for (var currentCount = 0; currentCount < count; currentCount++) {
+                    var page = this._getPageData(currentCount);
+                    if (page.id == pageId) {
+                        result = currentCount;
+                        currentCount = count;
+                    }
+                }
+            }
+        }
+        return result;
+    };
     ScoController.prototype._restorePagesState = function () {
         if (this._scormService.LMSIsInitialized()) {
-            var count = this._scormService.doLMSGetValue("cmi.objectives._count"), lessonStatus = this._scormService.doLMSGetValue("cmi.core.lesson_status");
+            var count = this._getPagesCount(), lessonStatus = this._scormService.doLMSGetValue("cmi.core.lesson_status");
             if (lessonStatus == "not attempted") {
                 this._scormService.doLMSSetValue("cmi.core.lesson_status", "incomplete");
                 this._scormService.doLMSCommit();
@@ -123,11 +230,12 @@ var ScoController = /** @class */ (function () {
             }
             if (count != undefined) {
                 for (var currentCount = 0; currentCount < count; currentCount++) {
-                    var currentKey = "cmi.objectives." + currentCount, id = this._scormService.doLMSGetValue(currentKey + ".id"), page = this._PageManager.getPageByName(id);
-                    if (page != undefined) {
-                        var scormState = this._scormService.doLMSGetValue(currentKey + ".status"), scormScore = parseFloat(this._scormService.doLMSGetValue(currentKey + ".score.raw")), pageState = page.getState();
-                        pageState.completed = scormState == "completed";
-                        pageState.score = !isNaN(scormScore) ? scormScore : null;
+                    var pageData = this._getPageData(currentCount);
+                    if (pageData != null) {
+                        var page = this._PageManager.getPageByName(pageData.id);
+                        var pageState = page.getState();
+                        pageState.completed = pageData.status == "completed";
+                        pageState.score = pageData.score;
                         pageState.visited = true;
                         page.setState(pageState);
                     }
@@ -142,36 +250,22 @@ var ScoController = /** @class */ (function () {
         var times = time.split(":");
         return (parseInt(times[0]) * 3600000) + (parseInt(times[1]) * 60000) + (parseInt(times[2]) * 1000);
     };
-    ScoController.prototype._getPageObjective = function (page) {
-        var result = null;
-        if (this._scormService.LMSIsInitialized()) {
-            var count = this._scormService.doLMSGetValue("cmi.objectives._count");
-            if (count != undefined) {
-                for (var currentCount = 0; currentCount < count; currentCount++) {
-                    var currentKey = "cmi.objectives." + currentCount, id = this._scormService.doLMSGetValue(currentKey + ".id");
-                    if (id == page) {
-                        result = currentCount;
-                        currentCount = count;
-                    }
-                }
-            }
-        }
-        return result;
-    };
     ScoController.prototype._onPageStateChange = function (e, result, $page, pageController) {
         var instance = e.data.instance;
         var total = instance._PageManager.count(), completed = instance._PageManager.getCompleted();
         if (instance._scormService.LMSIsInitialized()) {
-            var count = instance._getPageObjective(pageController.options.name), key = void 0, progress = instance._Navigator.getProgressPercentage();
-            if (count == undefined) {
-                count = parseInt(instance._scormService.doLMSGetValue("cmi.objectives._count"));
+            var pageData = instance._getPageData(pageController.options.name), progress = instance._Navigator.getProgressPercentage();
+            if (pageData == null) {
+                pageData = {
+                    id: pageController.options.name,
+                    index: instance._getPagesCount(),
+                    score: null,
+                    status: "incomplete"
+                };
             }
-            key = "cmi.objectives." + count;
-            instance._scormService.doLMSSetValue(key + ".id", pageController.options.name);
-            instance._scormService.doLMSSetValue(key + ".status", "completed");
-            if (pageController.state.score != undefined) {
-                instance._scormService.doLMSSetValue(key + ".score.raw", pageController.state.score);
-            }
+            pageData.score = pageController.state.score;
+            pageData.status = "completed";
+            instance._setPageData(pageData, false);
             if (instance._options.progressAsScore) {
                 instance._scormService.doLMSSetValue("cmi.core.score.raw", progress);
             }
@@ -339,9 +433,6 @@ var ScoController = /** @class */ (function () {
                         _this._Navigator.goTo(0);
                     }
                 }
-                else if (result instanceof _this._$) {
-                    _this._$context.append(result);
-                }
             });
         }
         else {
@@ -349,6 +440,7 @@ var ScoController = /** @class */ (function () {
         }
         return this;
     };
+    var ScoController_1;
     ScoController.NAMESPACE = "sco";
     ScoController.CLASS_CONTEXT = "hz-container";
     ScoController.CLASS_PAGES = "hz-pages-container";
@@ -371,7 +463,6 @@ var ScoController = /** @class */ (function () {
         })
     ], ScoController);
     return ScoController;
-    var ScoController_1;
 }());
 exports.ScoController = ScoController;
 //# sourceMappingURL=Sco.js.map

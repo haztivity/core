@@ -174,6 +174,7 @@ var ScormService = /** @class */ (function () {
         }
     };
     ;
+    var ScormService_1;
     ScormService.VERSIONS = {
         auto: "Auto",
         v12: "1.2",
@@ -188,7 +189,6 @@ var ScormService = /** @class */ (function () {
         })
     ], ScormService);
     return ScormService;
-    var ScormService_1;
 }());
 exports.ScormService = ScormService;
 //# sourceMappingURL=ScormService.js.map
