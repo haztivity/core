@@ -99,7 +99,7 @@ var ResourceInitializer = /** @class */ (function () {
         if (initState === void 0) { initState = 2; }
         var result = [], $elements = this._findElementsInContext($context);
         switch (initState) {
-            case 0://only without init
+            case 0: //only without init
                 for (var elementIndex = 0, $elementsLength = $elements.length; elementIndex < $elementsLength; elementIndex++) {
                     var $element = this._$($elements[elementIndex]);
                     if ($element.data(ResourceInitializer_1.PREFIX_INSTANCE) == undefined) {
@@ -107,7 +107,7 @@ var ResourceInitializer = /** @class */ (function () {
                     }
                 }
                 break;
-            case 1://only initialized
+            case 1: //only initialized
                 for (var elementIndex = 0, $elementsLength = $elements.length; elementIndex < $elementsLength; elementIndex++) {
                     var $element = this._$($elements[elementIndex]);
                     if ($element.data(ResourceInitializer_1.PREFIX_INSTANCE) != undefined) {
@@ -163,6 +163,7 @@ var ResourceInitializer = /** @class */ (function () {
         $elements = parents.concat($context.find("[" + ResourceInitializer_1.PREFIX + "],[data-" + ResourceInitializer_1.PREFIX + "]").toArray()); //get elements with the prefix
         return this._$($elements);
     };
+    var ResourceInitializer_1;
     ResourceInitializer.PREFIX = "hz-resource";
     ResourceInitializer.CAMEL_PREFIX = "hzResource";
     ResourceInitializer.PREFIX_INSTANCE = "hzResourceInstance";
@@ -179,7 +180,6 @@ var ResourceInitializer = /** @class */ (function () {
         })
     ], ResourceInitializer);
     return ResourceInitializer;
-    var ResourceInitializer_1;
 }());
 exports.ResourceInitializer = ResourceInitializer;
 //# sourceMappingURL=ResourceInitializer.js.map

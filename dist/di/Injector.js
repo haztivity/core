@@ -1,4 +1,11 @@
 "use strict";
+var __spreadArrays = (this && this.__spreadArrays) || function () {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * @license
@@ -188,7 +195,7 @@ var Injector = /** @class */ (function () {
                         }
                         resolvedDependencies.push(dependency);
                     }
-                    else {
+                    else { //If doesn't has access to the requested dependency
                         throw new Errors_1.HaztivityDependencyAccessDenied(serviceName, dependencyToResolveName);
                     }
                 }
@@ -196,7 +203,7 @@ var Injector = /** @class */ (function () {
                     throw new Errors_1.HaztivityDependencyNotRegisteredError(dependencyToResolve, serviceName);
                 }
             }
-            else {
+            else { //If the dependency requested is null
                 throw new Errors_1.HaztivityDependencyNotValid(serviceName, dependencies);
             }
         }
@@ -245,7 +252,7 @@ var Injector = /** @class */ (function () {
                     return factory.call(null, service, injectorRegister.dependencies, resolvedDependencies);
                 }
                 else {
-                    return new (service.bind.apply(service, [void 0].concat(resolvedDependencies)))();
+                    return new (service.bind.apply(service, __spreadArrays([void 0], resolvedDependencies)))();
                 }
             });
         }
@@ -319,7 +326,7 @@ var Injector = /** @class */ (function () {
                     return factory.call(null, service, dependenciesToInject, resolvedDependencies, params);
                 }
                 else {
-                    return new (service.bind.apply(service, [void 0].concat(resolvedDependencies)))();
+                    return new (service.bind.apply(service, __spreadArrays([void 0], resolvedDependencies)))();
                 }
             };
             this._root.instanceFactory(name, GenericFactory);

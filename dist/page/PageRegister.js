@@ -56,6 +56,7 @@ var PageRegister = /** @class */ (function () {
     PageRegister.prototype.getName = function () {
         return this._options.name;
     };
+    var PageRegister_1;
     PageRegister.NAMESPACE = "page";
     PageRegister = PageRegister_1 = __decorate([
         di_1.Core({
@@ -67,7 +68,6 @@ var PageRegister = /** @class */ (function () {
         })
     ], PageRegister);
     return PageRegister;
-    var PageRegister_1;
 }());
 exports.PageRegister = PageRegister;
 //# sourceMappingURL=PageRegister.js.map

@@ -33,6 +33,7 @@ var Haztivity = /** @class */ (function () {
         devTools.enable();
         return devTools;
     };
+    var Haztivity_1;
     Haztivity = Haztivity_1 = __decorate([
         di_1.Core({
             name: "Haztivity",
@@ -42,7 +43,6 @@ var Haztivity = /** @class */ (function () {
         })
     ], Haztivity);
     return Haztivity;
-    var Haztivity_1;
 }());
 exports.Haztivity = Haztivity;
 //# sourceMappingURL=Haztivity.js.map

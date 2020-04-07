@@ -37,6 +37,7 @@ var PageFactory = /** @class */ (function () {
         page.activate(options);
         return page;
     };
+    var PageFactory_1;
     PageFactory = PageFactory_1 = __decorate([
         di_1.Core({
             name: "PageFactory",
@@ -46,7 +47,6 @@ var PageFactory = /** @class */ (function () {
         })
     ], PageFactory);
     return PageFactory;
-    var PageFactory_1;
 }());
 exports.PageFactory = PageFactory;
 //# sourceMappingURL=PageFactory.js.map

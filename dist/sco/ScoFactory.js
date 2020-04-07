@@ -44,6 +44,7 @@ var ScoFactory = /** @class */ (function () {
         return ScoFactory_1.SCO;
     };
     ;
+    var ScoFactory_1;
     ScoFactory = ScoFactory_1 = __decorate([
         di_1.Core({
             name: "ScoFactory",
@@ -51,7 +52,6 @@ var ScoFactory = /** @class */ (function () {
         })
     ], ScoFactory);
     return ScoFactory;
-    var ScoFactory_1;
 }());
 exports.ScoFactory = ScoFactory;
 //# sourceMappingURL=ScoFactory.js.map

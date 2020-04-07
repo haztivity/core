@@ -41,7 +41,7 @@ var DataOptions = /** @class */ (function () {
                         //myParam to my-param
                         parsedKey = parsedKey.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
                         break;
-                    default://camel
+                    default: //camel
                         //myParam
                         parsedKey = parsedKey.charAt(0).toLowerCase().concat(parsedKey.substring(1));
                         break;
@@ -58,6 +58,7 @@ var DataOptions = /** @class */ (function () {
         }
         return parsedParams;
     };
+    var DataOptions_1;
     DataOptions.EXTRACT_DATA_MODE = {
         underscore: "underscore",
         hypen: "hypen",
@@ -73,7 +74,6 @@ var DataOptions = /** @class */ (function () {
         })
     ], DataOptions);
     return DataOptions;
-    var DataOptions_1;
 }());
 exports.DataOptions = DataOptions;
 //# sourceMappingURL=DataOptions.js.map

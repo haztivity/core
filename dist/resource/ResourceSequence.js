@@ -205,6 +205,7 @@ var ResourceSequence = /** @class */ (function () {
         return this;
     };
     ;
+    var ResourceSequence_1;
     ResourceSequence.NAMESPACE = "resourceSequence";
     ResourceSequence.ON_COMPLETED = ResourceSequence_1.NAMESPACE + ":completed";
     ResourceSequence.ON_RESOURCE_STATE_CHANGE = ResourceSequence_1.NAMESPACE + ":resourcestatechange";
@@ -229,7 +230,6 @@ var ResourceSequence = /** @class */ (function () {
         })
     ], ResourceSequence);
     return ResourceSequence;
-    var ResourceSequence_1;
 }());
 exports.ResourceSequence = ResourceSequence;
 //# sourceMappingURL=ResourceSequence.js.map

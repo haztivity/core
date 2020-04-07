@@ -168,6 +168,7 @@ var ResourceController = /** @class */ (function () {
     ResourceController.prototype.getElement = function () {
         return this._$element;
     };
+    var ResourceController_1;
     ResourceController.NAMESPACE = "resourceController";
     ResourceController.ON_COMPLETED = ResourceController_1.NAMESPACE + ":completed";
     ResourceController.CLASS_UNCOMPLETED = "hz-resource--uncompleted";
@@ -182,7 +183,6 @@ var ResourceController = /** @class */ (function () {
         })
     ], ResourceController);
     return ResourceController;
-    var ResourceController_1;
 }());
 exports.ResourceController = ResourceController;
 //# sourceMappingURL=ResourceController.js.map

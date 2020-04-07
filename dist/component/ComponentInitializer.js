@@ -111,7 +111,7 @@ var ComponentInitializer = /** @class */ (function () {
         if (initState === void 0) { initState = 2; }
         var result = [], $elements = this._findElementsInContext($context);
         switch (initState) {
-            case 0://only without init
+            case 0: //only without init
                 for (var elementIndex = 0, $elementsLength = $elements.length; elementIndex < $elementsLength; elementIndex++) {
                     var $element = this._$($elements[elementIndex]);
                     if ($element.data(this._instanceDataName) == undefined) {
@@ -119,7 +119,7 @@ var ComponentInitializer = /** @class */ (function () {
                     }
                 }
                 break;
-            case 1://only initialized
+            case 1: //only initialized
                 for (var elementIndex = 0, $elementsLength = $elements.length; elementIndex < $elementsLength; elementIndex++) {
                     var $element = this._$($elements[elementIndex]);
                     if ($element.data(this._instanceDataName) != undefined) {
