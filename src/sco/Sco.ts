@@ -378,11 +378,11 @@ export class ScoController implements ISco {
                             instance._scormService.doLMSSetValue("cmi.success_status", "failed");
                         }
                     }else{
-                        instance._scormService.doLMSSetValue("cmi.core.success_status", "passed");
+                        instance._scormService.doLMSSetValue("cmi.success_status", "passed");
                     }
                 } else{
                     instance._scormService.doLMSSetValue("cmi.completion_status", "completed");
-                    instance._scormService.doLMSSetValue("cmi.core.success_status", "passed");
+                    instance._scormService.doLMSSetValue("cmi.success_status", "passed");
                 }
             }
             instance._scormService.doLMSCommit();
@@ -393,7 +393,7 @@ export class ScoController implements ISco {
         this._eventEmitter.globalEmitter.trigger(ScoController.ON_BEFORE_EXIT);
         if(this._scormService.LMSIsInitialized()){
             // enviamos un exit
-            this._scormService.doLMSSetValue("cmi.core.exit","");
+            this._scormService.doLMSSetValue("cmi.exit","normal");
             // se obtiene tiempo total de todas las sesiones de suspend data
             this._saveTotalTime(false);
             const totalTimeSD = this.getTotalTime(false);
