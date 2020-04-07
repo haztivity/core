@@ -45,6 +45,28 @@ export class ScormService {
     public unescapeJSONString(str){
         return str.replace(/({'|'}|\['|'\]|':'?|'?,'?)/g,(match)=>match.replace(/'/g,'"'));
     }
+    public getTotalTimeAsMillis() {
+        const raw = this.doLMSGetValue("cmi.core.total_time");
+        const parsed= this.parseScormTimeToMillis(raw);
+        return parsed;
+    }
+    public setSessionTimeAsMillis(millis){
+        const parsed = this.parseMillisToScormTime(millis);
+        return this.doLMSSetValue( "cmi.core.session_time", parsed);
+    }
+    public parseMillisToScormTime(timeInMillis) {
+        let hours:any = Math.floor(timeInMillis / (1000 * 60 * 60) % 60),
+            minutes:any = Math.floor(timeInMillis / (1000 * 60) % 60),
+            seconds:any = Math.floor(timeInMillis / 1000 % 60);
+        hours = hours < 10 ? '0' + hours : hours;
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        seconds = seconds < 10 ? '0' + seconds : seconds;
+        return hours + ':'+ minutes + ':' + seconds;
+    }
+    public parseScormTimeToMillis(scoTime) {
+        const times = scoTime.split(":");
+        return (parseInt(times[0])*3600000)+(parseInt(times[1])*60000)+(parseInt(times[2])*1000);
+    }
     public setSuspendData(data,commit=true):boolean{
         let result = false;
         if(this.LMSIsInitialized()){
@@ -92,7 +114,16 @@ export class ScormService {
     }
 
     public doLMSInitialize(): boolean {
-        return this.cmiBooleanToJs(this._getAPICall("LMSInitialize", "Initialize")(""));
+        this.getAPIHandle();
+        if (!this._API?.Initialized) {
+            const result = this.cmiBooleanToJs(this._getAPICall("LMSInitialize", "Initialize")(""));
+            if (this._version == ScormService.VERSIONS.v12) {
+                this._API.Initialized = result;
+            }
+            return result;
+        } else {
+            return false;
+        }
     }
 
     public doLMSFinish(): boolean {
@@ -124,7 +155,7 @@ export class ScormService {
     }
 
     public LMSIsInitialized() {
-        return this._API;
+        return this._API.Initialized;
     }
 
     public ErrorHandler() {
@@ -157,6 +188,7 @@ export class ScormService {
         for (findAttempts; findAttempts < findAttemptLimit; findAttempts++) {
             if (win.API && (this._version === ScormService.VERSIONS.v12 || this._version === ScormService.VERSIONS.auto)) {
                 this._API = win.API;
+                this._API.Initialized = false;
                 this._version = ScormService.VERSIONS.v12;
                 findAttempts = findAttemptLimit;
             } else if (win.API_1484_11 && (this._version === ScormService.VERSIONS.v2004 || this._version === ScormService.VERSIONS.auto)) {

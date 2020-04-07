@@ -285,10 +285,9 @@ export class ScoController implements ISco {
                 this._totalTime = 0;
             }
             if (count != undefined) {
-                let totalTime = this._scormService.doLMSGetValue("cmi.total_time");
-                let time = this._timeFormattedToMillies(totalTime);
+                let time = this._scormService.getTotalTimeAsMillis();
                 let suspendDataTime = (this._scormService.getSuspendData()["%time"]||"");
-                suspendDataTime =  this._timeFormattedToMillies(suspendDataTime);
+                suspendDataTime =  this._scormService.parseScormTimeToMillis(suspendDataTime);
                 this._totalTime = suspendDataTime > time ? suspendDataTime : time;
                 for (let currentCount = 0; currentCount < count; currentCount++) {
                         const pageData = this._getPageData(currentCount);
@@ -306,9 +305,7 @@ export class ScoController implements ISco {
             this._totalTime = 0;
         }
     }
-    protected _timeFormattedToMillies(time){
-        return time*1000;
-    }
+
     protected _onPageStateChange(e,result,$page,pageController:PageController){
         let instance:ScoController = e.data.instance;
         let total = instance._PageManager.count(),
@@ -401,7 +398,7 @@ export class ScoController implements ISco {
             this._saveTotalTime(false);
             const totalTimeSD = this.getTotalTime(false);
             // se obtiene tiempo total de scorm
-            const totalTimeSC = this._timeFormattedToMillies(this._scormService.doLMSGetValue("cmi.core.total_time"));
+            const totalTimeSC = this._scormService.getTotalTimeAsMillis();
             // se obtiene tiempo de la sesión actual
             let sessionTime: string | number = this.getSessionTime();
             // se guarda el que mayor sume
@@ -409,8 +406,7 @@ export class ScoController implements ISco {
                 // se compensan los tiempos
                 sessionTime = (totalTimeSD - totalTimeSC) + sessionTime;
             }
-            sessionTime = this.formatTime(sessionTime);
-            this._scormService.doLMSSetValue( "cmi.core.session_time", sessionTime );
+            this._scormService.setSessionTimeAsMillis(sessionTime);
             this._stopAutoSaveTotalTime();
             this._scormService.doLMSCommit();
             this._scormService.doLMSFinish();
@@ -436,21 +432,9 @@ export class ScoController implements ISco {
     }
     public getTotalTimeFormatted(includeSession:boolean = true):string{
         const totalTime = this.getTotalTime(includeSession);
-        return this.formatTime(totalTime);
+        return this._scormService.parseMillisToScormTime(totalTime);
     }
-    public formatTime(timeInMillis) {
-        return timeInMillis / 1000;
-    }
-    public getSessionTimeFormatted(){
-        const sessionTime = this.getSessionTime();
-        let hours:any = Math.floor(sessionTime / (1000 * 60 * 60) % 60),
-            minutes:any = Math.floor(sessionTime / (1000 * 60) % 60),
-            seconds:any = Math.floor(sessionTime / 1000 % 60);
-        hours = hours < 10 ? '0' + hours : hours;
-        minutes = minutes < 10 ? '0' + minutes : minutes;
-        seconds = seconds < 10 ? '0' + seconds : seconds;
-        return hours + ':'+ minutes + ':' + seconds;
-    }
+
     public run(): ScoController {
         this._dateStart = new Date();
         window.onbeforeunload = () => {
