@@ -36,7 +36,7 @@
     "commander": "^2.20.0",
     "core-js": "^2.5.1",
     "fuse-box": "^2.3.3",
-    "node-sass": "^4.11.0",
+    "node-sass": "^7.0.0",
     "require-dir": "^0.3.2",
     "rimraf": "^2.6.3",
     "typescript": "^2.5.3"
